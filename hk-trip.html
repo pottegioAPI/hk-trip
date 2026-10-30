@@ -1830,7 +1830,6 @@ function exRow(e){
 function renderGo(){
   document.getElementById('v-go').innerHTML = `
     ${navHTML()}
-    ${waterNavHTML()}
     <div class="panel"><h3>ป้ายบอกคนขับแท็กซี่ <small>กลับที่พัก</small></h3>
       <div class="show">旺角 彌敦道607號 新興大廈<small>Sun Hing Building, 603-609 Nathan Road, Mong Kok (ใกล้ MTR Mong Kok Exit E1)</small></div>
       <div class="acts"><button class="btn-s" type="button" id="copyaddr">${ic('link')}คัดลอกที่อยู่</button><a class="btn-s" href="${'https://www.google.com/maps/search/?api=1&query='+HOTEL_LL.join(',')}" target="_blank" rel="noopener">${ic('pin')}เปิดแผนที่</a></div>
