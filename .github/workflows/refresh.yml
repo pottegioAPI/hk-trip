@@ -18,6 +18,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      # Free Supabase projects go to sleep after 7 quiet days; one small read a day keeps the sync awake.
+      - name: Keep the sync database awake
+        continue-on-error: true
+        run: |
+          curl -s -X POST "https://btagqhxhljlbhwwkzghr.supabase.co/rest/v1/rpc/hk_pull" \
+            -H "apikey: sb_publishable_S8yqxmseObhtyqdxmW2A7w_DCyZwPfd" -H "Content-Type: application/json" \
+            -d '{"p_key":"keepalive","p_since":"2100-01-01T00:00:00Z"}' -o /dev/null -w "supabase %{http_code}\n" || true
+          curl -s "https://btagqhxhljlbhwwkzghr.supabase.co/functions/v1/hk-queue" -o /dev/null -w "queue %{http_code}\n" || true
       - name: Download and check new data
         run: bash tools/refresh.sh
       - name: Publish if something changed
