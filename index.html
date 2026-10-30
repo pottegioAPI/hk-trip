@@ -58,6 +58,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.dzgoal{background:var(--mint-soft);border-radius:16px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:4px}.dzgoal.tight{background:var(--sun-soft)}.dzgoal>b{font-size:15px}.dzgoal small{font-size:12.5px;color:var(--muted)}.dzgl{display:flex;gap:6px;flex-wrap:wrap}.dzgl span{background:var(--surface);border-radius:99px;padding:2px 10px;font-size:12.5px}.dzgl span.ok{background:var(--mint);color:#fff}.dzgoal .tips{font-size:12.5px;margin:2px 0 0;padding-left:18px}
 .dzmini{margin-top:10px;background:var(--grape-soft);border-radius:16px;padding:10px 12px}.dzmh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}.dzmh small{font-size:11.5px;color:var(--muted)}.dzmr{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px dashed var(--line)}.dzmr .rk{width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}.dzmr span b{display:block;font-size:13.5px}.dzmr small{font-size:11.5px;color:var(--muted)}.dzmini .dzmeal{margin-bottom:6px}.dzday{background:var(--mint-soft);border-radius:16px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:2px}.dzday b{font-size:15px}.dzday small{font-size:12.5px;color:var(--muted)}
 .wxnow{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:center;background:var(--sky-soft);border-radius:16px;padding:10px 14px;margin-bottom:10px}.wxnow b{grid-row:span 2;font-family:var(--display);font-size:30px;color:var(--sky)}.wxnow span{font-size:13.5px}.wxnow small{font-size:11.5px;color:var(--muted)}
 .fwedit{margin-top:6px;font-size:12.5px}.fwedit summary{cursor:pointer;opacity:.9;list-style:none}.fwedit summary::-webkit-details-marker{display:none}.fwedit p{margin:6px 0;opacity:.9}.fwrow{display:flex;align-items:center;gap:10px;margin:4px 0}.fwrow label{min-width:64px;color:#fff}.fwrow input{flex:1;max-width:160px;border:none;border-radius:10px;padding:6px 10px;font-size:16px;color:var(--ink);background:#fff}
@@ -2084,6 +2085,7 @@ function dzMiniHTML(){
   const min=dzNowMin(), recs=dzRecommend(), today=hkNow().date==='2026-11-16';
   return `<div class="dzmini">
     <div class="dzmh"><b>🏰 ในสวนตอนนี้</b>${today?'':'<small>ตัวอย่าง (ข้อมูลจริงขึ้นวันที่ 16)</small>'}</div>
+    ${dzGoalHTML()}
     ${dzMealHTML(min)}
     ${recs.length?`<div class="mini" style="margin:2px 0 4px">เล่นอะไรต่อดี</div>${recs.map((r,i)=>`<div class="dzmr"><span class="rk">${i+1}</span><span><b>${esc(DZ_RIDES[r.k].n)}</b><small>${DZ_LANDS[DZ_LAND_OF[r.k]][0]} · ${r.w.qt||r.w.live?'รอ':'คาดว่ารอ ~'} ${r.w.w} นาที · เดิน ~${r.walk} นาที</small></span><button type="button" class="btn-s" data-dz="${r.k}">เล่นแล้ว</button></div>`).join('')}`:''}
     <div class="acts"><button type="button" class="btn-s pay" data-tab="dz">${ic('ticket')}เปิดแท็บ Disneyland ทั้งหมด</button></div></div>`;
@@ -2101,12 +2103,39 @@ function dzDayHTML(){
   return go;
 }
 
+
+/* ---------- the day's goal: every ride + both voucher meals + the fireworks, with no paid extras ---------- */
+function dzGoal(){
+  const now=dzNowMin(), start=Math.max(now, dzOpenT()), end=fwBeThere();
+  const left=Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]), meals=['lunch','dinner'].filter(k=>!dzMealDone(k));
+  // in the plan's order: walk between lands + the wait at about the time we get there + ~5 min on the ride
+  const order=[...DZ_PLAN.flatMap(b=>b.rides), ...Object.keys(DZ_RIDES)].filter((k,i,a)=>a.indexOf(k)===i && left.includes(k));
+  let t=start, need=0, land=S.dzLand||'MS';
+  for(const k of order){ const w=dzWait(k,t), step=dzWalk(land,DZ_LAND_OF[k])+(w.closed?0:w.w)+5; need+=step; t+=step; land=DZ_LAND_OF[k] }
+  need += meals.length*35 + dzWalk(land,'MS');
+  return {left, meals, need, avail:Math.max(0,end-start), fw:!!S.done['3c']};
+}
+function dzGoalHTML(){
+  const g=dzGoal(), total=Object.keys(DZ_RIDES).length, ok=g.need<=g.avail, gap=Math.abs(g.avail-g.need);
+  const singles=g.left.filter(k=>DZ_RIDES[k].single).map(k=>DZ_RIDES[k].n);
+  const tips = ok ? [] : [
+    singles.length ? `ใช้แถว Single Rider (นั่งแยกกันแต่รอสั้นกว่ามาก): ${singles.join(', ')}` : '',
+    '16:45 คนไปดูพาเหรด เป็นช่วงที่คิวเครื่องเล่นสั้น เล่นเครื่องที่คิวยาวช่วงนั้น',
+    'กินข้าวนอกช่วงคนแน่น (ก่อน 12:00 หรือหลัง 13:30 · เย็นช่วง 16:30–17:30) จะได้คืนเวลาเล่น',
+    'ไปถึงก่อนสวนเปิด แล้วเดินตรงไปเครื่องที่คิวยาวที่สุดก่อน (World of Frozen)'
+  ].filter(Boolean);
+  return `<div class="dzgoal${ok?'':' tight'}"><b>🎯 เป้าหมายวันนี้ (ไม่ต้องจ่ายเพิ่ม)</b>
+    <div class="dzgl"><span class="${g.left.length?'':'ok'}">🎢 เครื่องเล่น ${total-g.left.length}/${total}</span><span class="${g.meals.length?'':'ok'}">🍽️ voucher ${2-g.meals.length}/2</span><span class="${g.fw?'ok':''}">🎆 พลุ ${g.fw?'✓':hhmm(fwTime())}</span></div>
+    <small>${g.left.length||g.meals.length ? (ok ? `✅ ทันตามแผน: ที่เหลือใช้ประมาณ ${Math.round(g.need/60*10)/10} ชม. ก่อนไปจองที่ดูพลุ ${hhmm(fwBeThere())} น. (เหลือเวลาว่าง ~${gap} นาที)` : `⚠️ เวลาอาจไม่พอ ~${gap} นาที ถ้าคิวเป็นแบบนี้ ลองวิธีเหล่านี้:`) : 'ครบทุกอย่างแล้ว! เหลือแค่ไปดูพลุ 🎆'}</small>
+    ${tips.length?`<ul class="tips">${tips.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</div>`;
+}
+
 function dzFwHTML(){
   const min=dzNowMin(), left=fwTime()-min, wx=WARN&&WARN.list.some(w=>/TC|WRAIN|WTS/.test(w.code));
   return `<div class="dzfw"><b>🎆 พลุและโชว์หน้าปราสาท · ห้ามพลาด!</b>
     <small>เริ่ม ${hhmm(fwTime())} น. · ไปจองที่ก่อน ${hhmm(fwBeThere())} น.${hkNow().date==='2026-11-16'&&left>0?` · อีก ${Math.floor(left/60)} ชม. ${left%60} นาที`:''} · แอปจะไม่แนะนำเครื่องเล่นที่เล่นไม่ทันก่อนเวลานี้</small>
     ${wx?'<small style="color:var(--danger)">มีประกาศฝน/ลมจากหอดูดาว พลุอาจงดหรือเลื่อน เช็คในแอป Disney</small>':''}
-    <small>${DZCAL&&!(S.settings&&S.settings.fw)?'เวลาจากปฏิทินทางการของ Disney · ':''}อยากได้ที่ดูแน่นอน: Disney Premier Access แบบรวม Momentous มีพื้นที่ชมเฉพาะ (เสียเงินเพิ่ม ซื้อในแอป Disney)</small>
+    ${DZCAL&&!(S.settings&&S.settings.fw)?'<small>เวลาจากปฏิทินทางการของ Disney</small>':''}
     <details class="fwedit"><summary>เวลาไม่ตรงกับแอป Disney วันนั้น? แตะเพื่อแก้เอง ▾</summary>
       <p>ปกติไม่ต้องแก้ แอปดึงเวลาจากปฏิทินทางการของ Disney ทุกเช้า แก้เฉพาะเมื่อในแอป Disney วันนั้นบอกเวลาไม่ตรงกับที่นี่ (ใส่แบบ 24 ชม. เช่น 20:00) บันทึกแล้วทั้งสองเครื่องจะใช้เวลานี้</p>
       <div class="fwrow"><label for="fwt">พลุเริ่ม</label><input id="fwt" type="time" value="${hhmm(fwTime())}"></div>
@@ -2124,6 +2153,7 @@ function renderDisney(){
       <div><div class="eyebrow">จันทร์ 16 พ.ย. 2569</div><h2>Hong Kong Disneyland</h2>
       <div class="pillrow"><span class="pill mint">วันจันทร์ คนค่อนข้างน้อย</span><span class="pill">เล่นแล้ว ${doneN}/${Object.keys(DZ_RIDES).length}</span></div></div>${dzParkHTML()}</div>
     ${dzDayHTML()}
+    ${dzGoalHTML()}
     ${dzFwHTML()}
     ${dzVoucherHTML()}
     ${dzShowsHTML()}
