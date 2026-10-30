@@ -50,11 +50,13 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.dzvch summary{list-style:none;cursor:pointer}.dzvch summary::-webkit-details-marker{display:none}.dzvch h3{margin:0}.dzvi{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;padding:6px 0;text-align:left;font-size:14px;color:var(--ink)}.dzvi.on{opacity:.55;text-decoration:line-through}
+.dzalt{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px;margin:-4px 0 10px;display:flex;flex-direction:column;gap:4px}.dzalt>b{font-size:14px}.dzalt>small{font-size:11.5px;color:var(--muted)}.dzaltr{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}.dzaltr span{display:flex;flex-direction:column}.dzaltr small{font-size:11.5px;color:var(--muted)}.dzaltr .num{text-align:right;flex:none}
 .dzshows summary{list-style:none;cursor:pointer}.dzshows summary::-webkit-details-marker{display:none}.dzshows h3{margin:0}.dzsh{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px dashed var(--line);font-size:13.5px}.dzsh b{display:block;font-weight:600}.dzsh small{color:var(--muted);font-size:11.5px}.dzsh .num{text-align:right}.dzsh i{font-style:normal;display:inline-block;padding:1px 6px;border-radius:8px;background:var(--surface2);margin:1px}.dzsh i.nx{background:var(--pink);color:#fff}.dzsh i.past{opacity:.4;text-decoration:line-through}.dzsh.fw b{color:#6B3FA0}
 .dzpk{min-width:70px;border-radius:16px;background:var(--pink-soft);padding:8px 8px;text-align:center;display:flex;flex-direction:column;line-height:1.15}.dzpk b{font-family:var(--display);font-weight:600;font-size:26px;color:var(--pink)}.dzpk small{font-size:11px;color:var(--muted)}.dzpk.open{background:var(--mint-soft)}.dzpk.open b{color:var(--mint)}.dzpk.off{background:var(--surface2)}.dzpk.off b{font-size:16px;color:var(--muted)}
 .dzfw{background:linear-gradient(135deg,#2A1B5E,#6B3FA0);color:#fff;border-radius:18px;padding:12px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:3px}.dzfw b{font-family:var(--display);font-weight:500;font-size:17px}.dzfw small{opacity:.9;font-size:12.5px}.dzfw label{color:#fff;font-size:12px}.dzfw input{color:var(--ink)}.dzfw.now{background:var(--danger);animation:flash 1.2s ease-in-out infinite alternate}.dzmeal{background:var(--sun-soft);border-radius:16px;padding:10px 12px;margin-bottom:10px;display:flex;flex-direction:column;gap:2px}.dzmeal.go{background:var(--mint-soft);border:2px solid var(--mint)}.dzmeal b{font-size:15px}.dzmeal small{font-size:12.5px;color:var(--muted)}
 @keyframes rideflash{from{filter:brightness(1)}to{filter:brightness(1.35)}}.ridehead.flash{animation:rideflash .5s ease-in-out infinite alternate}
-.exh{background:var(--sun-soft);border-radius:10px;padding:6px 9px;color:var(--ink)!important;display:block!important}.arrowbox{width:220px;height:220px;margin:6px auto 10px;border-radius:50%;background:var(--sky-soft);display:grid;place-items:center;box-shadow:inset 0 0 0 6px var(--surface),0 0 0 3px var(--sky)}.arrow{width:150px;height:150px;transition:transform .3s}.arrowinfo{text-align:center;display:flex;flex-direction:column;gap:2px;margin-bottom:10px}.arrowinfo b{font-family:var(--display);font-size:30px}.arrowinfo small{color:var(--muted)}
+.exh{background:var(--sun-soft);border-radius:10px;padding:6px 9px;color:var(--ink)!important;display:block!important}.arrowbox{width:220px;height:220px;margin:6px auto 10px;border-radius:50%;background:var(--sky-soft);display:grid;place-items:center;box-shadow:inset 0 0 0 6px var(--surface),0 0 0 3px var(--sky)}.arrow{width:150px;height:150px;will-change:transform}.arrowinfo{text-align:center;display:flex;flex-direction:column;gap:2px;margin-bottom:10px}.arrowinfo b{font-family:var(--display);font-size:30px}.arrowinfo small{color:var(--muted)}
 .ridehead{background:var(--sky-soft);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;margin-bottom:10px;position:sticky;top:0;z-index:1}.ridehead.hot{background:var(--danger);color:#fff}.ridehead b{font-family:var(--display);font-size:26px}.ridehead small{opacity:.8}.ridelist{list-style:none;margin:0;padding:0 0 0 6px;max-height:46vh;overflow:auto}.ridelist li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:13.5px;position:relative}.ridelist li i{width:12px;height:12px;border-radius:50%;border:3px solid var(--sky);background:var(--surface);flex:none;margin-top:3px}.ridelist li.past{opacity:.45}.ridelist li.past i{background:var(--sky)}.ridelist li.here i{background:var(--pink);border-color:var(--pink);box-shadow:0 0 0 4px var(--pink-soft)}.ridelist li.end i{border-color:var(--danger)}.ridelist li.end b{color:var(--danger)}.ridelist li.prev small{color:var(--sun);font-weight:700}
 .ghbtns{display:flex;gap:14px;flex-wrap:wrap}.opts.others{margin-top:4px}.opts.others .op{opacity:.92}
 .hgo{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.gobtn{border:none;border-radius:99px;background:#fff;color:var(--pink);font-family:var(--display);font-weight:600;font-size:16px;padding:10px 18px;box-shadow:0 4px 12px rgba(0,0,0,.15)}.gobtn.alt{background:rgba(255,255,255,.22);color:#fff}.gobtn.big{font-size:24px;padding:14px 28px;animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.06)}}@media (prefers-reduced-motion:reduce){.gobtn.big{animation:none}}
@@ -603,8 +605,8 @@ const DEFAULT_PLAN = [
  [
   {id:'3a',t:'08:00',e:'08:45',h:'อาหารเช้าให้อิ่มจุก',p:'วันนี้ต้องเดินเยอะมาก กินให้เต็มที่',st:'MOK'},
   {id:'3b',t:'09:30',e:'20:00',h:'Hong Kong Disneyland!',exit:'A',p:'เล่นเครื่องเล่น ถ่ายรูปกับตัวละคร ช้อปของที่ระลึก',tip:'รถไฟสาย Disneyland มีหน้าต่างรูปมิกกี้ อย่าลืมถ่ายรูป',map:'Hong Kong Disneyland',st:'DIS',ll:[22.3130,114.0413]},
-  {id:'3l',t:'12:15',e:'13:15',h:'มื้อเที่ยง Royal Banquet Hall',p:'ใช้ตั๋วรวมอาหาร ร้านอยู่ Fantasyland ใกล้ปราสาท',tip:'ดูคำแนะนำในแท็บ Disneyland ว่าควรกินตอนไหนดี',st:'DIS'},
-  {id:'3n',t:'17:30',e:'18:30',h:'มื้อเย็น Royal Banquet Hall',p:'ใช้ตั๋วรวมอาหาร กินให้เสร็จก่อนไปจองที่ดูพลุ',st:'DIS'},
+  {id:'3l',t:'12:15',e:'13:15',h:'มื้อเที่ยง Royal Banquet Hall (Voucher)',p:'Meal Voucher: ชุดไม่เกิน HK$170 แลกก่อน 16:00 · โชว์ QR บน eTicket ตอนสั่ง',tip:'ดูคำแนะนำในแท็บ Disneyland ว่าควรกินตอนไหนดี',st:'DIS'},
+  {id:'3n',t:'17:30',e:'18:30',h:'มื้อเย็น Royal Banquet Hall (Voucher)',p:'Meal Voucher: ชุดไม่เกิน HK$170 แลกได้ตั้งแต่ 16:30 · กินให้เสร็จก่อนไปจองที่ดูพลุ',st:'DIS'},
   {id:'3c',t:'20:00',e:'20:20',h:'🎆 พลุหน้าปราสาท (ห้ามพลาด!)',p:'การแสดงพลุ แสง สี เสียง',tip:'ไปจองที่หน้าปราสาทก่อนเวลาสักหน่อย จะได้มุมสวย',st:'DIS'},
   {id:'3d',t:'20:20',e:'21:30',h:'กลับที่พัก',p:'นั่ง MTR กลับแล้วเดินกลับเกสต์เฮาส์',st:'MOK',exit:'E1'}
  ],
@@ -1062,9 +1064,9 @@ function gpsCardHTML(){
 }
 
 /* ---------- walking from the exit to the place (Google Maps, walking) ---------- */
-function exitLL(st, ref){ const e=BUS && BUS.ex[st] && BUS.ex[st].find(x=>x[0]===ref); return e ? [e[2]/1e5, e[3]/1e5] : null }
+function exitLL(st, ref){ ref=String(ref||'').split(/\s/)[0]; const e=BUS && BUS.ex[st] && BUS.ex[st].find(x=>x[0]===ref); return e ? [e[2]/1e5, e[3]/1e5] : null }
 function exitWalkBtn(st, ref, dest){
-  const a=ref&&exitLL(st,ref); if(!a||!dest||metres(a,dest)<60) return '';
+  ref=String(ref||'').split(/\s/)[0]; const a=ref&&exitLL(st,ref); if(!a||!dest||metres(a,dest)<60) return '';
   return `<a class="btn-s" href="https://www.google.com/maps/dir/?api=1&origin=${a[0].toFixed(5)},${a[1].toFixed(5)}&destination=${dest[0].toFixed(5)},${dest[1].toFixed(5)}&travelmode=walking" target="_blank" rel="noopener">${ic('walk')}เดินจาก Exit ${esc(ref)} ไปที่หมาย (${wDist(metres(a,dest))})</a>`;
 }
 
@@ -1149,7 +1151,8 @@ async function dzQueueFetch(force){
   try{ const j=await liveJSON(SB.url+'/functions/v1/hk-queue'), m={};
     for(const r of j.rides||[]){ if(/single rider/i.test(r.name)) continue; const k=Object.keys(DZ_RIDES).find(k=>dzNorm(r.name).startsWith(dzNorm(DZ_RIDES[k].n))); if(k) m[k]={open:r.open, w:r.wait, at:Date.parse(r.updated)} }
     const rb=(j.rides||[]).find(r=>dzNorm(r.name)==='royalbanquethall');
-    DZQ={at:Date.now(), m, anyOpen:Object.values(m).some(x=>x.open), rbh: rb ? {open:rb.open, w:rb.wait, at:Date.parse(rb.updated)} : null}; if(S.tab==='dz' && !S.dzEdit) renderDisney() }catch(e){}
+    const food={}; for(const r of j.rides||[]) if(DZ_FOOD.some(x=>dzNorm(x.n)===dzNorm(r.name))) food[dzNorm(r.name)]={open:r.open, w:r.wait};
+    DZQ={at:Date.now(), m, food, anyOpen:Object.values(m).some(x=>x.open), rbh: rb ? {open:rb.open, w:rb.wait, at:Date.parse(rb.updated)} : null}; if(S.tab==='dz' && !S.dzEdit) renderDisney() }catch(e){}
 }
 
 
@@ -1472,6 +1475,7 @@ function bearing(a,b){ const r=Math.PI/180, y=Math.sin((b[1]-a[1])*r)*Math.cos(b
 const COMPASS_TH = ['เหนือ','ตะวันออกเฉียงเหนือ','ตะวันออก','ตะวันออกเฉียงใต้','ใต้','ตะวันตกเฉียงใต้','ตะวันตก','ตะวันตกเฉียงเหนือ'];
 const compassTh = deg => COMPASS_TH[Math.round(deg/45)%8];
 function exitHint(st, ref, dest){
+  ref=String(ref||'').split(/\s/)[0];   // "B3 · Sik Sik Yuen…" → "B3"
   const e=BUS && BUS.ex[st] && BUS.ex[st].find(x=>x[0]===ref); if(!e||!dest) return '';
   const a=[e[2]/1e5,e[3]/1e5], d=metres(a,dest); if(d<40) return `ออกจาก Exit ${esc(ref)} ก็ถึงเลย (ไม่ถึง 50 ม.)`;
   const mins=Math.max(1,Math.round(d*1.3/75));
@@ -1480,20 +1484,30 @@ function exitHint(st, ref, dest){
 
 /* ---------- follow the arrow: GPS + the phone's compass point at the place ---------- */
 let heading=null, compassOn=false;
-function onOrient(e){ const h = e.webkitCompassHeading!=null ? e.webkitCompassHeading : (e.absolute && e.alpha!=null ? 360-e.alpha : null); if(h!=null){ heading=h; arrowDraw() } }
+const angDiff = (a,b) => ((a-b+540)%360)-180;            // shortest turn from b to a, -180..180
+// the compass is noisy: keep a smoothed heading and turn the arrow a little each frame
+function onOrient(e){ const h = e.webkitCompassHeading!=null ? e.webkitCompassHeading : (e.absolute && e.alpha!=null ? 360-e.alpha : null);
+  if(h==null) return; heading = heading==null ? h : (heading + angDiff(h,heading)*0.15 + 360)%360 }
+let arrowAng=null, arrowRAF=0;   // reset when the sheet opens
+function arrowSpin(){
+  arrowRAF=0; const box=document.getElementById('arrowbox'); if(!box||!S.walk||!S.sheet||S.sheet.kind!=='walk') return;
+  const g=gpsFresh()?S.gps:null;
+  if(g){ const target=bearing(g.ll,S.walk.ll)-(heading??0); const first=arrowAng==null; if(first) arrowAng=target; const d=angDiff(target,arrowAng);
+    if(first||Math.abs(d)>0.4){ arrowAng+=d*0.18; box.querySelector('.arrow').style.transform=`rotate(${arrowAng.toFixed(1)}deg)` } }
+  arrowRAF=requestAnimationFrame(arrowSpin);
+}
 async function compassStart(){
   if(compassOn) return; compassOn=true;
   try{ if(window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission==='function'){ const p=await DeviceOrientationEvent.requestPermission(); if(p!=='granted'){ toast('ไม่ได้อนุญาตเข็มทิศ จะแสดงเป็นทิศแทน'); return } } }catch(e){}
   addEventListener('deviceorientationabsolute', onOrient); addEventListener('deviceorientation', onOrient);
 }
-function walkTo(name, ll){ S.walk={name, ll}; gpsStart(true); compassStart(); openSheet({kind:'walk'}) }
+function walkTo(name, ll){ S.walk={name, ll}; arrowAng=null; gpsStart(true); compassStart(); openSheet({kind:'walk'}) }
 function arrowDraw(){
   const box=document.getElementById('arrowbox'); if(!box||!S.walk) return;
   const g=gpsFresh()?S.gps:null, info=document.getElementById('arrowinfo');
   if(!g){ info.innerHTML='กำลังหาตำแหน่ง… (ออกไปที่โล่งจะเร็วขึ้น)'; return }
-  const d=metres(g.ll,S.walk.ll), b=bearing(g.ll,S.walk.ll), rot = heading!=null ? b-heading : b;
-  box.querySelector('.arrow').style.transform=`rotate(${rot}deg)`;
-  info.innerHTML = d<Math.max(30,g.acc*.8) ? '<b>ถึงแล้ว! 🎉</b>' : `<b class="num">${wDist(d)}</b><span>${heading!=null?'เดินตามลูกศร':'ไปทางทิศ'+compassTh(b)+' (ลูกศรชี้ทิศเหนือขึ้นบน)'} · ~${Math.max(1,Math.round(d*1.3/75))} นาที</span><small>GPS แม่นยำ ±${Math.round(g.acc)} ม.</small>`;
+  const d=metres(g.ll,S.walk.ll), b=bearing(g.ll,S.walk.ll); if(!arrowRAF) arrowRAF=requestAnimationFrame(arrowSpin);
+  info.innerHTML = d>30000 ? `<b class="num">${(d/1000).toFixed(0)} กม.</b><span>ตอนนี้ยังอยู่ไกลจากที่หมายมาก ลูกศรจะช่วยได้เมื่อเดินอยู่แถวนั้น</span>` : d<Math.max(30,g.acc*.8) ? '<b>ถึงแล้ว! 🎉</b>' : `<b class="num">${wDist(d)}</b><span>${heading!=null?'เดินตามลูกศร':'ไปทางทิศ'+compassTh(b)+' (ลูกศรชี้ทิศเหนือขึ้นบน)'} · ~${Math.max(1,Math.round(d*1.3/75))} นาที</span><small>GPS แม่นยำ ±${Math.round(g.acc)} ม.</small>`;
 }
 function walkSheetHTML(){
   const w=S.walk;
@@ -1549,7 +1563,7 @@ function stepsHTML(legs, inEx, outEx, dest){
       <div class="how">${walk?`เดินเชื่อมสถานีไป ${esc(stName(L.to))} (ประมาณ 5–10 นาที)`
         :`${enter} ขึ้นชานชาลา <span class="ln" style="background:${c}">${LINES[L.line].n}</span> มุ่งหน้า <b>${esc(L.toward)}</b> · ${L.stops} ป้าย`}</div>${walk?'':liveBtn({mtr:[L.line,L.from,L.to]})}</div></li>`;
   }).join('') + `<li class="lg end" style="--c:${(()=>{ const L=legs.filter(l=>l.line!=='WALK').pop(); return L?LINES[L.line].c:'var(--muted)' })()}"><span class="nd"></span><div><div class="stn">${esc(stName(endSt))} <small>ปลายทาง</small></div>
-    <div class="how">${outEx?`ลงสถานีนี้ ออกทาง <span class="exit">Exit ${esc(outEx)}</span>`:'ลงสถานีนี้ ดูป้าย Exit ในสถานีให้ใกล้ที่หมาย'}</div>${outEx&&dest?`<div class="how exh">${exitHint(MTR.st[endSt][0], outEx, dest)}</div>`:''}${outEx?`<div class="how">${walkBtn('ที่หมาย', dest)}${exitWalkBtn(MTR.st[endSt][0], outEx, dest)}</div>`:''}</div></li></ol>`;
+    <div class="how">${outEx?`ลงสถานีนี้ ออกทาง <span class="exit">Exit ${esc(outEx)}</span>`:'ลงสถานีนี้ ดูป้าย Exit ในสถานีให้ใกล้ที่หมาย'}</div>${(()=>{ const h=outEx&&dest?exitHint(MTR.st[endSt][0], outEx, dest):''; return h?`<div class="how exh">${h}</div>`:'' })()}${outEx?`<div class="how">${walkBtn('ที่หมาย', dest)}${exitWalkBtn(MTR.st[endSt][0], outEx, dest)}</div>`:''}</div></li></ol>`;
 }
 function autoIds(id){ return [`auto-${id}-0`,`auto-${id}-1`,`auto-${id}-t`] }
 // a stop's step-by-step route: open for the next stop, or when tapped open
@@ -1859,12 +1873,12 @@ const DZ_RIDES = {
 const DZ_PLAN = [
   {t:'10:30', e:'11:30', zone:'World of Frozen', why:'เปิดสวนคนยังน้อย รีบไปโซนที่แถวยาวที่สุดก่อน', rides:['oaken','frozen']},
   {t:'11:15', e:'12:15', zone:'Toy Story Land', why:'แถวยังสั้นก่อนเที่ยง', rides:['para','rc','slinky']},
-  {t:'12:15', e:'13:15', zone:'มื้อเที่ยง Royal Banquet Hall', why:'ใช้ตั๋วรวมอาหาร ร้านอยู่ Fantasyland ใกล้ปราสาท · ถ้าเครื่องเล่นแถวยาวแต่ร้านคิวสั้น แอปจะแนะนำให้กินก่อน', rides:[], meal:'Royal Banquet Hall (ตั๋วรวมมื้อเที่ยง)'},
+  {t:'12:15', e:'13:15', zone:'มื้อเที่ยง Royal Banquet Hall (Voucher)', why:'ใช้ Meal Voucher ได้ (ชุดไม่เกิน HK$170 แลกก่อน 16:00) · ถ้าคิวยาว ใช้ voucher ที่ร้านอื่นในรายการได้ แอปจะแนะนำให้', rides:[], meal:'Royal Banquet Hall (ตั๋วรวมมื้อเที่ยง)'},
   {t:'13:15', e:'14:15', zone:'Grizzly Gulch + Mystic Point', why:'อยู่ติดกัน ใช้แถวคนเดียวถ้าแถวปกติยาว', rides:['grizzly','manor']},
   {t:'14:15', e:'15:30', zone:'Tomorrowland', why:'เครื่องเล่นในร่ม แถวไม่ยาวทั้งวัน เหมาะช่วงบ่ายร้อน', rides:['hyper','ironman','antman']},
   {t:'15:30', e:'16:45', zone:'Fantasyland', why:'เครื่องเล่นเบาๆ ในร่ม พักขา', rides:['philhar','small','pooh','tea']},
   {t:'16:30', e:'17:30', zone:'Adventureland', why:'ช่วงเย็นแถวลดลง · 16:45 มีขบวนพาเหรด Friendtastic! คนจะไปรอดูพาเหรด เครื่องเล่นมักว่างขึ้น', rides:['jungle','dumbo']},
-  {t:'17:30', e:'18:30', zone:'มื้อเย็น Royal Banquet Hall', why:'กินให้เสร็จก่อน 19:00 จะได้มีเวลาไปจองที่ดูพลุ', rides:[], meal:'Royal Banquet Hall (ตั๋วรวมมื้อเย็น)'},
+  {t:'17:30', e:'18:30', zone:'มื้อเย็น Royal Banquet Hall (Voucher)', why:'Voucher มื้อเย็นแลกได้ตั้งแต่ 16:30 · กินให้เสร็จก่อน 19:00 จะได้มีเวลาไปจองที่ดูพลุ', rides:[], meal:'Royal Banquet Hall (ตั๋วรวมมื้อเย็น)'},
   {t:'18:30', e:'19:45', zone:'เก็บตกที่ชอบ', why:'แถวโซนยอดฮิตมักสั้นลงช่วงเย็น ลอง Frozen หรือ Toy Story อีกรอบ', rides:[], meal:'มื้อเย็นในสวน แล้วซื้อของที่ระลึกก่อนร้านแน่น'},
   {t:'19:15', e:'20:20', zone:'🎆 Momentous พลุหน้าปราสาท 20:00 (ห้ามพลาด!)', why:'ไปจองที่ลานหน้าปราสาทหรือปลาย Main Street ก่อนเริ่ม 40 นาที · สวนปิด 20:00 พร้อมโชว์', rides:[]}
 ];
@@ -1915,7 +1929,8 @@ async function dzReset(){
 }
 
 /* ---------- Disney meals (ticket includes lunch + dinner at Royal Banquet Hall) and the fireworks ---------- */
-const DZ_MEALS = {lunch:{n:'มื้อเที่ยง', from:11*60+30, to:14*60+30, late:13*60}, dinner:{n:'มื้อเย็น', from:16*60+30, to:19*60, late:18*60+15}};
+// 3-in-1 Park Meal Voucher (Klook): lunch combo ≤ HK$170 redeemed before 16:00, dinner combo ≤ HK$170 from 16:30
+const DZ_MEALS = {lunch:{n:'มื้อเที่ยง', from:11*60+30, to:15*60+45, late:13*60+30}, dinner:{n:'มื้อเย็น', from:16*60+30, to:19*60, late:18*60+15}};
 let DZCAL=null;
 fetch('dzcal.json').then(r=>r.ok?r.json():null).then(j=>{ if(j){ DZCAL=j; rerender() } }).catch(()=>{});
 const dzShow = re => DZCAL && (DZCAL.shows||[]).find(s=>re.test(s.name));
@@ -1944,11 +1959,29 @@ function dzMealNow(min){
   }
   return null;
 }
+
+// the other restaurants where the meal voucher works (combos up to HK$170, prices from the official menus)
+const DZ_FOOD = [
+  {n:"Clopin's Festival of Foods", land:'FL', price:'HK$150–160', food:'ก๋วยเตี๋ยวเนื้อ/ลูกชิ้นปลา, ข้าวผัดสับปะรดซีฟู้ด · ชุดรวมน้ำแร่'},
+  {n:'Starliner Diner', land:'TL', price:'HK$145–160', food:'เบอร์เกอร์, ไก่ทอด · ชุดรวมเฟรนช์ฟรายส์และน้ำอัดลม'},
+  {n:'Comet Cafe', land:'TL', price:'HK$150–160', food:'ข้าวหมูทอดเทริยากิ, ข้าวแกงกะหรี่อบ, บะหมี่เนื้อตุ๋นไต้หวัน · ชุดรวมน้ำอัดลม'},
+  {n:"Wayfinders' Table", land:'AL', price:'HK$160–170', food:'ไก่อบกับข้าวหอม, แกงมัสมั่นกุ้ง · อาหารฮาลาล · ชุดรวมน้ำแร่ · เปิด 12:30', open:12*60+30, close:19*60+30},
+  {n:"Explorer's Club Restaurant", land:'MP', price:'HK$170', food:'ไก่บัตเตอร์อินเดีย, คันเนลโลนีฟักทองผักโขม · voucher ใช้ได้เฉพาะมื้อเที่ยง สั่งได้ถึง 15:00', lunch:true, open:12*60, close:15*60}
+];
+function dzFoodHTML(min, why){
+  const here=S.dzLand||'MS', live=DZQ&&DZQ.food||{};
+  const list=DZ_FOOD.filter(r=>(!r.open||min>=r.open) && (!r.close||min<r.close-30||r.lunch&&min<r.close)).map(r=>{ const q=live[dzNorm(r.n)], w=q&&q.open?q.w:null, closed=q&&!q.open&&DZQ.anyOpen, walk=dzWalk(here,r.land);
+    return {...r, w, walk, closed, score:(w??10)+walk} }).filter(r=>!r.closed).sort((a,b)=>a.score-b.score).slice(0,3);
+  if(!list.length) return '';
+  return `<div class="dzalt"><b>${why}</b>${list.map(r=>`<div class="dzaltr"><span><b>${esc(r.n)}</b><small>${esc(DZ_LANDS[r.land][0])} · เดิน ~${r.walk} นาที · ${esc(r.food)}</small></span><span class="num"><b>${r.price}</b><small>${r.w!=null?'คิว ~'+r.w+' นาที':'ต่อชุด'}</small></span></div>`).join('')}
+    <small>ทุกร้านนี้ใช้ Meal Voucher ได้ (ชุดไม่เกิน HK$170) · ราคาจากเมนูทางการของ Disney · Golden Crocus Inn อยู่ในรายการ voucher แต่เมนูหลักตอนนี้ HK$195 ขึ้นไป</small></div>`;
+}
 function dzMealHTML(min){
   const x=dzMealNow(min), parts=[];
   if(x){ const why = x.rbh && x.rbh.open ? (x.go&&min<x.m.late ? `ร้านรอแค่ ~${x.rbh.w} นาที ขณะที่เครื่องเล่นรอ ${x.best}+ นาที กินตอนนี้คุ้มกว่า` : `ร้านรอ ~${x.rbh.w} นาที${x.best?` · เครื่องเล่นรอ ${x.best}+ นาที`:''}`) : x.go ? 'ใกล้หมดช่วงมื้ออาหารแล้ว' : 'ยังไม่มีเวลารอสดของร้าน';
-    parts.push(`<div class="dzmeal${x.go?' go':''}"><b>🍽️ ${x.go?'แนะนำ: ไปกิน'+x.m.n+'ตอนนี้':x.m.n+' Royal Banquet Hall'}</b><small>${why} · ร้านอยู่ Fantasyland ใกล้ปราสาท · ใช้ตั๋วรวมอาหาร</small>
-      <div class="acts"><button type="button" class="btn-s pay" data-dzmeal="${x.k}">กิน${x.m.n.replace('มื้อ','')}แล้ว</button></div></div>`) }
+    parts.push(`<div class="dzmeal${x.go?' go':''}"><b>🍽️ ${x.go?'แนะนำ: ไปกิน'+x.m.n+'ตอนนี้':x.m.n+' Royal Banquet Hall'}</b><small>${why} · ร้านอยู่ Fantasyland ใกล้ปราสาท · ใช้ Meal Voucher (โชว์ QR ตอนสั่ง)${x.k==='lunch'?' · แลกก่อน 16:00':''}</small>
+      <div class="acts"><button type="button" class="btn-s pay" data-dzmeal="${x.k}">กิน${x.m.n.replace('มื้อ','')}แล้ว</button></div></div>`);
+    if(x.rbh && (!x.rbh.open || x.rbh.w>=25)) parts.push(dzFoodHTML(min, x.rbh.open ? `Royal Banquet Hall คิว ~${x.rbh.w} นาที ใช้ voucher ที่ร้านอื่นแทนได้:` : 'Royal Banquet Hall ปิดอยู่ ใช้ voucher ที่ร้านอื่นแทนได้:')) }
   const left=fwBeThere()-min;
   if(left<=25) parts.unshift(`<div class="dzfw now"><b>🎆 ${left<=0?'ไปที่ดูพลุเลย!':'อีก '+left+' นาที ไปจองที่ดูพลุ'}</b><small>เดินไปลานหน้าปราสาท / ปลาย Main Street หันหน้าเข้าปราสาท · พลุเริ่ม ${hhmm(fwTime())} น.</small></div>`);
   return parts.join('');
@@ -1960,6 +1993,13 @@ function dzShowsHTML(){
   return `<details class="panel dzshows"><summary><h3>โชว์และพาเหรดวันที่ 16 <small>ปฏิทินทางการ ▾</small></h3></summary>${rows}
     ${DZCAL.closed&&DZCAL.closed.length?`<p class="mini" style="margin:8px 0 0">ปิดปรับปรุงวันนั้น: ${DZCAL.closed.map(esc).join(', ')}</p>`:''}
     <p class="mini" style="margin:6px 0 0">สวนเปิด ${DZCAL.open}–${DZCAL.close} น. · ข้อมูลจาก hongkongdisneyland.com อัปเดตทุกเช้า · ตารางอาจเปลี่ยนได้ เช็คในแอป Disney อีกครั้ง</p></details>`;
+}
+const DZ_VOUCHER = [['lunch','มื้อเที่ยง (ก่อน 16:00)'],['dinner','มื้อเย็น (ตั้งแต่ 16:30)'],['snack','Frozen Lollipop หรือ Popcorn 1 ชิ้น ที่รถเข็น'],['cart20','ลด HK$20 เมื่อซื้อครบ HK$100 ที่รถเข็น']];
+function dzVoucherHTML(){
+  const left=DZ_VOUCHER.filter(([k])=>!S.done['dz:'+k]).length;
+  return `<details class="panel dzvch"><summary><h3>🎟️ Meal Voucher <small>เหลือ ${left}/4 ▾</small></h3></summary>
+    ${DZ_VOUCHER.map(([k,n])=>`<button type="button" class="dzvi${S.done['dz:'+k]?' on':''}" data-dzmeal="${k}"><span class="ck2${S.done['dz:'+k]?' on':''}">${ic('check',3)}</span>${n}</button>`).join('')}
+    <p class="mini" style="margin:8px 0 0">โชว์ QR บน eTicket (Klook) ตอนสั่ง · ชุดราคาไม่เกิน HK$170 ไม่รวมเมนูพิเศษตามฤดูกาล · ใช้ได้ที่ Royal Banquet Hall, Clopin's, Starliner Diner, Comet Cafe, Wayfinders' Table, Golden Crocus Inn, Explorer's Club (เฉพาะมื้อเที่ยง ถึง 15:00) · ร้านนั่งโต๊ะ River View Cafe / Main Street Corner Cafe / Plaza Inn ใช้ได้แต่ต้องจ่ายส่วนต่าง + 10%</p></details>`;
 }
 function dzFwHTML(){
   const min=dzNowMin(), left=fwTime()-min, wx=WARN&&WARN.list.some(w=>/TC|WRAIN|WTS/.test(w.code));
@@ -1980,6 +2020,7 @@ function renderDisney(){
       <div><div class="eyebrow">จันทร์ 16 พ.ย. 2569</div><h2>Hong Kong Disneyland</h2>
       <div class="pillrow"><span class="pill mint">วันจันทร์ คนค่อนข้างน้อย</span><span class="pill">เล่นแล้ว ${doneN}/${Object.keys(DZ_RIDES).length}</span></div></div>${dzParkHTML()}</div>
     ${dzFwHTML()}
+    ${dzVoucherHTML()}
     ${dzShowsHTML()}
     ${dzSmartHTML()}
     <div class="links" style="margin-bottom:14px">
@@ -2105,6 +2146,7 @@ function alertsHTML(){
     const spent=allExp().filter(e=>e.day===td).reduce((s,e)=>s+share(e,me),0), per=Number(S.budget)/4;
     if(spent>per) out.push(['warn',`วันนี้ใช้ไป ${hk(spent)} เกินงบเฉลี่ยต่อวัน (${hk(per)})`,'money']);
   }
+  if(td===3 && !S.done['dz:lunch'] && n.min>=15*60 && n.min<16*60) out.unshift(['warn',`🍽️ voucher มื้อเที่ยงต้องแลกก่อน 16:00 (อีก ${16*60-n.min} นาที)`,'dz']);
   if(td===3 && !S.done['3c']){ const left=fwBeThere()-n.min; if(left<=30 && left>-40) out.unshift(['warn',`🎆 ${left>0?'อีก '+left+' นาที':'ถึงเวลา'}ไปจองที่ดูพลุหน้าปราสาท (พลุเริ่ม ${hhmm(fwTime())} น.)`,'dz']) }
   if(td){ const {delay}=dayDelay(dayItems(td)); if(delay!=null && delay>=30) out.push(['info',`ช้ากว่าแผน ${delay} นาที ลองตัดหรือเลื่อนบางจุดในแผนวันนี้`,'plan']) }
   const now=n.min<4*60?n.min+1440:n.min, lh=(td||n.date==='2026-11-18') && now>=21*60 ? lastHome() : null;
