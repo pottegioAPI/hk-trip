@@ -25,3 +25,16 @@ self.addEventListener('fetch', e=>{
   }
   // live times and shared data always go to the network
 });
+
+// push notifications from the trip server (meals, fireworks, flights, last train)
+self.addEventListener('push', e=>{
+  let d={}; try{ d=e.data ? e.data.json() : {} }catch(_){ d={body: e.data && e.data.text()} }
+  e.waitUntil(self.registration.showNotification(d.title||'ทริปฮ่องกง', {body:d.body||'', tag:d.tag, icon:'icon-192.png', badge:'icon-192.png', data:{url:d.url||'./'}}));
+});
+self.addEventListener('notificationclick', e=>{
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({type:'window', includeUncontrolled:true}).then(ws=>{
+    for(const w of ws) if('focus' in w) return w.focus();
+    return self.clients.openWindow((e.notification.data && e.notification.data.url) || './');
+  }));
+});

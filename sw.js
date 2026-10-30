@@ -1,5 +1,5 @@
 // Offline copy of the app: opens without signal, updates itself when online.
-const VERSION='91dfd1f713', CACHE='hk-'+VERSION, FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-180.png","bus.json","places.json","water.json","weather.json","lasttrain.json","dzcal.json"];
+const VERSION='4b969191d7', CACHE='hk-'+VERSION, FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-180.png","bus.json","places.json","water.json","weather.json","lasttrain.json","dzcal.json"];
 self.addEventListener('install', e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())) });
 self.addEventListener('activate', e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('hk-')&&k!==CACHE&&k!=='hk-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim())) });
 const timeout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('slow')),ms))]);
@@ -24,4 +24,17 @@ self.addEventListener('fetch', e=>{
     e.respondWith(caches.open('hk-fonts').then(c=>c.match(req).then(hit=>hit||fetch(req).then(r=>{ c.put(req,r.clone()); return r }))));
   }
   // live times and shared data always go to the network
+});
+
+// push notifications from the trip server (meals, fireworks, flights, last train)
+self.addEventListener('push', e=>{
+  let d={}; try{ d=e.data ? e.data.json() : {} }catch(_){ d={body: e.data && e.data.text()} }
+  e.waitUntil(self.registration.showNotification(d.title||'ทริปฮ่องกง', {body:d.body||'', tag:d.tag, icon:'icon-192.png', badge:'icon-192.png', data:{url:d.url||'./'}}));
+});
+self.addEventListener('notificationclick', e=>{
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({type:'window', includeUncontrolled:true}).then(ws=>{
+    for(const w of ws) if('focus' in w) return w.focus();
+    return self.clients.openWindow((e.notification.data && e.notification.data.url) || './');
+  }));
 });
