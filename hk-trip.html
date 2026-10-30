@@ -658,8 +658,8 @@ const DEFAULT_PLAN = [
   {id:'1s',t:'11:45',tz:'TH',flight:true,h:'ถึงสนามบินสุวรรณภูมิ (BKK)',p:'เช็คอิน Emirates โหลดกระเป๋า แล้วผ่าน ตม. ขาออก',tip:'มาถึงก่อนเครื่องออกอย่างน้อย 3 ชั่วโมง เคาน์เตอร์เช็คอินมักปิดประมาณ 1 ชั่วโมงก่อนเครื่องออก ดูเวลาที่แน่นอนบนตั๋ว'},
   {id:'1f',t:'14:45',tz:'TH',flight:true,h:'บิน EK384 สุวรรณภูมิ → ฮ่องกง',p:'ออก 13:45 น. เวลาไทย · ถึงฮ่องกง 17:40 น. เวลาฮ่องกง · บินประมาณ 3 ชั่วโมง',tip:'ขึ้นเครื่องประมาณ 45 นาทีก่อนออก ดูประตูและเวลาขึ้นเครื่องบนบอร์ดดิ้งพาส · ตั้งนาฬิกาเร็วขึ้น 1 ชั่วโมงเมื่อถึงฮ่องกง'},
   {id:'1a',t:'17:40',h:'ถึงสนามบินฮ่องกง (HKG)',p:'ผ่าน ตม. และรับกระเป๋าให้เรียบร้อย',tip:'ซื้อหรือเติมเงินบัตร Octopus ที่สนามบินได้เลย ใช้ได้ทั้ง MTR และรถบัส',map:'Hong Kong International Airport',st:null,ll:[22.3155,113.9365]},
-  {id:'1b',t:'19:00',e:'20:15',h:'เช็คอิน Kam Mun Guest House',p:'ขึ้นบัส A21 ที่สนามบิน ลงป้าย <b>"Bank Centre, Nathan Road"</b> (มงก๊ก ป้ายที่ 8) แล้วข้ามถนน Nathan Road ไปตึก <b>Sun Hing Building</b> เลขที่ 603-609 ขึ้นชั้น 21 ห้อง 2101',exit:'E1',tip:'บนรถมีจอ LED บอกชื่อป้าย ป้ายก่อนหน้าคือ "Argyle Centre, Nathan Road" ถ้าเลยไปลงป้าย "Sino Centre, Nathan Road" แล้วเดินย้อนขึ้นไปทางเหนือประมาณ 100 เมตร',map:'Sun Hing Building 607 Nathan Road Mong Kok',st:'MOK',bus:[{n:'บัส A21',d:'สนามบิน → Bank Centre, Nathan Road (มงก๊ก)',fare:34.6,mins:60}],go:{mode:'bus:0'}},
-  {id:'1c',t:'20:30',e:'22:00',h:'Avenue of Stars',p:'ชมวิวอ่าววิคตอเรีย ถ่ายรูปรับลมเย็นๆ',map:'Avenue of Stars Hong Kong',st:'TST',ll:[22.2930,114.1740]}
+  {id:'1b',t:'19:45',e:'20:30',h:'เช็คอิน Kam Mun Guest House',p:'ขึ้นบัส A21 ที่สนามบิน ลงป้าย <b>"Bank Centre, Nathan Road"</b> (มงก๊ก ป้ายที่ 8) แล้วข้ามถนน Nathan Road ไปตึก <b>Sun Hing Building</b> เลขที่ 603-609 ขึ้นชั้น 21 ห้อง 2101',exit:'E1',tip:'บนรถมีจอ LED บอกชื่อป้าย ป้ายก่อนหน้าคือ "Argyle Centre, Nathan Road" ถ้าเลยไปลงป้าย "Sino Centre, Nathan Road" แล้วเดินย้อนขึ้นไปทางเหนือประมาณ 100 เมตร',map:'Sun Hing Building 607 Nathan Road Mong Kok',st:'MOK',bus:[{n:'บัส A21',d:'สนามบิน → Bank Centre, Nathan Road (มงก๊ก)',fare:34.6,mins:60}],go:{mode:'bus:0'}},
+  {id:'1c',t:'20:45',e:'22:00',h:"ตลาดเลดี้ส์ (Ladies' Market) มงก๊ก",p:'เดินจากที่พักได้ ไม่ต้องนั่งรถ เดินดูของ กินของทานเล่น แล้วกลับไปพักผ่อน',tip:'ร้านส่วนใหญ่ปิดราว 23:00 ต่อราคาได้',map:"Ladies' Market Mong Kok",st:'MOK',ll:[22.3190,114.1717]}
  ],
  [
   {id:'2a',t:'08:00',e:'08:45',h:'อาหารเช้าแบบคนฮ่องกง',p:'โจ๊กหรือขนมปังปิ้ง ร้านแถวที่พัก',st:'MOK'},
@@ -668,7 +668,8 @@ const DEFAULT_PLAN = [
   {id:'2d',t:'12:00',e:'13:30',h:'Central + มื้อเที่ยง',p:'ทานข้าวและเดินเล่นแถว Central',exit:'A',map:'Central Hong Kong',st:'CEN'},
   {id:'2e',t:'13:30',e:'15:45',h:'ชายหาด Repulse Bay',p:'เดินเล่นริมหาด ถ่ายรูป พักผ่อน',map:'Repulse Bay Beach',st:null,ll:[22.2368,114.1963],bus:[{n:'บัส 6 / 6X / 260',d:'ขึ้นที่ Exchange Square',fare:10,mins:35}],go:{mode:'bus:0'}},
   {id:'2f',t:'15:45',e:'18:30',h:'Sunset ที่ Kennedy Town',exit:'C',p:'เดินริมทะเล ถ่ายรูปพระอาทิตย์ตก แวะคาเฟ่',map:'Kennedy Town Praya',st:'KET',ll:[22.2830,114.1275],bus:[{n:'บัส 6X หรือ 6 + MTR',d:'ขึ้นบัส 6X/6 ที่ป้าย Repulse Bay Beach กลับ Central (Exchange Square) HK$7.5 แล้วต่อ MTR สายน้ำเงิน Central → Kennedy Town HK$5.9',fare:13.4,mins:55,combo:true}],go:{mode:'bus:0'}},
-  {id:'2g',t:'18:30',h:'มื้อค่ำแถวที่พัก',p:'กลับมงก๊ก ทานมื้อค่ำแล้วพักผ่อน',st:'MOK',exit:'E1'}
+  {id:'2g',t:'18:30',e:'19:45',h:'มื้อค่ำย่านจิมซาจุ่ย',p:'นั่ง MTR ไปจิมซาจุ่ย หาร้านกินข้าวแถวถนน Canton Road / Peking Road',map:'Peking Road Tsim Sha Tsui',st:'TST',ll:[22.2963,114.1702]},
+  {id:'2h',t:'19:45',e:'21:00',h:'โชว์แสงสี Symphony of Lights + Avenue of Stars',p:'โชว์เลเซอร์และไฟตึกริมอ่าวเริ่ม 20:00 น. ยาวประมาณ 10 นาที ดูจาก Avenue of Stars แล้วเดินเล่นริมอ่าว',tip:'ไปถึงก่อน 19:50 จะได้ที่ยืนแถวหน้า เสร็จแล้วนั่ง MTR 2 ป้ายกลับมงก๊ก',map:'Avenue of Stars Hong Kong',st:'TST',ll:[22.2930,114.1740]}
  ],
  [
   {id:'3a',t:'08:00',e:'08:45',h:'อาหารเช้าให้อิ่มจุก',p:'วันนี้ต้องเดินเยอะมาก กินให้เต็มที่',st:'MOK'},
@@ -785,13 +786,13 @@ function namedExit(code, it){
 }
 // stop id → [station, exit, what the official MTR street map lists at that exit]
 const OFFICIAL_EXITS = {
-  'hotel':['MOK','E1','ใกล้ที่พัก'], '1b':['MOK','E1','Chong Hing Square (601 Nathan Rd) ติดกับที่พัก'], '2a':['MOK','E1','ใกล้ที่พัก'], '2g':['MOK','E1','ใกล้ที่พัก'], '3a':['MOK','E1','ใกล้ที่พัก'], '3d':['MOK','E1','ใกล้ที่พัก'], '4a':['MOK','E1','ใกล้ที่พัก'],
-  '1c':['TST','E','Avenue of Stars'], '2b':['WTS','B3','Sik Sik Yuen Wong Tai Sin Temple'], '2c':['CKT','B','Che Kung Temple'],
+  'hotel':['MOK','E1','ใกล้ที่พัก'], '1b':['MOK','E1','Chong Hing Square (601 Nathan Rd) ติดกับที่พัก'], '2a':['MOK','E1','ใกล้ที่พัก'], '3a':['MOK','E1','ใกล้ที่พัก'], '3d':['MOK','E1','ใกล้ที่พัก'], '4a':['MOK','E1','ใกล้ที่พัก'],
+  '2h':['TST','E','Avenue of Stars'], '2b':['WTS','B3','Sik Sik Yuen Wong Tai Sin Temple'], '2c':['CKT','B','Che Kung Temple'],
   '2d':['CEN','A','Two IFC / Central Harbourfront ทางไป Exchange Square'], '2f':['KET','C','Cadogan Street Promenade ริมทะเล'],
   '3b':['DIS','A','Hong Kong Disneyland'], '3c':['DIS','A','Hong Kong Disneyland'], '3l':['DIS','A','Hong Kong Disneyland'], '3n':['DIS','A','Hong Kong Disneyland'],
   '4b':['TUC','C','Citygate Outlets'], '4c':['TUC','B','Tung Chung Cable Car Terminal (Ngong Ping 360)'], '4d':['TUC','C','Citygate Outlets']
 };
-const HOTEL_IDS = new Set(['hotel','1b','2a','2g','3a','3d','4a']);
+const HOTEL_IDS = new Set(['hotel','1b','2a','3a','3d','4a']);
 // the exit to show for a stop: the user's own choice wins, otherwise real data, otherwise what the old plan said
 function exitFor(it){
   if(!it || !it.st) return null;
@@ -805,7 +806,7 @@ function exitFor(it){
 }
 const exitTxt = x => x ? `Exit ${x.ref}${x.name?' · '+x.name:''}` : '';
 const HOTEL_LL = [22.3174,114.1694]; // Sun Hing Building, 603-609 Nathan Road, Mong Kok (MTR Mong Kok Exit E1, ~100 m south)
-const DEF_LL = Object.fromEntries([...DEFAULT_PLAN.flat().filter(i=>i.ll).map(i=>[i.id,i.ll]), ...['1b','2a','2g','3a','3d','4a'].map(id=>[id,HOTEL_LL]), ['3c',[22.3130,114.0413]], ['4c',[22.2893,113.9408]], ['4d',[22.2896,113.9417]]]); // also covers saved plans made before coordinates existed
+const DEF_LL = Object.fromEntries([...DEFAULT_PLAN.flat().filter(i=>i.ll).map(i=>[i.id,i.ll]), ...['1b','2a','3a','3d','4a'].map(id=>[id,HOTEL_LL]), ['3c',[22.3130,114.0413]], ['4c',[22.2893,113.9408]], ['4d',[22.2896,113.9417]]]); // also covers saved plans made before coordinates existed
 const locOf = it => it ? (it.ll || DEF_LL[it.id] || (it.st ? stLL(it.st) : null)) : null;
 function metres(a,b){ const dy=(a[0]-b[0])*111320, dx=(a[1]-b[1])*111320*Math.cos(a[0]*Math.PI/180); return Math.hypot(dx,dy) }
 const dowOf = iso => (new Date(iso+'T12:00:00Z').getUTCDay()+6)%7; // Mon=0 … Sun=6
@@ -1026,7 +1027,7 @@ function optionsBetween(dn,prev,it){
 function chosen(dn,it,opts){
   const key = it.go && it.go.mode;
   return opts.find(o=>o.key===key) || (key&&key.startsWith('bus:')&&opts.find(o=>o.bx||o.key.startsWith('bus:')&&!o.manual))
-    || opts.find(o=>o.key==='mtr') || opts.find(o=>o.key==='walk') || opts[0];
+    || opts.find(o=>o.key==='mtr') || opts.find(o=>o.key==='walk' && o.mins!=null) || opts[0];   // walking is the default only when the stops are close (it then has a time)
 }
 
 /* ---------- place search (OpenStreetMap attractions) ---------- */
@@ -2476,7 +2477,7 @@ const MAP_ICON = {
   pin:'<path d="M0 11 C-7 2 -8 -2 -8 -4 A8 8 0 0 1 8 -4 C8 -2 7 2 0 11 Z" fill="var(--pink)" stroke="#fff" stroke-width="1.5"/><circle cy="-4" r="3" fill="#fff"/>'
 };
 // [icon, name, drawn-at override, nudge in px so close neighbours don't overlap]
-const MAP_SPOT = {'1a':['plane','สนามบิน',null,[-4,-6]], '4e':['plane','สนามบิน',null,[-4,-6]], '1c':['star','Avenue of Stars',null,[34,-2]], '2b':['temple','หวังต้าเซียน'], '2c':['temple','แชกงหมิว'],
+const MAP_SPOT = {'1a':['plane','สนามบิน',null,[-4,-6]], '4e':['plane','สนามบิน',null,[-4,-6]], '1c':['bag','ตลาดเลดี้ส์',null,[-30,-10]], '2h':['star','Avenue of Stars',null,[34,-2]], '2b':['temple','หวังต้าเซียน'], '2c':['temple','แชกงหมิว'],
   '2d':['city','Central',null,[6,16]], '2e':['beach','Repulse Bay'], '2f':['sunset','Kennedy Town',null,[-16,8]], '3b':['castle','Disneyland'], '3c':['castle','Disneyland'], '3l':['castle','Disneyland'], '3n':['castle','Disneyland'],
   '4b':['bag','Citygate',null,[8,10]], '4d':['bag','Citygate',null,[8,10]], '4c':['buddha','พระใหญ่',[22.2540,113.9050]]};
 function tripMapSVG(){

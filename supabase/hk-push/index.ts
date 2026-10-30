@@ -144,7 +144,7 @@ async function tick(atIso?: string, mock: any = {}) {
   }
 
   // --- getting home at night: the last MTR is around midnight
-  for (const [date, last] of [['2026-11-14', '1c'], ['2026-11-15', '2g'], ['2026-11-16', '3d']]) at(date, '23:10', 'night-' + date, 'night', '🚇 ใกล้รถไฟเที่ยวสุดท้ายแล้ว', 'ยังไม่ถึงที่พัก? เปิดแอปดูเวลารถไฟเที่ยวสุดท้ายจากจุดที่อยู่ หรือกด "พากลับที่พัก"', !done[last]);
+  for (const [date, last] of [['2026-11-14', '1c'], ['2026-11-15', '2h'], ['2026-11-16', '3d']]) at(date, '23:10', 'night-' + date, 'night', '🚇 ใกล้รถไฟเที่ยวสุดท้ายแล้ว', 'ยังไม่ถึงที่พัก? เปิดแอปดูเวลารถไฟเที่ยวสุดท้ายจากจุดที่อยู่ หรือกด "พากลับที่พัก"', !done[last]);
 
   // --- the last day: check-out, bags, airport
   at('2026-11-17', '07:30', 'checkout', 'depart', '🧳 วันนี้เช็คเอาท์', 'เก็บของให้ครบ แล้วไปฝากกระเป๋าที่ Citygate Outlets (Tung Chung)', !done['4a']);
