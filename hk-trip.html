@@ -50,6 +50,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.dzpk{min-width:70px;border-radius:16px;background:var(--pink-soft);padding:8px 8px;text-align:center;display:flex;flex-direction:column;line-height:1.15}.dzpk b{font-family:var(--display);font-weight:600;font-size:26px;color:var(--pink)}.dzpk small{font-size:11px;color:var(--muted)}.dzpk.open{background:var(--mint-soft)}.dzpk.open b{color:var(--mint)}.dzpk.off{background:var(--surface2)}.dzpk.off b{font-size:16px;color:var(--muted)}
 .dzfw{background:linear-gradient(135deg,#2A1B5E,#6B3FA0);color:#fff;border-radius:18px;padding:12px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:3px}.dzfw b{font-family:var(--display);font-weight:500;font-size:17px}.dzfw small{opacity:.9;font-size:12.5px}.dzfw label{color:#fff;font-size:12px}.dzfw input{color:var(--ink)}.dzfw.now{background:var(--danger);animation:flash 1.2s ease-in-out infinite alternate}.dzmeal{background:var(--sun-soft);border-radius:16px;padding:10px 12px;margin-bottom:10px;display:flex;flex-direction:column;gap:2px}.dzmeal.go{background:var(--mint-soft);border:2px solid var(--mint)}.dzmeal b{font-size:15px}.dzmeal small{font-size:12.5px;color:var(--muted)}
 @keyframes rideflash{from{filter:brightness(1)}to{filter:brightness(1.35)}}.ridehead.flash{animation:rideflash .5s ease-in-out infinite alternate}
 .exh{background:var(--sun-soft);border-radius:10px;padding:6px 9px;color:var(--ink)!important;display:block!important}.arrowbox{width:220px;height:220px;margin:6px auto 10px;border-radius:50%;background:var(--sky-soft);display:grid;place-items:center;box-shadow:inset 0 0 0 6px var(--surface),0 0 0 3px var(--sky)}.arrow{width:150px;height:150px;transition:transform .3s}.arrowinfo{text-align:center;display:flex;flex-direction:column;gap:2px;margin-bottom:10px}.arrowinfo b{font-family:var(--display);font-size:30px}.arrowinfo small{color:var(--muted)}
@@ -265,9 +266,9 @@ nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding-
 .dzbtn svg{width:28px;height:28px}
 .tab.dzt-tab[aria-selected="true"]{background:none}
 .tab.dzt-tab[aria-selected="true"] .dzbtn{background:var(--sun);color:var(--ink)}
-.dzhero{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:14px;margin-bottom:12px}
-.dzhero .castle{width:72px;height:72px}
-.dzhero h2{font-family:var(--display);font-weight:500;font-size:21px;margin:2px 0 8px}
+.dzhero{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:14px;margin-bottom:12px}
+.dzhero .castle{width:52px;height:52px}
+.dzhero h2{font-family:var(--display);font-weight:500;font-size:18px;line-height:1.25;margin:2px 0 6px}
 .dzplan{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:10px}
 .dzb{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px}
 .dzb.now{border-color:var(--pink);box-shadow:var(--shadow)}
@@ -1915,7 +1916,19 @@ async function dzReset(){
 /* ---------- Disney meals (ticket includes lunch + dinner at Royal Banquet Hall) and the fireworks ---------- */
 const DZ_MEALS = {lunch:{n:'มื้อเที่ยง', from:11*60, to:14*60+30, late:13*60}, dinner:{n:'มื้อเย็น', from:16*60+30, to:19*60, late:18*60+15}};
 const fwTime = () => toMin((S.settings && S.settings.fw) || '20:30');
-const fwBeThere = () => fwTime()-40;                       // be at the castle 40 minutes before the show
+const fwBeThere = () => fwTime()-40;
+const dzOpenT = () => toMin((S.settings && S.settings.dzOpen) || '10:00'), dzCloseT = () => toMin((S.settings && S.settings.dzClose) || '21:00');
+// right side of the Disney header: days to go, countdown to opening, time left, or closed
+function dzParkHTML(){
+  const n=hkNow(), day='2026-11-16', live=DZQ&&Date.now()-DZQ.at<20*60e3;
+  if(n.date<day){ const d=Math.ceil((Date.parse(day)-Date.parse(n.date))/864e5); return `<div class="dzpk"><small>อีก</small><b class="num">${d}</b><small>วัน</small></div>` }
+  if(n.date>day) return '<div class="dzpk off"><b>👋</b><small>ไปมาแล้ว</small></div>';
+  const o=dzOpenT(), c=dzCloseT(), isOpen = live ? DZQ.anyOpen : n.min>=o && n.min<c;
+  const dur=m=>m>=60?`${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`:`${m} น.`;
+  if(isOpen) return `<div class="dzpk open"><small>เปิดอยู่${live?' ●':''}</small><b class="num">${dur(Math.max(0,c-n.min))}</b><small>ก่อนปิด ${hhmm(c)}</small></div>`;
+  if(n.min<o) return `<div class="dzpk"><small>สวนเปิดใน</small><b class="num">${dur(o-n.min)}</b><small>เปิด ${hhmm(o)} น.</small></div>`;
+  return '<div class="dzpk off"><small>สวน</small><b>ปิดแล้ว</b></div>';
+}                       // be at the castle 40 minutes before the show
 function dzNowMin(){ const n=hkNow(); return n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 600) }
 function dzMealNow(min){
   // which meal is due now, and should we go now? (restaurant queue short while rides are long, or getting late)
@@ -1941,7 +1954,8 @@ function dzFwHTML(){
   return `<div class="dzfw"><b>🎆 พลุและโชว์หน้าปราสาท · ห้ามพลาด!</b>
     <small>เริ่ม ${hhmm(fwTime())} น. · ไปจองที่ก่อน ${hhmm(fwBeThere())} น.${left>0&&left<24*60?` · อีก ${Math.floor(left/60)} ชม. ${left%60} นาที`:''} · แอปจะไม่แนะนำเครื่องเล่นที่เล่นไม่ทันก่อนเวลานี้</small>
     ${wx?'<small style="color:var(--danger)">มีประกาศฝน/ลมจากหอดูดาว พลุอาจงดหรือเลื่อน เช็คในแอป Disney</small>':''}
-    <div class="fin" style="margin-top:6px"><label for="fwt">เวลาพลุจริง (ดูในแอป Disney วันนั้น)</label><input id="fwt" type="time" value="${hhmm(fwTime())}" style="width:110px"><button type="button" class="btn-s" data-fwsave="1">บันทึก</button></div></div>`;
+    <div class="fin" style="margin-top:6px"><label for="fwt">เวลาพลุจริง (ดูในแอป Disney วันนั้น)</label><input id="fwt" type="time" value="${hhmm(fwTime())}" style="width:110px"><button type="button" class="btn-s" data-fwsave="1">บันทึก</button></div>
+    <div class="fin"><label for="dzo">สวนเปิด–ปิด</label><input id="dzo" type="time" value="${hhmm(dzOpenT())}" style="width:96px"><input id="dzc" type="time" value="${hhmm(dzCloseT())}" style="width:96px"></div></div>`;
 }
 
 function renderDisney(){
@@ -1951,7 +1965,7 @@ function renderDisney(){
   document.getElementById('v-dz').innerHTML = `
     <div class="dzhero">${DZ_CASTLE}
       <div><div class="eyebrow">จันทร์ 16 พ.ย. 2569</div><h2>Hong Kong Disneyland</h2>
-      <div class="pillrow"><span class="pill mint">วันจันทร์ คนค่อนข้างน้อย</span><span class="pill">เล่นแล้ว ${doneN}/${Object.keys(DZ_RIDES).length}</span></div></div></div>
+      <div class="pillrow"><span class="pill mint">วันจันทร์ คนค่อนข้างน้อย</span><span class="pill">เล่นแล้ว ${doneN}/${Object.keys(DZ_RIDES).length}</span></div></div>${dzParkHTML()}</div>
     ${dzFwHTML()}
     ${dzSmartHTML()}
     <div class="links" style="margin-bottom:14px">
@@ -2675,7 +2689,8 @@ document.addEventListener('click', e=>{
   if(ds.dzrefresh){ renderDisney(); toast('อัปเดตคำแนะนำแล้ว'); return }
   if(ds.dzreset) return dzReset();
   if(ds.dzmeal){ const k='dz:'+ds.dzmeal; const next={...S.done}; if(next[k]) delete next[k]; else next[k]={at:hhmm(hkNow().min)}; S.done=next; saveProgress(); renderDisney(); toast(next[k]?'บันทึกแล้ว อิ่มอร่อย!':'ยกเลิกแล้ว'); return }
-  if(ds.fwsave){ const v=document.getElementById('fwt').value; if(!/^\d{2}:\d{2}$/.test(v)) return; S.settings={...S.settings, fw:v}; if(db) db.doc('trip/settings').set(S.settings).catch(()=>{}); else lsSave(); renderDisney(); toast('ตั้งเวลาพลุ '+v+' น. แล้ว'); return }
+  if(ds.fwsave){ const ok=s=>/^\d{2}:\d{2}$/.test(s), v=document.getElementById('fwt').value, o=document.getElementById('dzo').value, c=document.getElementById('dzc').value; if(!ok(v)) return;
+    S.settings={...S.settings, fw:v, ...(ok(o)?{dzOpen:o}:{}), ...(ok(c)?{dzClose:c}:{})}; if(db) db.doc('trip/settings').set(S.settings).catch(()=>{}); else lsSave(); renderDisney(); toast('บันทึกเวลาพลุและเวลาสวนแล้ว'); return }
   if(ds.navpick) return openNavPick(ds.navpick);
   if(ds.nextnav){ const fi=findItem(ds.nextnav); S.nav.from=planSpot(); const x=exitFor(fi.it); S.nav.to=navSpot(fi.it.h, locOf(fi.it), {st:fi.it.st||undefined, exit:x&&x.src!=='auto'?x.ref:undefined, exitName:x&&x.name}); S.navOpen=0; return setTab('go') }
   if(ds.chkopen){ S.checkOpen=!S.checkOpen; renderHome(); return }
