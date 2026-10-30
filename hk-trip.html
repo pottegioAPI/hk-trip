@@ -50,6 +50,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.dzmini{margin-top:10px;background:var(--grape-soft);border-radius:16px;padding:10px 12px}.dzmh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}.dzmh small{font-size:11.5px;color:var(--muted)}.dzmr{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px dashed var(--line)}.dzmr .rk{width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}.dzmr span b{display:block;font-size:13.5px}.dzmr small{font-size:11.5px;color:var(--muted)}.dzmini .dzmeal{margin-bottom:6px}.dzday{background:var(--mint-soft);border-radius:16px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:2px}.dzday b{font-size:15px}.dzday small{font-size:12.5px;color:var(--muted)}
 .wxnow{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:center;background:var(--sky-soft);border-radius:16px;padding:10px 14px;margin-bottom:10px}.wxnow b{grid-row:span 2;font-family:var(--display);font-size:30px;color:var(--sky)}.wxnow span{font-size:13.5px}.wxnow small{font-size:11.5px;color:var(--muted)}
 .fwedit{margin-top:6px;font-size:12.5px}.fwedit summary{cursor:pointer;opacity:.9;list-style:none}.fwedit summary::-webkit-details-marker{display:none}.fwedit p{margin:6px 0;opacity:.9}.fwrow{display:flex;align-items:center;gap:10px;margin:4px 0}.fwrow label{min-width:64px;color:#fff}.fwrow input{flex:1;max-width:160px;border:none;border-radius:10px;padding:6px 10px;font-size:16px;color:var(--ink);background:#fff}
 .dzvch summary{list-style:none;cursor:pointer}.dzvch summary::-webkit-details-marker{display:none}.dzvch h3{margin:0}.dzvi{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;padding:6px 0;text-align:left;font-size:14px;color:var(--ink)}.dzvi.on{opacity:.55;text-decoration:line-through}
@@ -1659,13 +1660,14 @@ function renderPlan(){
         <h3>${esc(it.h)}</h3>
         ${it.p?`<p>${it.p}</p>`:''}
         ${['1f','4f'].includes(it.id)||(['1a','4e'].includes(it.id)&&!done)?flightHTML(flightFor(it.id)):''}
+        ${it.id==='3b'&&!S.done['3c']?dzMiniHTML():''}
         ${it.tip?`<div class="tip">${esc(it.tip)}</div>`:''}
         ${gh}
         <div class="acts">
           <button class="arrive${done?' undo':''}" type="button" data-arrive="${it.id}">${ic('check',2.4)}${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}</button>
           ${it.map||it.h?`<a class="btn-s" href="${mapUrl(it.map||it.h)}" target="_blank" rel="noopener">${ic('pin')}แผนที่</a>`:''}
           ${it.cost?(allExp().some(e=>e.planId===it.id)?`<span class="btn-s paid">${ic('check')}จด ${hk(it.cost.amt)} แล้ว</span>`:`<button class="btn-s pay" type="button" data-cost="${it.id}">${ic('plus')}จด ${esc(it.cost.note)} ${hk(it.cost.amt)}</button>`):''}
-          ${/disney/i.test((it.map||'')+it.h)?`<button class="btn-s pay" type="button" data-tab="dz">${ic('ticket')}แผนเครื่องเล่น</button>`:''}
+          ${/disney/i.test((it.map||'')+it.h)&&it.id!=='3b'?`<button class="btn-s pay" type="button" data-tab="dz">${ic('ticket')}แผนเครื่องเล่น</button>`:''}
           ${locOf(it)&&WATER?`<button class="btn-s" type="button" data-wnear="${it.id}" aria-expanded="${S.wOpen.has(it.id)}">${ic('drop')}น้ำดื่มใกล้ที่นี่</button>`:''}
           <button class="btn-s edit" type="button" data-edit="${it.id}" aria-label="แก้ไข ${esc(it.h)}">${ic('pen')}แก้ไข</button>
         </div>
@@ -2010,7 +2012,7 @@ function dzNowMin(){ const n=hkNow(); return n.date==='2026-11-16' ? n.min : (S.
 function dzMealNow(min){
   // which meal is due now, and should we go now? (restaurant queue short while rides are long, or getting late)
   for(const [k,m] of Object.entries(DZ_MEALS)){
-    if(S.done['dz:'+k] || min<m.from || min>m.to) continue;
+    if(dzMealDone(k) || min<m.from || min>m.to) continue;
     const rbh=DZQ&&DZQ.rbh&&Date.now()-DZQ.rbh.at<20*60e3?DZQ.rbh:null, recs=dzRecommend(true), best=recs.length?Math.min(...recs.map(r=>r.w.w)):0;
     const go = (rbh && rbh.open && (rbh.w<=15 && best>=25 || rbh.w<=10 && min>=m.from+30)) || min>=m.late;
     return {k, m, rbh, best, go};
@@ -2054,11 +2056,43 @@ function dzShowsHTML(){
 }
 const DZ_VOUCHER = [['lunch','มื้อเที่ยง (ก่อน 16:00)'],['dinner','มื้อเย็น (ตั้งแต่ 16:30)'],['snack','Frozen Lollipop หรือ Popcorn 1 ชิ้น ที่รถเข็น'],['cart20','ลด HK$20 เมื่อซื้อครบ HK$100 ที่รถเข็น']];
 function dzVoucherHTML(){
-  const left=DZ_VOUCHER.filter(([k])=>!S.done['dz:'+k]).length;
+  const vd=k=>k==='lunch'||k==='dinner'?dzMealDone(k):!!S.done['dz:'+k], left=DZ_VOUCHER.filter(([k])=>!vd(k)).length;
   return `<details class="panel dzvch"><summary><h3>🎟️ Meal Voucher <small>เหลือ ${left}/4 ▾</small></h3></summary>
-    ${DZ_VOUCHER.map(([k,n])=>`<button type="button" class="dzvi${S.done['dz:'+k]?' on':''}" data-dzmeal="${k}"><span class="ck2${S.done['dz:'+k]?' on':''}">${ic('check',3)}</span>${n}</button>`).join('')}
+    ${DZ_VOUCHER.map(([k,n])=>`<button type="button" class="dzvi${vd(k)?' on':''}" data-dzmeal="${k}"><span class="ck2${vd(k)?' on':''}">${ic('check',3)}</span>${n}</button>`).join('')}
     <p class="mini" style="margin:8px 0 0">โชว์ QR บน eTicket (Klook) ตอนสั่ง · ชุดราคาไม่เกิน HK$170 ไม่รวมเมนูพิเศษตามฤดูกาล · ใช้ได้ที่ Royal Banquet Hall, Clopin's, Starliner Diner, Comet Cafe, Wayfinders' Table, Golden Crocus Inn, Explorer's Club (เฉพาะมื้อเที่ยง ถึง 15:00) · ร้านนั่งโต๊ะ River View Cafe / Main Street Corner Cafe / Plaza Inn ใช้ได้แต่ต้องจ่ายส่วนต่าง + 10%</p></details>`;
 }
+
+/* ---------- Disney day: plan stops and the Disney tab share one state ---------- */
+// lunch/dinner/fireworks can be ticked from either place
+const DZ_LINK = {'3l':'dz:lunch', '3n':'dz:dinner', '3c':'dz:fireworks'};
+const dzMealDone = k => !!(S.done['dz:'+k] || S.done[{lunch:'3l',dinner:'3n'}[k]]);
+function dzLinkToggle(key){        // key is a plan id (3l/3n/3c) or a dz: key — both sides follow
+  const plan=Object.keys(DZ_LINK).find(p=>p===key||DZ_LINK[p]===key), dz=plan?DZ_LINK[plan]:key, on=!(S.done[plan]||S.done[dz]), next={...S.done};
+  if(on){ const v={at:hhmm(hkNow().min)}; next[dz]=v; if(plan) next[plan]=v } else { delete next[dz]; if(plan) delete next[plan] }
+  S.done=next; saveProgress(); renderAll(); return on;
+}
+// the park, right inside the plan's Disneyland stop
+function dzMiniHTML(){
+  const min=dzNowMin(), recs=dzRecommend(), today=hkNow().date==='2026-11-16';
+  return `<div class="dzmini">
+    <div class="dzmh"><b>🏰 ในสวนตอนนี้</b>${today?'':'<small>ตัวอย่าง (ข้อมูลจริงขึ้นวันที่ 16)</small>'}</div>
+    ${dzMealHTML(min)}
+    ${recs.length?`<div class="mini" style="margin:2px 0 4px">เล่นอะไรต่อดี</div>${recs.map((r,i)=>`<div class="dzmr"><span class="rk">${i+1}</span><span><b>${esc(DZ_RIDES[r.k].n)}</b><small>${DZ_LANDS[DZ_LAND_OF[r.k]][0]} · ${r.w.qt||r.w.live?'รอ':'คาดว่ารอ ~'} ${r.w.w} นาที · เดิน ~${r.walk} นาที</small></span><button type="button" class="btn-s" data-dz="${r.k}">เล่นแล้ว</button></div>`).join('')}`:''}
+    <div class="acts"><button type="button" class="btn-s pay" data-tab="dz">${ic('ticket')}เปิดแท็บ Disneyland ทั้งหมด</button></div></div>`;
+}
+// the day around the park, at the top of the Disney tab
+function dzDayHTML(){
+  const items=dayItems(3), park=items.find(i=>i.id==='3b'), home=items.find(i=>i.id==='3d'), min=dzNowMin(), parked=!!S.done['3b'];
+  let go='';
+  if(park && !parked){ const {opts}=optionsFor(3,park), sel=opts.length?chosen(3,park,opts):null;
+    go=`<div class="dzday"><b>🚇 ไป Disneyland</b><small>${sel?esc(sel.n)+(sel.fare?' · '+hk(sel.fare):'')+(sel.mins?' · ~'+sel.mins+' นาที':''):''} · ลง Disneyland Resort ออก Exit A · สวนเปิด ${hhmm(dzOpenT())} น.</small>
+      <div class="acts"><button type="button" class="btn-s pay" data-nextnav="3b">${ic('pin')}นำทาง</button><button type="button" class="btn-s" data-arrive="3b">${ic('check')}ถึงสวนแล้ว</button><button type="button" class="btn-s" data-gotoday="3">ดูแผนวันที่ 16</button></div></div>` }
+  else if(S.done['3c'] || min>=fwTime()+20){ const lh=lastHome();
+    go=`<div class="dzday"><b>🏠 กลับที่พัก</b><small>${lh?`รถไฟเที่ยวสุดท้าย: ขึ้นที่ ${esc(stName(NET.byCode[lh.st]))} ก่อน ${hhmm(lh.m%1440)} น.`:'MTR Disneyland Resort → Sunny Bay → Lai King → Mong Kok'}</small>
+      <div class="acts"><button type="button" class="btn-s pay" data-gohome="1">${ic('home',2)}พากลับที่พัก</button>${home?`<button type="button" class="btn-s" data-arrive="3d">${ic('check')}ถึงที่พักแล้ว</button>`:''}</div></div>` }
+  return go;
+}
+
 function dzFwHTML(){
   const min=dzNowMin(), left=fwTime()-min, wx=WARN&&WARN.list.some(w=>/TC|WRAIN|WTS/.test(w.code));
   return `<div class="dzfw"><b>🎆 พลุและโชว์หน้าปราสาท · ห้ามพลาด!</b>
@@ -2081,6 +2115,7 @@ function renderDisney(){
     <div class="dzhero">${DZ_CASTLE}
       <div><div class="eyebrow">จันทร์ 16 พ.ย. 2569</div><h2>Hong Kong Disneyland</h2>
       <div class="pillrow"><span class="pill mint">วันจันทร์ คนค่อนข้างน้อย</span><span class="pill">เล่นแล้ว ${doneN}/${Object.keys(DZ_RIDES).length}</span></div></div>${dzParkHTML()}</div>
+    ${dzDayHTML()}
     ${dzFwHTML()}
     ${dzVoucherHTML()}
     ${dzShowsHTML()}
@@ -2100,7 +2135,7 @@ function renderDisney(){
       <li>เวลารอในแผนเป็นค่าเฉลี่ยย้อนหลัง ไม่ใช่ของวันจริง เช็คเวลารอสดในแอป Hong Kong Disneyland หรือลิงก์ด้านบน</li></ul>
       <div class="src">สถิติเวลารอจาก queue-times.com (ไม่ใช่ข้อมูลทางการของ Disney) · เวลาเปิดสวนและโชว์อาจเปลี่ยน</div></div>`;
 }
-function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else next['dz:'+k]={at:hhmm(hkNow().min)}; S.done=next; renderDisney(); saveProgress() }
+function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else next['dz:'+k]={at:hhmm(hkNow().min)}; S.done=next; renderAll(); saveProgress() }
 const DZ_CASTLE = `<svg class="castle" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 58V30l4-6 4 6v28M46 58V30l4-6 4 6v28M18 58V36h28v22" fill="var(--pink-soft)" stroke="var(--pink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 36V22l8-12 8 12v14" fill="var(--sky-soft)" stroke="var(--sky)" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 58v-9a4 4 0 0 1 8 0v9" fill="var(--surface)" stroke="var(--pink)" stroke-width="2.5"/><path d="M32 10V4l5 2-5 2" fill="var(--sun)" stroke="var(--sun)" stroke-width="2"/><circle cx="32" cy="27" r="2.5" fill="var(--sun)"/></svg>`;
 
 /* ---------- home: countdown, trip map, four days at a glance ---------- */
@@ -2204,7 +2239,7 @@ function alertsHTML(){
     const spent=allExp().filter(e=>e.day===td).reduce((s,e)=>s+share(e,me),0), per=Number(S.budget)/4;
     if(spent>per) out.push(['warn',`วันนี้ใช้ไป ${hk(spent)} เกินงบเฉลี่ยต่อวัน (${hk(per)})`,'money']);
   }
-  if(td===3 && !S.done['dz:lunch'] && n.min>=15*60 && n.min<16*60) out.unshift(['warn',`🍽️ voucher มื้อเที่ยงต้องแลกก่อน 16:00 (อีก ${16*60-n.min} นาที)`,'dz']);
+  if(td===3 && !dzMealDone('lunch') && n.min>=15*60 && n.min<16*60) out.unshift(['warn',`🍽️ voucher มื้อเที่ยงต้องแลกก่อน 16:00 (อีก ${16*60-n.min} นาที)`,'dz']);
   if(td===3 && !S.done['3c']){ const left=fwBeThere()-n.min; if(left<=30 && left>-40) out.unshift(['warn',`🎆 ${left>0?'อีก '+left+' นาที':'ถึงเวลา'}ไปจองที่ดูพลุหน้าปราสาท (พลุเริ่ม ${hhmm(fwTime())} น.)`,'dz']) }
   if(td){ const {delay}=dayDelay(dayItems(td)); if(delay!=null && delay>=30) out.push(['info',`ช้ากว่าแผน ${delay} นาที ลองตัดหรือเลื่อนบางจุดในแผนวันนี้`,'plan']) }
   const now=n.min<4*60?n.min+1440:n.min, lh=(td||n.date==='2026-11-18') && now>=21*60 ? lastHome() : null;
@@ -2655,6 +2690,7 @@ function fixHotel(items){ const defs=Object.fromEntries(DEFAULT_PLAN.flat().map(
 function findItem(id){ for(let d=0;d<4;d++){ const it=S.plan[d].find(i=>i.id===id); if(it) return {dn:d+1,it} } return null }
 async function toggleArrive(id){
   const f=findItem(id); if(!f) return; const {dn,it}=f;
+  if(DZ_LINK[id]){ const on=dzLinkToggle(id); toast(on?'บันทึกแล้ว':'ยกเลิกแล้ว'); return }   // meals and fireworks are ticked the same way as in the Disney tab
   if(S.done[id]){
     const next={...S.done}; delete next[id]; S.done=next; renderPlan(); saveProgress();
     try{ if(S.expenses.some(e=>e.id===`auto-${id}-t`)) await removeExpense(`auto-${id}-t`); await reconcile(); toast('ยกเลิกแล้ว ค่าเดินทางที่จดอัตโนมัติถูกลบออก') }catch(e){ toast('ลบค่าเดินทางไม่สำเร็จ') }
@@ -2804,7 +2840,7 @@ document.addEventListener('click', e=>{
   if(ds.dzsim){ S.dzSimMin=Number(ds.dzsim); renderDisney(); return }
   if(ds.dzrefresh){ renderDisney(); toast('อัปเดตคำแนะนำแล้ว'); return }
   if(ds.dzreset) return dzReset();
-  if(ds.dzmeal){ const k='dz:'+ds.dzmeal; const next={...S.done}; if(next[k]) delete next[k]; else next[k]={at:hhmm(hkNow().min)}; S.done=next; saveProgress(); renderDisney(); toast(next[k]?'บันทึกแล้ว อิ่มอร่อย!':'ยกเลิกแล้ว'); return }
+  if(ds.dzmeal){ const on=dzLinkToggle('dz:'+ds.dzmeal); toast(on?'บันทึกแล้ว':'ยกเลิกแล้ว'); return }
   if(ds.fwreset){ const s={...S.settings}; delete s.fw; delete s.dzOpen; delete s.dzClose; S.settings=s; if(db) db.doc('trip/settings').set(S.settings).catch(()=>{}); else lsSave(); renderDisney(); toast('ใช้เวลาจากปฏิทินทางการแล้ว'); return }
   if(ds.fwsave){ const ok=s=>/^\d{2}:\d{2}$/.test(s), v=document.getElementById('fwt').value, o=document.getElementById('dzo').value, c=document.getElementById('dzc').value; if(!ok(v)) return;
     S.settings={...S.settings, fw:v, ...(ok(o)?{dzOpen:o}:{}), ...(ok(c)?{dzClose:c}:{})}; if(db) db.doc('trip/settings').set(S.settings).catch(()=>{}); else lsSave(); renderDisney(); toast('บันทึกเวลาพลุและเวลาสวนแล้ว'); return }
