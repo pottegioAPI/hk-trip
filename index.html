@@ -58,7 +58,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
-.dzwb{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:54px;height:54px;border-radius:14px;background:var(--wc);color:#fff;line-height:1}.dzwb b{font-family:var(--display);font-size:24px;font-weight:600;color:#fff!important}.dzwb small{font-size:10px;opacity:.95;margin-top:2px;color:#fff!important}.dznext .dzwb{min-width:62px;height:62px}.dznext .dzwb b{font-size:28px}.dzbtns{display:flex;flex-direction:column;gap:4px;align-items:stretch}.dzlater{border:none;background:var(--surface2);border-radius:99px;font-size:11.5px;padding:4px 8px;color:var(--muted)}
+.dzwb{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:54px;height:54px;border-radius:14px;background:var(--wc);color:#fff;line-height:1}.dzwb b{font-family:var(--display);font-size:24px;font-weight:600;color:#fff!important}.dzwb small{font-size:10px;opacity:.95;margin-top:2px;color:#fff!important}.dznext .dzwb{min-width:62px;height:62px}.dznext .dzwb b{font-size:28px}.dzbtns{display:flex;flex-direction:column;gap:8px;align-items:stretch}.dzlater{border:1.5px solid var(--line);background:var(--surface);border-radius:99px;font-size:12px;padding:6px 10px;color:var(--muted)}
 .mustt{display:inline-block;font-size:10.5px;font-weight:700;color:#fff;background:var(--pink);border-radius:99px;padding:0 6px;vertical-align:2px;font-family:var(--body)}
 .dzwhere{display:block;width:100%;border:none;background:var(--bg);border-radius:12px;padding:8px 10px;font-size:13.5px;color:var(--ink);text-align:left;margin-bottom:6px}.dzwhere b{font-weight:700}.dzwhere span{float:right;color:var(--pink);font-weight:600;font-size:12.5px}.dzset{background:var(--bg);border-radius:12px;padding:8px 10px;margin:-2px 0 8px;display:flex;flex-direction:column;gap:4px}
 .dzchips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:-4px 0 12px}.dzc{border:none;background:var(--surface);border-radius:18px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:0 2px 8px rgba(155,123,255,.15);color:var(--ink)}.dzci{width:38px;height:38px;border-radius:50%;background:var(--grape-soft);display:grid;place-items:center;font-size:20px;margin-bottom:2px}.dzc b{font-size:12px;font-weight:600}.dzc small{font-size:11px;color:var(--muted)}
@@ -421,7 +421,7 @@ nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding-
 .wxd span{font-size:11px;line-height:1.25}
 .dsum{padding:12px 14px}
 .wbtn.hbtn2{background:var(--sun-soft);color:var(--sun)}
-.wbtn.sosb{background:#E5383B;color:#fff;font:800 11px/1 system-ui,sans-serif;letter-spacing:.3px;box-shadow:0 2px 6px rgba(229,56,59,.35)}
+.wbtn.sosb{background:rgba(229,56,59,.13);color:#D9363C;font:800 11px/1 system-ui,sans-serif;letter-spacing:.3px}
 header.top .wrap{gap:8px}
 button.sync{border:none;font-weight:600;color:var(--ink);background:var(--pink-soft);padding:6px 12px;font-size:12.5px}
 
@@ -516,10 +516,10 @@ input[type=time].txt{appearance:none;min-height:46px}
   <div class="wrap">
     <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18M5 18V9l4-3v12M9 18V4l5 3v11M14 18v-8l5-2v10"/></svg></div>
     <div class="ttl"><h1>ทริปฮ่องกง</h1><p id="countdown">14–17 พ.ย. 2569</p></div>
-    <button class="wbtn sosb" type="button" data-sos="1" aria-label="บัตรฉุกเฉิน โทร 999 และสถานกงสุลไทย">SOS</button>
     <button class="wbtn hbtn2" id="hotelbtn" type="button" aria-label="ที่พักของเรา และพากลับที่พัก"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" fill="currentColor"/></svg></button>
     <button class="wbtn" id="waterbtn" type="button" aria-label="จุดกดน้ำฟรีใกล้ฉัน"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z" fill="currentColor"/><path d="M9.5 15.5q2.5 2 5 0" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></button>
     <button class="sync" id="sync" type="button" aria-label="สลับว่าใครใช้เครื่องนี้"><i></i><span>…</span></button>
+    <button class="wbtn sosb" type="button" data-sos="1" aria-label="บัตรฉุกเฉิน โทร 999 และสถานกงสุลไทย">SOS</button>
   </div>
 </header>
 
@@ -1167,8 +1167,10 @@ function sosSheetHTML(){
 /* ---------- live Disneyland waits (Queue-Times.com via our Supabase function) ---------- */
 let DZQ=null;
 const dzNorm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
+// the park is open right now and its board answered: plan with the real queues and closures of today
+const dzLiveNow = () => hkNow().date==='2026-11-16' || !!(DZQ && DZQ.anyOpen && Date.now()-DZQ.at<20*60e3);
 async function dzQueueFetch(force){
-  if(window.claude || hkNow().date!=='2026-11-16' || (!force && DZQ && Date.now()-DZQ.at<4*60e3)) return;   // today's queues/closures say nothing about 16 Nov
+  if(window.claude || (!force && DZQ && Date.now()-DZQ.at<4*60e3)) return;   // today's queues/closures say nothing about 16 Nov
   try{ const j=await liveJSON(SB.url+'/functions/v1/hk-queue'), m={};
     for(const r of j.rides||[]){ if(/single rider/i.test(r.name)) continue; const k=Object.keys(DZ_RIDES).find(k=>dzNorm(r.name).startsWith(dzNorm(DZ_RIDES[k].n))); if(k) m[k]={open:r.open, w:r.wait, at:Date.parse(r.updated)} }
     const rb=(j.rides||[]).find(r=>dzNorm(r.name)==='royalbanquethall');
@@ -1183,6 +1185,9 @@ const PDB = (()=>{ let p=null;
   const run=(mode,f)=>open().then(d=>new Promise((res,rej)=>{ const t=d.transaction('p',mode), q=f(t.objectStore('p')); t.oncomplete=()=>res(q&&q.result); t.onerror=()=>rej(t.error) }));
   return {get:k=>run('readonly',s=>s.get(k)), put:(k,v)=>run('readwrite',s=>s.put(v,k)), del:k=>run('readwrite',s=>s.delete(k)), keys:()=>run('readonly',s=>s.getAllKeys())};
 })();
+// day 1 of the trip: photos and hand-typed waits from trying the app out beforehand don't count
+// (the shared ticks, expenses and game are cleared on the server at the same moment)
+if(hkNow().date>='2026-11-14' && lsGet('hk-fresh','')!=='1'){ lsSet('hk-dzlive','{}'); lsSet('hk-ch','null'); PDB.keys().then(ks=>Promise.all((ks||[]).map(k=>PDB.del(k)))).catch(()=>{}).finally(()=>lsSet('hk-fresh','1')) }
 const photoURL = new Map();   // key -> object URL, so images show without re-reading
 async function photoSrc(k){ if(photoURL.has(k)) return photoURL.get(k); const b=await PDB.get(k).catch(()=>null); const u=b?URL.createObjectURL(b):''; photoURL.set(k,u); return u }
 async function shrinkPhoto(file, max=1280){
@@ -1360,7 +1365,7 @@ const flightFor = id => ({'1s':'EK384','1f':'EK384','1a':'EK384','4e':'EK385','4
 const tripStarted = () => !!S.done.start;
 const tripEnded = () => !!S.done['4g'] || hkNow().date>'2026-11-18';
 async function letsGo(){
-  if(S.done.start) return; S.done={...S.done, start:{at:hhmm(hkNow().min), ts:Date.now()}}; saveProgress(); confetti(); renderAll(); toast('เริ่มทริปแล้ว! เที่ยวให้สนุกนะ');
+  if(S.done.start) return; S.done={...S.done, start:{at:hhmm(hkNow().min), d:hkNow().date, ts:Date.now()}}; saveProgress(); confetti(); renderAll(); toast('เริ่มทริปแล้ว! เที่ยวให้สนุกนะ');
 }
 function confetti(){
   const c=document.createElement('canvas'), g=c.getContext('2d'), W=c.width=innerWidth, H=c.height=innerHeight, cols=['#FF4F8B','#FFC23D','#3FB2E6','#22C08B','#9B7BFF'];
@@ -1977,7 +1982,7 @@ function dzWait(k, min){
   const h=Math.floor(min/60), f=DZ_HOUR[h] ?? (h<9?.5:.4); return {w:Math.round(DZ_RIDES[k].avg*f/5)*5, live:false};
 }
 function dzRecommend(any){
-  const n=hkNow(), min = n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 630), here=S.dzLand||'MS';
+  const n=hkNow(), min = dzLiveNow() ? n.min : (S.dzSimMin ?? 630), here=S.dzLand||'MS';
   return Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]).map(k=>{ const w=dzWait(k,min), walk=dzWalk(here,DZ_LAND_OF[k]);
     if(!any && min+walk+w.w+10+dzWalk(DZ_LAND_OF[k],'MS') > fwBeThere()) return null;   // would miss the fireworks
     return w.closed ? null : {k, w, walk, score:w.w + walk + (DZ_RIDES[k].avg>=25 && min<11*60 ? -10 : 0)} }).filter(Boolean).sort((a,b)=>a.score-b.score).slice(0,3);
@@ -2059,7 +2064,7 @@ function dzOptimizeRun(){
   return {...best, start};
 }
 function dzRouteHTML(full){
-  const p=dzOptimize(), now=dzNowMin(), today=hkNow().date==='2026-11-16', deadline=fwBeThere();
+  const p=dzOptimize(), now=dzNowMin(), today=dzLiveNow(), deadline=fwBeThere();
   if(!p.steps.length) return `<p class="mini">เล่นครบและกินครบแล้ว! ไปจองที่ดูพลุได้เลย 🎆</p>`;
   const row=(s,i)=>{ if(s.snack) return `<div class="dzstep snack"><span class="dzwb" style="--wc:var(--sun)"><b>🍿</b><small>ฟรี</small></span><span><b>รับ Frozen Lollipop หรือ Popcorn ฟรี</b><small>${hhmm(s.at)} น. · รถเข็นแถว ${esc(DZ_LANDS[s.land][0])} ${s.walk?`(เดิน ${s.walk} นาที)`:'(อยู่โซนนี้)'} · Meal Voucher เลือก 1 อย่าง โชว์ QR ตอนรับ</small></span><div class="dzbtns"><button type="button" class="dzok" data-dzmeal="snack">รับแล้ว</button></div></div>`;
     const late=s.at+s.wait+s.dur>deadline, must=s.k&&DZ_MUST.has(s.k), name=s.meal?`🍽️ ${DZ_MEALS[s.meal].n} · Royal Banquet Hall`:(must?'⭐ ':'')+esc(DZ_RIDES[s.k].n)+(must?' <span class="mustt">ห้ามพลาด</span>':'');
@@ -2079,9 +2084,9 @@ function dzRouteHTML(full){
 }
 
 function dzSmartHTML(){
-  const today=hkNow().date==='2026-11-16';
+  const today=dzLiveNow(), trial=today&&hkNow().date!=='2026-11-16';
   return `${dzMealHTML(dzNowMin())}<div class="panel dzsmart"><h3>🧭 เส้นทางแนะนำ <button type="button" class="btn-s" data-dzrefresh="1">${ic('swap')}คำนวณใหม่</button></h3>
-    <button type="button" class="dzwhere" data-dzset="1">📍 ตอนนี้อยู่ <b>${esc(DZ_LANDS[S.dzLand||'MS'][0])}</b>${today?'':` · ตัวอย่างเริ่ม ${hhmm(S.dzSimMin??630)}`} <span>${S.dzSetOpen?'ปิด ▴':'เปลี่ยน ▾'}</span></button>
+    <button type="button" class="dzwhere" data-dzset="1">📍 ตอนนี้อยู่ <b>${esc(DZ_LANDS[S.dzLand||'MS'][0])}</b>${trial?' · <span class="dzlv">● คิวจริงวันนี้</span>':today?'':` · ตัวอย่างเริ่ม ${hhmm(S.dzSimMin??630)}`} <span>${S.dzSetOpen?'ปิด ▴':'เปลี่ยน ▾'}</span></button>
     ${S.dzSetOpen?`<div class="dzset"><div class="mini">อยู่โซนไหน (ปกติไม่ต้องกด แอปเปลี่ยนให้เองเมื่อกด "เล่นแล้ว")</div>
       <div class="places" style="margin:0 -14px 6px">${Object.entries(DZ_LANDS).map(([k,l])=>`<button class="chip" type="button" data-dzland="${k}" aria-pressed="${(S.dzLand||'MS')===k}">${l[0]}</button>`).join('')}</div>
       ${today?'':`<div class="mini">ลองดูแผนถ้าเริ่มตอน (ใช้ดูก่อนวันจริงเท่านั้น วันที่ 16 แอปใช้เวลาจริงเอง)</div><div class="places" style="margin:0 -14px">${[10.5,12,14,17,19].map(h=>`<button type="button" class="chip num" data-dzsim="${h*60}" aria-pressed="${(S.dzSimMin??630)===h*60}">${hhmm(h*60)}</button>`).join('')}</div>`}</div>`:''}
@@ -2118,7 +2123,7 @@ function dzParkHTML(){
   if(n.min<o) return `<div class="dzpk"><small>สวนเปิดใน</small><b class="num">${dur(o-n.min)}</b><small>เปิด ${hhmm(o)} น.</small></div>`;
   return '<div class="dzpk off"><small>สวน</small><b>ปิดแล้ว</b></div>';
 }                       // be at the castle 40 minutes before the show
-function dzNowMin(){ const n=hkNow(); return n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 630) }
+function dzNowMin(){ const n=hkNow(); return dzLiveNow() ? n.min : (S.dzSimMin ?? 630) }
 function dzMealNow(min){
   // which meal is due now, and should we go now? (restaurant queue short while rides are long, or getting late)
   for(const [k,m] of Object.entries(DZ_MEALS)){
@@ -2178,14 +2183,14 @@ const DZ_LINK = {'3l':'dz:lunch', '3n':'dz:dinner', '3c':'dz:fireworks'};
 const dzMealDone = k => !!(S.done['dz:'+k] || S.done[{lunch:'3l',dinner:'3n'}[k]]);
 function dzLinkToggle(key){        // key is a plan id (3l/3n/3c) or a dz: key — both sides follow
   const plan=Object.keys(DZ_LINK).find(p=>p===key||DZ_LINK[p]===key), dz=plan?DZ_LINK[plan]:key, on=!(S.done[plan]||S.done[dz]), next={...S.done};
-  if(on){ const v={at:hhmm(hkNow().min)}; next[dz]=v; if(plan) next[plan]=v } else { delete next[dz]; if(plan) delete next[plan] }
+  if(on){ const v={at:hhmm(hkNow().min), d:hkNow().date}; next[dz]=v; if(plan) next[plan]=v } else { delete next[dz]; if(plan) delete next[plan] }
   S.done=next; saveProgress(); renderAll(); if(S.sheet&&S.sheet.kind==='dzinfo') drawSheet(); return on;
 }
 // the park, right inside the plan's Disneyland stop
 function dzMiniHTML(){
-  const min=dzNowMin(), recs=dzRecommend(), today=hkNow().date==='2026-11-16';
+  const min=dzNowMin(), recs=dzRecommend(), today=dzLiveNow(), trial=today&&hkNow().date!=='2026-11-16';
   return `<div class="dzmini">
-    <div class="dzmh"><b>🏰 ในสวนตอนนี้</b>${today?'':'<small>ตัวอย่าง (ข้อมูลจริงขึ้นวันที่ 16)</small>'}</div>
+    <div class="dzmh"><b>🏰 ในสวนตอนนี้</b>${trial?'<small class="dzlv">● คิวจริงวันนี้ (ทดลองก่อนไป)</small>':today?'':'<small>ตัวอย่าง (สวนปิดอยู่ ใช้สถิติคิว)</small>'}</div>
     ${dzMealHTML(min)}
     ${dzRouteHTML(false)}
     <div class="acts"><button type="button" class="btn-s pay" data-tab="dz">${ic('ticket')}เปิดแท็บ Disneyland ทั้งหมด</button></div></div>`;
@@ -2287,7 +2292,7 @@ function renderDisney(){
       <li>เวลารอในแผนเป็นค่าเฉลี่ยย้อนหลัง ไม่ใช่ของวันจริง เช็คเวลารอสดในแอป Hong Kong Disneyland หรือลิงก์ด้านบน</li></ul>
       <div class="src">สถิติเวลารอจาก queue-times.com (ไม่ใช่ข้อมูลทางการของ Disney) · เวลาเปิดสวนและโชว์อาจเปลี่ยน</div></div>`;
 }
-function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else { next['dz:'+k]={at:hhmm(hkNow().min)}; S.dzLand=DZ_LAND_OF[k] } S.done=next; renderAll(); saveProgress() }
+function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else { next['dz:'+k]={at:hhmm(hkNow().min), d:hkNow().date}; S.dzLand=DZ_LAND_OF[k] } S.done=next; renderAll(); saveProgress() }
 const DZ_CASTLE = `<svg class="castle" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 58V30l4-6 4 6v28M46 58V30l4-6 4 6v28M18 58V36h28v22" fill="var(--pink-soft)" stroke="var(--pink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 36V22l8-12 8 12v14" fill="var(--sky-soft)" stroke="var(--sky)" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 58v-9a4 4 0 0 1 8 0v9" fill="var(--surface)" stroke="var(--pink)" stroke-width="2.5"/><path d="M32 10V4l5 2-5 2" fill="var(--sun)" stroke="var(--sun)" stroke-width="2"/><circle cx="32" cy="27" r="2.5" fill="var(--sun)"/></svg>`;
 
 /* ---------- home: countdown, trip map, four days at a glance ---------- */
@@ -2857,7 +2862,7 @@ async function toggleArrive(id){
   }
   const label=((sel&&sel.mode==='bus'&&sel.key==='bus:c'&&it.go&&it.go.no?'บัส '+it.go.no:sel?sel.n:'')+' → '+it.h).slice(0,60);
   const paid = sel && sel.mode!=='walk' && sel.fare>0;
-  S.done={...S.done,[id]:{at:hhmm(hkNow().min), ...(paid?{fare:sel.fare, label, shared:!!sel.shared, oct:['mtr','bus','ferry','other'].includes(sel.mode)}:{})}}; renderPlan(); saveProgress();
+  S.done={...S.done,[id]:{at:hhmm(hkNow().min), d:hkNow().date, ...(paid?{fare:sel.fare, label, shared:!!sel.shared, oct:['mtr','bus','ferry','other'].includes(sel.mode)}:{})}}; renderPlan(); saveProgress();
   if(!paid){ toast('ถึงแล้ว!'); return }
   if(S.meta.skip['auto-'+id]){ const sk={...S.meta.skip}; delete sk['auto-'+id]; S.meta.skip=sk; saveProfile().catch(()=>{}) } // arriving again records it again
   try{
