@@ -48,6 +48,9 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .hdbud{border:none;background:none;padding:0;font:inherit;font-weight:700;color:var(--mint)}
 .hdbud.low{color:#E58A00}
 .hdbud.neg{color:var(--danger)}
+.cur{font-size:.55em;font-weight:500;opacity:.85;letter-spacing:.02em}
+.hero .big small{display:block;font-size:15px;margin-top:2px;opacity:.9}
+.hdbud .cur{font-size:.85em}
 @media (max-width:430px){ header.top .logo{display:none} }
 .sync{flex:none;font-size:11.5px;padding:4px 10px;border-radius:99px;background:var(--surface2);color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
@@ -853,7 +856,10 @@ const allExp = () => S.expenses.concat(S.mine);
 /* ---------- helpers ---------- */
 const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = (n,d=0) => Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d});
-const hk = n => (n<0?'-':'')+'HK$'+fmt(Math.abs(n), Math.abs(n)%1 ? 1 : 0);
+// written HK 2,482.9 $ with spaces that never break, so the number stands apart from the currency
+const hk = n => (n<0?'-':'')+'HK '+fmt(Math.abs(n), Math.abs(n)%1 ? 1 : 0)+' $';
+// the big money figures: the number large, HK and $ small beside it
+const hkH = n => `${n<0?'-':''}<span class="cur">HK</span> ${fmt(Math.abs(n), Math.abs(n)%1 ? 1 : 0)} <span class="cur">$</span>`;
 const thb = n => '≈ '+fmt(Math.round(n*rate()))+' ฿';
 const rate = () => Number(S.settings.rate)||4.65;
 const nm = i => esc((S.settings.names||DEFAULTS.names)[i] || DEFAULTS.names[i]);
@@ -994,7 +1000,7 @@ function renderHeader(){
   // under the title: where we are in the trip, and how much of my own budget is left (tap → money)
   const when = td ? `วันที่ ${td}/4 · ${DAYS[td-1].dow} ${DAYS[td-1].d} พ.ย.` : n.date<DAYS[0].date ? `อีก ${Math.ceil((Date.parse(DAYS[0].date)-Date.parse(n.date))/864e5)} วันบิน` : 'จบทริปแล้ว';
   const B=Number(S.budget)||0, left = S.me!=null && B>0 ? B-allExp().reduce((t,e)=>t+share(e,S.me),0) : null;
-  cd.innerHTML = left==null ? esc(when)+' · 14–17 พ.ย. 2569' : `<button type="button" class="hdbud${left<0?' neg':left<B*.15?' low':''}" data-tab="money">${left<0?'เกินงบ '+hk(-left):'เหลือ '+hk(left)}</button> · ${esc(when)}`;
+  cd.innerHTML = left==null ? esc(when)+' · 14–17 พ.ย. 2569' : `<button type="button" class="hdbud${left<0?' neg':left<B*.15?' low':''}" data-tab="money">${left<0?'เกินงบ '+hkH(-left):'เหลือ '+hkH(left)}</button> · ${esc(when)}`;
   const sy=document.getElementById('sync');
   sy.className='sync'+(S.mode==='shared' && S.net!=='off' && S.net!=='wait'?' on':'')+(S.net==='wait'?' wait':'');
   sy.querySelector('span').innerHTML = S.me==null ? 'คุณคือใคร?' : nm(S.me);
@@ -1783,16 +1789,16 @@ function renderMoney(){
     ${setPanelHTML()}
     <div class="hero">
       ${B ? `<div class="lab"><b>${left>=0?'เงินคงเหลือ':'เกินงบแล้ว'}</b> ของ${nm(me)}</div>
-      <div class="big num">${hk(Math.abs(left))} <small>${thb(Math.abs(left))}</small></div>`
+      <div class="big num">${hkH(Math.abs(left))} <small>${thb(Math.abs(left))}</small></div>`
       : `<div class="lab">${nm(me)} ใช้ไปแล้ว · ส่วนตัว ${nm(other(me))} มองไม่เห็น</div>
-      <div class="big num">${hk(tot)} <small>${thb(tot)}</small></div>`}
+      <div class="big num">${hkH(tot)} <small>${thb(tot)}</small></div>`}
       ${(()=>{ const o=octoState(); return o.spent||o.bal!=null ? `<button type="button" class="ocline" data-msub="oct">จ่ายผ่าน Octopus ${hk(o.spent)} · คงเหลือในบัตร ${o.bal==null?'–':hk(o.bal)} ›</button>` : '' })()}
       ${B?`<div class="bar left${left<0?' over':''}" style="margin-top:12px"><i style="width:${Math.max(0,Math.min(100,left/B*100))}%"></i></div>
       <div class="barcap">${left>=0?`เหลือ ${Math.round(left/B*100)}% ของงบ`:'ใช้เกินงบแล้ว'} · ส่วนตัว ${nm(other(me))} มองไม่เห็น</div>`:''}
       <div class="people" style="margin-top:8px">
-        ${B ? `<div class="person"><div class="nm">ใช้ไปแล้ว</div><div class="v num">${hk(tot)}</div><small class="num">จากงบ ${hk(B)}</small></div>`
+        ${B ? `<div class="person"><div class="nm">ใช้ไปแล้ว</div><div class="v num">${hkH(tot)}</div><small class="num">จากงบ ${hk(B)}</small></div>`
           : `<div class="person"><div class="nm">งบของ${nm(me)}</div><div class="v num">ยังไม่ตั้ง</div><small>ไปตั้งที่แท็บ ตั้งงบ</small></div>`}
-        <div class="person"><div class="nm">ใช้ได้อีกวันละ</div><div class="v num">${B&&left>0&&daysLeft>0?'~'+hk(left/daysLeft):'–'}</div><small>${daysLeft?`เหลือ ${daysLeft} วัน`:'จบทริปแล้ว'}</small></div>
+        <div class="person"><div class="nm">ใช้ได้อีกวันละ</div><div class="v num">${B&&left>0&&daysLeft>0?'~'+hkH(left/daysLeft):'–'}</div><small>${daysLeft?`เหลือ ${daysLeft} วัน`:'จบทริปแล้ว'}</small></div>
       </div>
     </div>
     ${owe<0.05?'':`<div class="panel"><h3>เคลียร์เงิน ${nm(0)} ↔ ${nm(1)} <small>เห็นตรงกันทั้ง 2 เครื่อง</small></h3>
