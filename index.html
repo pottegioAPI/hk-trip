@@ -390,6 +390,13 @@ nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding-
 .wbtn{flex:none;width:38px;height:38px;border-radius:50%;border:none;background:var(--sky-soft);color:var(--sky);display:grid;place-items:center;padding:0}
 .wbtn svg{width:22px;height:22px}
 .ocline{display:block;margin-top:8px;border:none;background:rgba(255,255,255,.22);color:inherit;border-radius:99px;padding:5px 12px;font-size:12.5px;font-weight:600}
+.fsec{border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;margin-top:12px}
+.fsh{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;margin-bottom:10px}
+.fsh i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font-size:12px}
+.fwho{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:start;margin-top:8px}
+.fwho:first-of-type{margin-top:0}
+.fwho>span{font-size:13px;font-weight:600;color:var(--muted);padding-top:8px}
+.fwho .chips{margin:0}
 .hero .lab{font-size:15px;opacity:1}
 .hero .lab b{font-weight:700}
 .hero .big{font-size:40px;margin-top:2px}
@@ -2769,15 +2776,18 @@ function drawSheet(){
     const a=Number(d.amt)||0, o=other(S.me), hint=esc(expHint(d));
     el.innerHTML = `<div class="wrap"><div class="grab"></div>
     <h2 id="sheet-title">จดค่าใช้จ่าย <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
-    <div class="amtbox"><span style="font-family:var(--display);font-size:22px;color:var(--muted)">HK$</span><input id="f-amt" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0" value="${esc(d.amt)}" aria-label="จำนวนเงิน HK$"></div>
-    <div class="conv num" id="f-conv">${a?thb(a):'กรอกเป็นเงินฮ่องกง'}</div>
-    <div class="fl">แบบไหน</div><div class="chips">${chip('type','own','ของฉันเอง')}${chip('type','split','ฉันจ่าย หารครึ่ง')}${chip('type','split-them',nm(o)+'จ่าย หารครึ่ง')}${chip('type','adv-me','ฉันออกให้'+nm(o)+'ก่อน')}${chip('type','adv-them',nm(o)+'ออกให้ฉันก่อน')}</div>
-    <div class="conv" id="f-hint" style="margin-top:6px">${hint}</div>
-    <div class="fl">หมวด</div><div class="chips">${CATS.map(c=>chip('cat',c.k,c.n,c.i)).join('')}</div>
-    ${EXP_TYPES[d.type].mine?`<div class="fl">จ่ายด้วย</div><div class="chips">${chip('oct','',ic('wallet')+'เงินสด/อื่นๆ')}${chip('oct','1','บัตร Octopus')}</div>`:''}
-    <label class="fl" for="f-note">รายละเอียด</label>
-    <input class="txt" id="f-note" maxlength="60" placeholder="เช่น ติ่มซำ, ตั๋ว Disneyland" value="${esc(d.note)}">
-    <div class="fl">วันที่</div><div class="chips">${DAYS.map(x=>chip('day',x.n,`${x.d} พ.ย.`)).join('')}${chip('day',0,'อื่นๆ')}</div>
+    <div class="fsec"><div class="fsh"><i>1</i>เท่าไหร่ ซื้ออะไร</div>
+      <div class="amtbox"><span style="font-family:var(--display);font-size:22px;color:var(--muted)">HK$</span><input id="f-amt" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0" value="${esc(d.amt)}" aria-label="จำนวนเงิน HK$"></div>
+      <div class="conv num" id="f-conv">${a?thb(a):'กรอกเป็นเงินฮ่องกง'}</div>
+      <input class="txt" id="f-note" maxlength="60" placeholder="รายละเอียด เช่น ติ่มซำ, ตั๋ว Disneyland" value="${esc(d.note)}" aria-label="รายละเอียด" style="margin-top:8px">
+      <div class="chips" style="margin-top:10px">${CATS.map(c=>chip('cat',c.k,c.n,c.i)).join('')}</div></div>
+    <div class="fsec"><div class="fsh"><i>2</i>ใครจ่าย</div>
+      <div class="fwho"><span>ฉันจ่าย</span><div class="chips">${chip('type','own','ของฉันคนเดียว')}${chip('type','split','หารครึ่ง')}${chip('type','adv-me','ออกให้'+nm(o)+'ก่อน')}</div></div>
+      <div class="fwho"><span>${nm(o)}จ่าย</span><div class="chips">${chip('type','split-them','หารครึ่ง')}${chip('type','adv-them','ออกให้ฉันก่อน')}</div></div>
+      <div class="conv" id="f-hint" style="margin-top:6px">${hint}</div>
+      ${EXP_TYPES[d.type].mine?`<div class="fwho"><span>จ่ายด้วย</span><div class="chips">${chip('oct','',ic('wallet')+'เงินสด/อื่นๆ')}${chip('oct','1','บัตร Octopus')}</div></div>`:''}</div>
+    <div class="fsec"><div class="fsh"><i>3</i>วันไหน</div>
+      <div class="chips">${DAYS.map(x=>chip('day',x.n,`${x.d} พ.ย.`)).join('')}${chip('day',0,'อื่นๆ')}</div></div>
     <button class="save" type="button" id="f-save" ${a>0?'':'disabled'}>บันทึก</button>
     <div class="err" id="f-err" hidden></div></div>`;
   } else {
