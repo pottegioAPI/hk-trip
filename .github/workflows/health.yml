@@ -1,0 +1,21 @@
+# Every morning (07:45 Hong Kong time) check from outside that everything the trip needs works:
+# website, live Disney queues, flight status, sync database, last night's backup, fresh data.
+# A failure fails this job, and GitHub emails the repository owner.
+name: health-check
+on:
+  schedule:
+    - cron: '45 23 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check every part of the trip app
+        run: node tools/health.js

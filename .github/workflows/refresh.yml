@@ -8,6 +8,8 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency: refresh
 jobs:
   refresh:
@@ -35,3 +37,7 @@ jobs:
           git add -A index.html sw.js hk-trip.html bus.json places.json water.json weather.json lasttrain.json dzcal.json data-cache/last-osm
           git diff --cached --quiet || git commit -m "Daily data refresh $(date -u +%F)"
           git push
+  # a push made by this job doesn't start other workflows, so the test-then-publish step is called here
+  publish:
+    needs: refresh
+    uses: ./.github/workflows/deploy.yml
