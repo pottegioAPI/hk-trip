@@ -2746,7 +2746,8 @@ function setPanelHTML(){
     <button class="save" type="button" id="set-save">บันทึก</button>
     ${!S.web?`<div class="fl">PIN เข้าแอป</div><div class="mini">เครื่องนี้ยังไม่ได้เข้าด้วยลิงก์ส่วนตัว เปิดลิงก์ส่วนตัวของคุณก่อน แล้วช่องตั้ง PIN จะขึ้นตรงนี้</div>`:''}
     ${S.web&&S.me!=null?`<label class="fl" for="set-pin">PIN เข้าแอป 4 ตัว ของ${nm(S.me)} <small>${S.pinSet?'· ตั้งแล้ว':'· ยังไม่ได้ตั้ง'}</small></label>
-    <div class="fin"><input id="set-pin" class="txt num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="${S.pinSet?'ใส่ PIN ใหม่เพื่อเปลี่ยน':'ตั้ง PIN 4 ตัว'}" style="flex:1;width:auto"><button type="button" class="btn-s pay" data-setpin="1">${S.pinSet?'เปลี่ยน PIN':'ตั้ง PIN'}</button></div>
+    ${S.pinSet?`<input id="set-pin-old" class="txt num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="PIN เดิม" aria-label="PIN เดิม" style="margin-bottom:6px">`:''}
+    <div class="fin"><input id="set-pin" class="txt num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="${S.pinSet?'PIN ใหม่':'ตั้ง PIN 4 ตัว'}" aria-label="PIN ใหม่" style="flex:1;width:auto"><button type="button" class="btn-s pay" data-setpin="1">${S.pinSet?'เปลี่ยน PIN':'ตั้ง PIN'}</button></div>
     <div class="mini">ใช้เข้าแอปแทนลิงก์ยาว เช่นตอนเปิดจากไอคอนหน้าจอ · อีกคนใช้ PIN นี้เข้าข้อมูลของคุณไม่ได้ เพราะต้องเลือกชื่อคุณด้วย และใส่ผิด 5 ครั้งจะล็อก 15 นาที</div>`:''}
     <div class="mini" style="margin-top:8px">${S.uid?'งบและค่าใช้จ่ายส่วนตัวผูกกับบัญชี claude.ai ของคุณ อีกคนมองไม่เห็น':'งบและค่าใช้จ่ายส่วนตัวเก็บในเครื่องนี้เท่านั้น'}</div></details>`;
 }
@@ -3279,10 +3280,13 @@ async function pinLogin(){
   document.getElementById('pinin').value='';
 }
 async function setPin(){
-  const el=document.getElementById('set-pin'), v=(el&&el.value||'').trim();
-  if(!/^[0-9]{4}$/.test(v)){ toast('PIN ต้องเป็นตัวเลข 4 หลัก'); return }
-  try{ await sbRpc('hk_set_pin',{p_key:lsGet('hk-key',''), p_pin:v}); S.pinSet=true; el.value=''; toast('ตั้ง PIN แล้ว ใช้เข้าแอปได้เลย'); renderAll() }
-  catch(e){ toast(e.http?'ตั้ง PIN ไม่สำเร็จ':'ไม่มีเน็ต ตั้ง PIN ไม่ได้') }
+  const el=document.getElementById('set-pin'), old=document.getElementById('set-pin-old'), v=(el&&el.value||'').trim(), o=(old&&old.value||'').trim();
+  if(S.pinSet && !/^[0-9]{4}$/.test(o)){ toast('ใส่ PIN เดิมก่อน'); old&&old.focus(); return }
+  if(!/^[0-9]{4}$/.test(v)){ toast('PIN ใหม่ต้องเป็นตัวเลข 4 หลัก'); return }
+  let r; try{ r=await sbRpc('hk_set_pin',{p_key:lsGet('hk-key',''), p_pin:v, p_old:S.pinSet?o:null}) }catch(e){ toast(e.http?'ตั้ง PIN ไม่สำเร็จ':'ไม่มีเน็ต ตั้ง PIN ไม่ได้'); return }
+  if(r&&r.ok){ const was=S.pinSet; S.pinSet=true; toast(was?'เปลี่ยน PIN แล้ว':'ตั้ง PIN แล้ว ใช้เข้าแอปได้เลย'); renderAll(); return }
+  if(old) old.value='';
+  toast(r&&r.err==='locked' ? `ใส่ผิดหลายครั้ง ล็อก ${r.mins} นาที` : r&&r.err==='old' ? `PIN เดิมไม่ถูกต้อง (ลองได้อีก ${r.left} ครั้ง)` : 'PIN ต้องเป็นตัวเลข 4 หลัก');
 }
 async function sbRpc(fn, args){
   const r = await fetch(SB.url+'/rest/v1/rpc/'+fn, {method:'POST', headers:{apikey:SB.key,'Content-Type':'application/json'}, body:JSON.stringify(args)});
