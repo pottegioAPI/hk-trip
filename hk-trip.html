@@ -51,6 +51,8 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .cur{font-size:.55em;font-weight:500;opacity:.85;letter-spacing:.02em}
 .hero .big small{display:block;font-size:15px;margin-top:2px;opacity:.9}
 .hdbud .cur{font-size:.85em}
+.dzall{display:flex;flex-direction:column;gap:6px}
+.dzref summary h3 small{font-weight:400;color:var(--muted);font-size:12px}
 @media (max-width:430px){ header.top .logo{display:none} }
 .sync{flex:none;font-size:11.5px;padding:4px 10px;border-radius:99px;background:var(--surface2);color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
@@ -2317,14 +2319,16 @@ function renderDisney(){
     ${dzChipsHTML()}
     ${dzDayHTML()}
     ${dzSmartHTML()}
-    <details class="dzref"><summary><h3>แผนตามโซน (ร่างเดิม) + เวลารอทุกเครื่อง ▾</h3></summary><ol class="dzplan">${DZ_PLAN.map((b,bi)=>`<li class="dzb${bi===slot?' now':''}">
-      <div class="dzt num">${b.t}–${b.e}${bi===slot?' <span class="nowtag">ตอนนี้</span>':''}</div>
-      <h3>${esc(b.zone)}</h3><p class="mini">${esc(b.why)}</p>
-      ${b.rides.map(k=>{ const r=DZ_RIDES[k], done=!!S.done['dz:'+k];
-        return `<button type="button" class="dzr${done?' done':''}" data-dz="${k}"><span class="ck">${ic('check',3)}</span>
-          <span class="rn"><b>${esc(r.n)}</b><small>${esc(r.th)} · ${DZ_LV[r.lv]}</small></span>${waitTag(r,k)}</button>
-          ${S.dzEdit===k?`<div class="fin" style="margin:6px 0 0 38px"><label for="dzw-${k}">ตอนนี้รอ</label><input id="dzw-${k}" type="number" inputmode="numeric" min="0" step="5" value="${dzLive()[k]?dzLive()[k].w:''}"><span>นาที</span><button type="button" class="btn-s pay" data-dzsave="${k}">บันทึก</button></div>`:''}` }).join('')}
-      ${b.meal?`<div class="tip">${esc(b.meal)}</div>`:''}</li>`).join('')}</ol></details>
+    <details class="dzref"><summary><h3>⏱️ เวลารอทุกเครื่อง <small>เรียงจากคิวสั้นไปยาว ▾</small></h3></summary>
+      <p class="mini" style="margin:0 0 8px">แตะชื่อเครื่อง = เล่นแล้ว · แตะเวลารอ = แก้เป็นคิวจริงที่เห็นหน้าเครื่อง</p>
+      <div class="dzall">${(()=>{ const now=dzNowMin();
+        // sorted by the number each row shows: what was typed in, else the live board, else the usual wait
+        const rank=k=>{ const lv=dzLive()[k], q=DZQ&&DZQ.anyOpen&&DZQ.m[k]&&Date.now()-DZQ.m[k].at<20*60e3?DZQ.m[k]:null;
+          const w = lv&&Date.now()-lv.at<40*60e3 ? lv.w : q ? (q.open?q.w:1000) : DZ_RIDES[k].avg; return (S.done['dz:'+k]?2000:0)+w };
+        return Object.keys(DZ_RIDES).sort((a,b)=>rank(a)-rank(b)).map(k=>{ const r=DZ_RIDES[k], done=!!S.done['dz:'+k], must=DZ_MUST.has(k);
+          return `<button type="button" class="dzr${done?' done':''}" data-dz="${k}"><span class="ck">${ic('check',3)}</span>
+            <span class="rn"><b>${must?'⭐ ':''}${esc(r.n)}</b><small>${esc(DZ_LANDS[DZ_LAND_OF[k]][0])} · ${DZ_LV[r.lv]}</small></span>${waitTag(r,k)}</button>
+            ${S.dzEdit===k?`<div class="fin" style="margin:6px 0 0 38px"><label for="dzw-${k}">ตอนนี้รอ</label><input id="dzw-${k}" type="number" inputmode="numeric" min="0" step="5" value="${dzLive()[k]?dzLive()[k].w:''}"><span>นาที</span><button type="button" class="btn-s pay" data-dzsave="${k}">บันทึก</button></div>`:''}` }).join('') })()}</div></details>
     <div class="panel"><h3>ทิปประหยัดเวลา</h3><ul class="tips">
       <li>ไปถึงก่อนเปิดสวน แล้วเดินไปโซน Frozen ก่อนเลย แถวโซนนี้ยาวที่สุดทั้งวัน</li>
       <li>Hyperspace Mountain, Big Grizzly และ Parachute Drop มีแถวคนเดียว (Single Rider) เร็วกว่ามาก ถ้าไม่ต้องนั่งคู่กัน</li>
