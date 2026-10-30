@@ -52,6 +52,11 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .hero .big small{display:block;font-size:15px;margin-top:2px;opacity:.9}
 .hdbud .cur{font-size:.85em}
 .save svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
+.pinlog{border:2px solid var(--pink)}
+.pinwho{margin-bottom:10px}
+.pinwho .chip{flex:1 1 0 !important;justify-content:center;text-align:center;font-size:16px;padding:12px}
+.pinbox{font-size:24px;letter-spacing:.5em;text-align:center}
+.pinalt{margin-top:12px;font-size:13px;color:var(--muted)}
 .dzsrc{font-size:12.5px;color:var(--muted);margin:2px 0 8px}
 .dzsrc.on{color:var(--mint);font-weight:600}
 .dzplayed{margin-top:10px;padding-top:8px;border-top:1.5px dashed var(--line)}
@@ -2528,9 +2533,15 @@ function renderHome(){
   const spent = me==null ? 0 : allExp().reduce((s,e)=>s+share(e,me),0), B=Number(S.budget)||0, oc=me==null?{bal:null}:octoState();
   const stopsAll = DAYS.reduce((s,d)=>s+dayItems(d.n).length,0), doneAll = DAYS.reduce((s,d)=>s+dayItems(d.n).filter(i=>S.done[i.id]).length,0);
   document.getElementById('v-home').innerHTML = `
-    ${S.needKey?`<div class="panel" style="border:2px solid var(--pink)"><h3>เข้าใช้ด้วยลิงก์ส่วนตัว</h3>
-      <p class="mini" style="margin:0 0 8px">เปิดแอปจากลิงก์ส่วนตัวที่ได้รับครั้งเดียว ข้อมูลของแบงค์กับเจจะตรงกัน หรือวางรหัสท้ายลิงก์ (หลัง #k=) ตรงนี้ ตอนนี้แอปบันทึกไว้เฉพาะในเครื่องนี้</p>
-      <div class="fin"><input id="keyin" class="txt" style="width:auto;flex:1" autocomplete="off" placeholder="รหัสส่วนตัว"><button type="button" class="btn-s pay" data-setkey="1">เข้าใช้</button></div></div>`:''}
+    ${S.needKey?`<div class="panel pinlog"><h3>เข้าใช้แอป</h3>
+      <p class="mini" style="margin:0 0 10px">เลือกชื่อ แล้วใส่ PIN 4 ตัวของคุณ (แต่ละคนเห็นแค่ข้อมูลส่วนตัวของตัวเอง)</p>
+      <div class="chips pinwho">${[0,1].map(p=>`<button class="chip" type="button" data-pinwho="${p}" aria-pressed="${S.pinWho===p}">${esc(DEFAULTS.names[p])}</button>`).join('')}</div>
+      <input id="pinin" class="txt num pinbox" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="PIN 4 ตัว" aria-label="PIN 4 ตัว">
+      <button type="button" class="save" data-pinlogin="1">เข้าใช้</button>
+      <div class="err" id="pin-err" hidden></div>
+      <details class="pinalt"><summary>ยังไม่ได้ตั้ง PIN? เข้าด้วยลิงก์ยาว</summary>
+        <p class="mini" style="margin:6px 0">เปิดลิงก์ส่วนตัวที่ได้รับ หรือวางรหัสท้ายลิงก์ (หลัง #k=) ตรงนี้ แล้วตั้ง PIN ได้ที่แท็บเงิน &gt; ตั้งงบและชื่อ</p>
+        <div class="fin"><input id="keyin" class="txt" style="width:auto;flex:1" autocomplete="off" placeholder="รหัสส่วนตัว"><button type="button" class="btn-s pay" data-setkey="1">เข้าใช้</button></div></details></div>`:''}
     ${heroHTML()}
     ${warnHTML()}
     ${alertsHTML()}
@@ -2712,6 +2723,9 @@ function setPanelHTML(){
     <div class="grid2"><div><label class="fl" for="set-n0">คนที่ 1</label><input class="txt" id="set-n0" maxlength="16" value="${esc(s.names[0])}"></div>
       <div><label class="fl" for="set-n1">คนที่ 2</label><input class="txt" id="set-n1" maxlength="16" value="${esc(s.names[1])}"></div></div>
     <button class="save" type="button" id="set-save">บันทึก</button>
+    ${S.web&&S.me!=null?`<label class="fl" for="set-pin">PIN เข้าแอป 4 ตัว ของ${nm(S.me)} <small>${S.pinSet?'· ตั้งแล้ว':'· ยังไม่ได้ตั้ง'}</small></label>
+    <div class="fin"><input id="set-pin" class="txt num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="${S.pinSet?'ใส่ PIN ใหม่เพื่อเปลี่ยน':'ตั้ง PIN 4 ตัว'}" style="flex:1;width:auto"><button type="button" class="btn-s pay" data-setpin="1">${S.pinSet?'เปลี่ยน PIN':'ตั้ง PIN'}</button></div>
+    <div class="mini">ใช้เข้าแอปแทนลิงก์ยาว เช่นตอนเปิดจากไอคอนหน้าจอ · อีกคนใช้ PIN นี้เข้าข้อมูลของคุณไม่ได้ เพราะต้องเลือกชื่อคุณด้วย และใส่ผิด 5 ครั้งจะล็อก 15 นาที</div>`:''}
     <div class="mini" style="margin-top:8px">${S.uid?'งบและค่าใช้จ่ายส่วนตัวผูกกับบัญชี claude.ai ของคุณ อีกคนมองไม่เห็น':'งบและค่าใช้จ่ายส่วนตัวเก็บในเครื่องนี้เท่านั้น'}</div></details>`;
 }
 /* ---------- sheets ---------- */
@@ -3109,6 +3123,9 @@ document.addEventListener('click', e=>{
   if(ds.stamp!=null){ const s=stampList().find(x=>x.key===ds.stamp); if(!s) return; if(!s.got){ toast('ยังไม่ได้ไป '+s.name+' กด "ถึงแล้ว" ในแผนก่อน'); return } return pickPhoto('st:'+s.key) }
   if(ds.say) return speakHK(ds.say);
   if(ds.savephones){ const p=[0,1].map(i=>(document.getElementById('ph'+i).value||'').trim().slice(0,24)); S.settings={...S.settings, phones:p}; if(db) db.doc('trip/settings').set(S.settings).catch(()=>toast('บันทึกไม่สำเร็จ')); else lsSave(); toast('บันทึกเบอร์แล้ว'); drawSheet(); return }
+  if(ds.pinwho!=null){ S.pinWho=Number(ds.pinwho); renderHome(); document.getElementById('pinin')?.focus(); return }
+  if(ds.pinlogin) return pinLogin();
+  if(ds.setpin) return setPin();
   if(ds.setkey){ const v=(document.getElementById('keyin').value||'').trim().replace(/^.*#k=/,''); if(v.length<16){ toast('รหัสไม่ถูกต้อง'); return } lsSet('hk-key',v); location.reload(); return }
   if(ds.mapzoom){ S.mapBig=!S.mapBig; renderHome(); const w=document.querySelector('.tmwrap');
     if(w&&S.mapBig){ const h=px(HOTEL_LL), sc=w.scrollWidth/MAP.w; w.scrollLeft=h[0]*sc-w.clientWidth/2; w.scrollTop=h[1]*sc-w.clientHeight/2 } return }
@@ -3196,7 +3213,7 @@ setTab(S.tab);
 setTimeout(()=>{ warnFetch(); nowFetch(); flightFetch(); dzQueueFetch() }, 0);
 setInterval(warnFetch, 10*60e3); setInterval(nowFetch, 10*60e3); setInterval(()=>flightFetch(), 5*60e3); gpsStart(false);
 setInterval(()=>{ if(document.visibilityState==='visible') dzQueueFetch() }, 60e3);   // the plan's park stop needs it too, not only the Disney tab
-setInterval(()=>{ if(!S.sheet && S.tab==='home' && document.activeElement?.id!=='chk-new') renderHome(); if(!S.sheet && S.tab==='plan') renderPlan(); if(!S.sheet && S.tab==='dz' && !S.dzEdit) renderDisney(); renderHeader() }, 60000);
+setInterval(()=>{ if(!S.sheet && S.tab==='home' && !['chk-new','pinin','keyin'].includes(document.activeElement?.id)) renderHome(); if(!S.sheet && S.tab==='plan') renderPlan(); if(!S.sheet && S.tab==='dz' && !S.dzEdit) renderDisney(); renderHeader() }, 60000);
 
 function goLocal(){
   S.mode='local'; db=null; S.uid=null;
@@ -3221,6 +3238,24 @@ function hkKey(){
   const m=location.hash.match(/[#&]k=([\w-]{16,})/);
   if(m){ lsSet('hk-key', m[1]); history.replaceState(null,'',location.pathname+location.search) }
   return lsGet('hk-key','');
+}
+async function pinLogin(){
+  const err=document.getElementById('pin-err'), say=t=>{ err.hidden=false; err.textContent=t }, v=(document.getElementById('pinin').value||'').trim();
+  if(S.pinWho==null) return say('เลือกชื่อก่อนว่าเป็นใคร');
+  if(!/^[0-9]{4}$/.test(v)) return say('PIN ต้องเป็นตัวเลข 4 หลัก');
+  let r; try{ r=await sbRpc('hk_pin_login',{p_slot:S.pinWho, p_pin:v}) }catch(e){ return say('เชื่อมต่อไม่ได้ เช็คเน็ตแล้วลองใหม่') }
+  if(r&&r.ok&&r.key){ lsSet('hk-key', r.key); lsSet('hk-me', String(S.pinWho)); location.reload(); return }
+  const who=DEFAULTS.names[S.pinWho];
+  say(r&&r.err==='locked' ? `ใส่ผิดหลายครั้ง PIN ของ${who}ถูกล็อก ${r.mins} นาที ระหว่างนี้เข้าด้วยลิงก์ยาวได้`
+    : r&&r.err==='nopin' ? `${who}ยังไม่ได้ตั้ง PIN เข้าด้วยลิงก์ยาวก่อน แล้วตั้งที่แท็บเงิน > ตั้งงบและชื่อ`
+    : `PIN ไม่ถูกต้อง (ลองได้อีก ${r&&r.left!=null?r.left:'–'} ครั้ง)`);
+  document.getElementById('pinin').value='';
+}
+async function setPin(){
+  const el=document.getElementById('set-pin'), v=(el&&el.value||'').trim();
+  if(!/^[0-9]{4}$/.test(v)){ toast('PIN ต้องเป็นตัวเลข 4 หลัก'); return }
+  try{ await sbRpc('hk_set_pin',{p_key:lsGet('hk-key',''), p_pin:v}); S.pinSet=true; el.value=''; toast('ตั้ง PIN แล้ว ใช้เข้าแอปได้เลย'); renderAll() }
+  catch(e){ toast(e.http?'ตั้ง PIN ไม่สำเร็จ':'ไม่มีเน็ต ตั้ง PIN ไม่ได้') }
 }
 async function sbRpc(fn, args){
   const r = await fetch(SB.url+'/rest/v1/rpc/'+fn, {method:'POST', headers:{apikey:SB.key,'Content-Type':'application/json'}, body:JSON.stringify(args)});
@@ -3313,7 +3348,7 @@ async function hkStoreStart(){
 (async()=>{
   let ns=null, us=null;
   try{ if(window.claude && window.claude.use) [ns,us] = await Promise.all([window.claude.use('db'), window.claude.use('user')]) }catch(e){ ns=null }
-  if(!ns && !(window.claude && window.claude.use)){ const st=await hkStoreStart(); if(st){ ns=st.db; us=st.user; S.web=true } else { S.needKey=true } }
+  if(!ns && !(window.claude && window.claude.use)){ const st=await hkStoreStart(); if(st){ ns=st.db; us=st.user; S.web=true; sbRpc('hk_pin_status',{p_key:lsGet('hk-key','')}).then(v=>{ S.pinSet=!!v }).catch(()=>{}) } else { S.needKey=true } }
   if(!ns) return goLocal();
   db=ns; S.mode='shared';
   try{ S.uid = us ? await us.id() : null }catch(e){ S.uid=null }
