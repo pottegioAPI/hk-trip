@@ -1980,13 +1980,13 @@ async function octoAdd(k){
 const DZ_RIDES = {
   oaken:{n:"Wandering Oaken's Sliding Sleighs", th:'รถไฟเหาะเลื่อนหิมะ หวาดเสียวเบาๆ', avg:32, max:52, lv:2},
   frozen:{n:'Frozen Ever After', th:'ล่องเรือโลก Frozen', avg:30, max:53, lv:1},
-  para:{n:'Toy Soldier Parachute Drop', th:'ร่มชูชีพดิ่งลง มีแถวคนเดียว', avg:33, max:51, lv:2, single:true},
+  para:{n:'Toy Soldier Parachute Drop', th:'ร่มชูชีพดิ่งลง', avg:33, max:51, lv:2, single:true},
   rc:{n:'RC Racer', th:'รถรางตัว U เหวี่ยงสูง', avg:29, max:47, lv:3},
   slinky:{n:'Slinky Dog Spin', th:'หมุนเบาๆ', avg:21, max:38, lv:1},
-  grizzly:{n:'Big Grizzly Mountain Runaway Mine Cars', th:'รถไฟเหาะเหมืองแร่ มีแถวคนเดียว', avg:24, max:44, lv:3, single:true},
+  grizzly:{n:'Big Grizzly Mountain Runaway Mine Cars', th:'รถไฟเหาะเหมืองแร่', avg:24, max:44, lv:3, single:true},
   manor:{n:'Mystic Manor', th:'คฤหาสน์ลึกลับ ต้องเล่น!', avg:20, max:45, lv:1},
   jungle:{n:'Jungle River Cruise', th:'ล่องเรือป่าดงดิบ', avg:18, max:27, lv:1},
-  hyper:{n:'Hyperspace Mountain', th:'รถไฟเหาะในที่มืด มีแถวคนเดียว', avg:15, max:27, lv:3, single:true},
+  hyper:{n:'Hyperspace Mountain', th:'รถไฟเหาะในที่มืด', avg:15, max:27, lv:3, single:true},
   ironman:{n:'Iron Man Experience', th:'ภาพยนตร์ 3D บินกับไอรอนแมน', avg:13, max:25, lv:2},
   antman:{n:'Ant-Man and The Wasp: Nano Battle!', th:'ยิงเป้าเก็บคะแนน', avg:10, max:19, lv:1},
   philhar:{n:"Mickey's PhilharMagic", th:'โรงหนัง 3D ในร่ม พักร้อน', avg:15, max:18, lv:1},
@@ -1995,11 +1995,14 @@ const DZ_RIDES = {
   dumbo:{n:'Dumbo the Flying Elephant', th:'ช้างบินดัมโบ้', avg:22, max:32, lv:1},
   tea:{n:'Mad Hatter Tea Cups', th:'ถ้วยกาแฟหมุน', avg:11, max:19, lv:1}
 };
+// rides meant for small children (spinners, Dumbo, gentle kiddie boats): Bank and J don't want them, so they are never planned or counted
+const DZ_KIDS = ['slinky','small','pooh','dumbo','tea'];
+for(const k of DZ_KIDS) delete DZ_RIDES[k];
 const DZ_PLAN = [
   {t:'10:30', e:'11:30', zone:'World of Frozen', why:'เปิดสวนคนยังน้อย รีบไปโซนที่แถวยาวที่สุดก่อน', rides:['oaken','frozen']},
   {t:'11:15', e:'12:15', zone:'Toy Story Land', why:'แถวยังสั้นก่อนเที่ยง', rides:['para','rc','slinky']},
   {t:'12:15', e:'13:15', zone:'มื้อเที่ยง Royal Banquet Hall (Voucher)', why:'ใช้ Meal Voucher ได้ (ชุดไม่เกิน HK$170 แลกก่อน 16:00) · ถ้าคิวยาว ใช้ voucher ที่ร้านอื่นในรายการได้ แอปจะแนะนำให้', rides:[], meal:'Royal Banquet Hall (ตั๋วรวมมื้อเที่ยง)'},
-  {t:'13:15', e:'14:15', zone:'Grizzly Gulch + Mystic Point', why:'อยู่ติดกัน ใช้แถวคนเดียวถ้าแถวปกติยาว', rides:['grizzly','manor']},
+  {t:'13:15', e:'14:15', zone:'Grizzly Gulch + Mystic Point', why:'อยู่ติดกัน', rides:['grizzly','manor']},
   {t:'14:15', e:'15:30', zone:'Tomorrowland', why:'เครื่องเล่นในร่ม แถวไม่ยาวทั้งวัน เหมาะช่วงบ่ายร้อน', rides:['hyper','ironman','antman']},
   {t:'15:30', e:'16:45', zone:'Fantasyland', why:'เครื่องเล่นเบาๆ ในร่ม พักขา', rides:['philhar','small','pooh','tea']},
   {t:'16:30', e:'17:30', zone:'Adventureland', why:'ช่วงเย็นแถวลดลง · 16:45 มีขบวนพาเหรด Friendtastic! คนจะไปรอดูพาเหรด เครื่องเล่นมักว่างขึ้น', rides:['jungle','dumbo']},
@@ -2137,7 +2140,7 @@ function dzRouteHTML(full){
     // the queue is what decides "go now or skip", so it is the biggest thing on the row
     const live=!s.meal && i===0 && dzWait(s.k,now).live, wc=s.wait>=40?'var(--danger)':s.wait>=25?'#E58A00':'var(--mint)';
     const wb=`<span class="dzwb" style="--wc:${wc}"><b class="num">${s.wait}</b><small>${s.meal?'คิวร้าน':'นาที'}${live?' · สด':''}</small></span>`;
-    const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&DZ_RIDES[s.k].single?' · มีแถว Single Rider':''}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
+    const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
     return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>ไปต่อเลย · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small></div><div class="dzbtns">${btn}${later}</div></div>`
       : `<div class="dzstep${late?' late':''}">${wb}<span><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small></span><div class="dzbtns">${btn}${later}</div></div>`;
   };
@@ -2210,6 +2213,7 @@ const DZ_FOOD = [
   {n:'Starliner Diner', land:'TL', price:'HK$145–160', food:'เบอร์เกอร์, ไก่ทอด · ชุดรวมเฟรนช์ฟรายส์และน้ำอัดลม'},
   {n:'Comet Cafe', land:'TL', price:'HK$150–160', food:'ข้าวหมูทอดเทริยากิ, ข้าวแกงกะหรี่อบ, บะหมี่เนื้อตุ๋นไต้หวัน · ชุดรวมน้ำอัดลม'},
   {n:"Wayfinders' Table", land:'AL', price:'HK$160–170', food:'ไก่อบกับข้าวหอม, แกงมัสมั่นกุ้ง · อาหารฮาลาล · ชุดรวมน้ำแร่ · เปิด 12:30', open:12*60+30, close:19*60+30},
+  {n:'Golden Crocus Inn', land:'WF', price:'ไม่เกิน HK$170', food:'ร้านในโซน World of Frozen · เลือกชุดคอมโบราคาไม่เกิน HK$170'},
   {n:"Explorer's Club Restaurant", land:'MP', price:'HK$170', food:'ไก่บัตเตอร์อินเดีย, คันเนลโลนีฟักทองผักโขม · voucher ใช้ได้เฉพาะมื้อเที่ยง สั่งได้ถึง 15:00', lunch:true, open:12*60, close:15*60}
 ];
 function dzFoodHTML(min, why){
@@ -2292,12 +2296,10 @@ function dzGoal(){
 }
 function dzGoalHTML(){
   const g=dzGoal(), total=Object.keys(DZ_RIDES).length, ok=g.need<=g.avail, gap=Math.abs(g.avail-g.need);
-  const singles=g.left.filter(k=>DZ_RIDES[k].single).map(k=>DZ_RIDES[k].n);
   const tips = ok ? [] : [
-    singles.length ? `ใช้แถว Single Rider (นั่งแยกกันแต่รอสั้นกว่ามาก): ${singles.join(', ')}` : '',
     '16:45 คนไปดูพาเหรด เป็นช่วงที่คิวเครื่องเล่นสั้น เล่นเครื่องที่คิวยาวช่วงนั้น',
     'กินข้าวนอกช่วงคนแน่น (ก่อน 12:00 หรือหลัง 13:30 · เย็นช่วง 16:30–17:30) จะได้คืนเวลาเล่น',
-    'ไปถึงก่อนสวนเปิด แล้วเดินตรงไปเครื่องที่คิวยาวที่สุดก่อน (World of Frozen)'
+    'ตั้งแต่สวนเปิด เดินตามกล่อง "ไปต่อเลย" ทันที แอปเลือกเครื่องที่คุ้มที่สุดให้แล้ว'
   ].filter(Boolean);
   return `<div class="dzgoal${ok?'':' tight'}"><b>🎯 เป้าหมายวันนี้ (ไม่ต้องจ่ายเพิ่ม)</b>
     <div class="dzgl"><span class="${[...DZ_MUST].every(k=>S.done['dz:'+k])?'ok':''}">⭐ ห้ามพลาด ${[...DZ_MUST].filter(k=>S.done['dz:'+k]).length}/${DZ_MUST.size}</span><span class="${g.left.length?'':'ok'}">🎢 ทั้งหมด ${total-g.left.length}/${total}</span><span class="${g.meals.length?'':'ok'}">🍽️ voucher ${2-g.meals.length}/2</span><span class="${g.fw?'ok':''}">🎆 พลุ ${g.fw?'✓':hhmm(fwTime())}</span></div>
@@ -2348,11 +2350,10 @@ function renderDisney(){
     ${dzSmartHTML()}
 
     <div class="panel"><h3>ทิปประหยัดเวลา</h3><ul class="tips">
-      <li>ไปถึงก่อนเปิดสวน แล้วเดินไปโซน Frozen ก่อนเลย แถวโซนนี้ยาวที่สุดทั้งวัน</li>
-      <li>Hyperspace Mountain, Big Grizzly และ Parachute Drop มีแถวคนเดียว (Single Rider) เร็วกว่ามาก ถ้าไม่ต้องนั่งคู่กัน</li>
-      <li>ถ้าเครื่องเล่นไหนรอเกิน 45 นาที ข้ามไปก่อนแล้วกลับมาช่วงเย็น</li>
-      <li>เวลารอในแผนเป็นค่าเฉลี่ยย้อนหลัง ไม่ใช่ของวันจริง เช็คเวลารอสดในแอป Hong Kong Disneyland หรือลิงก์ด้านบน</li></ul>
-      <div class="src">สถิติเวลารอจาก queue-times.com (ไม่ใช่ข้อมูลทางการของ Disney) · เวลาเปิดสวนและโชว์อาจเปลี่ยน</div></div>`;
+      <li>ไปถึงประตูก่อนสวนเปิด พอเปิดแล้วเดินตามกล่อง "ไปต่อเลย" ทันที ช่วงเช้าคิวสั้นที่สุดของวัน</li>
+      <li>กด "เล่นแล้ว" ทันทีที่ลงจากเครื่อง แอปจะคิดเส้นทางที่เหลือใหม่จากโซนที่อยู่</li>
+      <li>ถ้าหน้าเครื่องคิวยาวกว่าที่แอปบอกมาก กด "ไว้ทีหลัง" แอปจะจัดเครื่องอื่นให้ก่อน</li></ul>
+      <div class="src">คิวสดจากระบบแอป Hong Kong Disneyland (ผ่าน Queue-Times.com สำรองด้วย ThemeParks.wiki) อัปเดตทุก 2 นาที · เวลาเปิดสวน โชว์ และเครื่องที่ปิดซ่อม จากปฏิทินทางการของ Disney อัปเดตทุกเช้า</div></div>`;
 }
 function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else { next['dz:'+k]={at:hhmm(hkNow().min), d:hkNow().date}; S.dzLand=DZ_LAND_OF[k] } S.done=next; renderAll(); saveProgress() }
 const DZ_CASTLE = `<svg class="castle" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 58V30l4-6 4 6v28M46 58V30l4-6 4 6v28M18 58V36h28v22" fill="var(--pink-soft)" stroke="var(--pink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 36V22l8-12 8 12v14" fill="var(--sky-soft)" stroke="var(--sky)" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 58v-9a4 4 0 0 1 8 0v9" fill="var(--surface)" stroke="var(--pink)" stroke-width="2.5"/><path d="M32 10V4l5 2-5 2" fill="var(--sun)" stroke="var(--sun)" stroke-width="2"/><circle cx="32" cy="27" r="2.5" fill="var(--sun)"/></svg>`;
