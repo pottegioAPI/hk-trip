@@ -58,6 +58,8 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.hgo{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.gobtn{border:none;border-radius:99px;background:#fff;color:var(--pink);font-family:var(--display);font-weight:600;font-size:16px;padding:10px 18px;box-shadow:0 4px 12px rgba(0,0,0,.15)}.gobtn.alt{background:rgba(255,255,255,.22);color:#fff}.gobtn.big{font-size:24px;padding:14px 28px;animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.06)}}@media (prefers-reduced-motion:reduce){.gobtn.big{animation:none}}
+.sumgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.sumgrid div{background:var(--surface2);border-radius:14px;padding:8px 4px;text-align:center}.sumgrid b{display:block;font-family:var(--display);font-size:22px}.sumgrid small{font-size:11px;color:var(--muted)}.hbig2{font-family:var(--display);font-size:30px;margin-bottom:8px}.sbar{display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center;font-size:13px;margin-top:4px}.sbar i{display:block;height:10px;border-radius:6px}.sday{display:grid;grid-template-columns:72px 1fr;gap:8px;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line)}.sday b{color:var(--pink)}.storys{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 12px;padding:0 16px}.storys img{height:360px;border-radius:14px;box-shadow:var(--shadow)}
 .flt{margin-top:8px;background:var(--sky-soft);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;font-size:13px}.flt b{font-size:13.5px}.flt small{color:var(--muted);font-size:11.5px}.flt.late{background:#FFE3E3}.flt .acts{margin-top:4px}
 .funcard{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-bottom:8px}.funcard button{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 12px;color:var(--ink);min-width:0}.funcard b{font-size:14px}.funcard small{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .chdot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--cc);border:1.5px solid rgba(0,0,0,.12);flex:none}
@@ -610,6 +612,8 @@ const DEFAULT_PLAN = [
   {id:'4b',t:'09:00',e:'10:15',h:'ฝากกระเป๋า Citygate Outlets',exit:'B',p:'ฝากกระเป๋าประมาณ 6 ชั่วโมง',map:'Citygate Outlets Tung Chung',st:'TUC',ll:[22.2893,113.9408],cost:{amt:120,note:'ฝากกระเป๋า Citygate',cat:'stay'}},
   {id:'4c',t:'10:15',e:'13:30',h:'กระเช้า Ngong Ping 360 + พระใหญ่',p:'ต่อคิวขึ้นกระเช้า ไหว้พระใหญ่เทียนถาน วัดโป่วหลิน แล้วกระเช้ากลับตุงชุง',map:'Ngong Ping 360 Tung Chung Terminal',st:'TUC'},
   {id:'4d',t:'13:30',e:'16:30',h:'ช้อปปิ้ง Citygate Outlets',p:'ช้อปส่งท้าย แล้วรับกระเป๋าคืน',st:'TUC'},
+  {id:'4f',t:'21:00',flight:true,h:'บิน EK385 ฮ่องกง → สุวรรณภูมิ',p:'ออก 21:00 น. เวลาฮ่องกง · ถึงสุวรรณภูมิ 23:15 น. เวลาไทย',tip:'เคาน์เตอร์เช็คอินมักปิดประมาณ 1 ชั่วโมงก่อนเครื่องออก ดูประตูขึ้นเครื่องบนบอร์ดดิ้งพาส'},
+  {id:'4g',t:'24:15',tz:'TH',flight:true,h:'กลับถึงไทยแล้ว 🇹🇭',p:'กด "ถึงแล้ว" เพื่อจบทริป แล้วดูสรุปและสร้าง Story ความทรงจำได้เลย'},
   {id:'4e',t:'17:00',h:'ถึงสนามบิน บินกลับบ้าน',p:'เช็คอิน ทานมื้อเย็น แล้วบินกลับ',map:'Hong Kong International Airport',st:null,ll:[22.3155,113.9365],bus:[{n:'บัส S1',d:'ขึ้นที่ Citygate Outlets',fare:3.7,mins:15}],go:{mode:'bus:0'}}
  ]
 ];
@@ -828,7 +832,7 @@ const arrivedAt = id => { const v=S.done[id]; return v && typeof v==='object' ? 
 function nextItem(dn){ if(DAYS[dn-1].date!==hkNow().date) return null; const it=dayItems(dn).find(i=>!S.done[i.id]); return it?it.id:null }
 // how late (+) or early (−) the trip is running, from the latest stop marked as arrived
 function dayDelay(list){ let delay=null, idx=-1; list.forEach((it,k)=>{ const a=arrivedAt(it.id); if(a){ delay=toMin(a)-toMin(it.t); idx=k } });
-  const ka=list.findIndex(i=>i.id==='1a'), fi=typeof flightInfo==='function'?flightInfo():null;
+  const ka=list.findIndex(i=>i.id==='1a'), fi=typeof flightInfo==='function'?flightInfo('EK384'):null;
   if(ka>=0 && idx<ka && !S.done['1a'] && fi && fi.delay!=null && fi.kind!=='cancel'){ delay=fi.delay; idx=ka }   // landing time from the airport board
   return {delay,idx} }
 let toastT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2800) }
@@ -1287,37 +1291,175 @@ function funCardHTML(){
 }
 
 
-/* ---------- the flight: EK384 Bangkok → Hong Kong, live from Hong Kong airport's flight board ---------- */
-const FLIGHT_NO='EK384', FLIGHT_DATE='2026-11-14';
-let FLIGHT=null;
-try{ FLIGHT=JSON.parse(lsGet('hk-flight','null')) }catch(e){}
+
+/* ---------- the flights: EK384 there, EK385 back — live from Hong Kong airport's flight board ---------- */
+const FLIGHTS = {EK384:{date:'2026-11-14', arrival:true, sched:'17:40'}, EK385:{date:'2026-11-17', arrival:false, sched:'21:00'}};
+let FLIGHT={};
+try{ FLIGHT=JSON.parse(lsGet('hk-flights','{}'))||{} }catch(e){}
 async function flightFetch(force){
   if(window.claude) return; const n=hkNow();
-  if(n.date<'2026-11-13' || n.date>FLIGHT_DATE) return;                 // the airport board only covers the days around today
-  if(!force && FLIGHT && Date.now()-FLIGHT.at<4*60e3) return;
-  try{ const j=await liveJSON(SB.url+'/functions/v1/hk-flight?flight='+FLIGHT_NO+'&date='+FLIGHT_DATE);
-    if(j && !j.error){ FLIGHT={at:Date.now(), found:j.found}; lsSet('hk-flight', JSON.stringify(FLIGHT)); rerender() } }catch(e){}
+  for(const [no,F] of Object.entries(FLIGHTS)){
+    const day=Date.parse(F.date), now=Date.parse(n.date); if(now<day-864e5 || now>day) continue;   // the board covers the days around today
+    if(!force && FLIGHT[no] && Date.now()-FLIGHT[no].at<4*60e3) continue;
+    try{ const j=await liveJSON(`${SB.url}/functions/v1/hk-flight?flight=${no}&date=${F.date}&arrival=${F.arrival?1:0}`);
+      if(j && !j.error){ FLIGHT[no]={at:Date.now(), found:j.found}; lsSet('hk-flights', JSON.stringify(FLIGHT)); rerender() } }catch(e){}
+  }
 }
-// "Est at 18:10", "At gate 18:56", "Landed 18:40", "Cancelled" → what it means for us
-function flightInfo(){
-  const fl=FLIGHT&&FLIGHT.found; if(!fl) return null;
+// "Est at 18:10", "At gate 18:56", "Dep 21:54", "Boarding", "Gate Closed", "Cancelled" → what it means for us
+function flightInfo(no){
+  const fl=FLIGHT[no]&&FLIGHT[no].found; if(!fl) return null;
   const s=fl.status||'', m=s.match(/(\d{1,2}:\d{2})/), sched=toMin(fl.time), tm=m?toMin(m[1]):null;
-  const kind=/cancel/i.test(s)?'cancel':/gate|landed|arrived/i.test(s)?'landed':/est/i.test(s)?'est':/delay/i.test(s)?'delay':'';
-  return {s, kind, tm, sched, delay: tm!=null ? tm-sched : null, belt:fl.baggage, hall:fl.hall, age:Math.round((Date.now()-FLIGHT.at)/60e3)};
+  const kind=/cancel/i.test(s)?'cancel':/gate closed/i.test(s)?'closed':/board|final/i.test(s)?'boarding':/^dep/i.test(s)?'dep':/gate|landed|arrived/i.test(s)?'landed':/est/i.test(s)?'est':/delay/i.test(s)?'delay':'';
+  return {s, kind, tm, sched, delay: tm!=null ? tm-sched : null, belt:fl.baggage, hall:fl.hall, gate:fl.gate, aisle:fl.aisle, age:Math.round((Date.now()-FLIGHT[no].at)/60e3)};
 }
-function flightHTML(){
-  const fi=flightInfo(), late=fi&&fi.delay!=null&&fi.delay>=10 ? ` (ช้า ${fi.delay} นาที)` : fi&&fi.delay!=null&&fi.delay<=-10 ? ` (เร็ว ${-fi.delay} นาที)` : '';
-  const txt = !fi ? 'สถานะสดจะขึ้นวันที่ 13–14 พ.ย. (ดึงจากสนามบินฮ่องกง)'
+function flightHTML(no){
+  const F=FLIGHTS[no], fi=flightInfo(no), late=fi&&fi.delay!=null&&fi.delay>=10 ? ` (ช้า ${fi.delay} นาที)` : fi&&fi.delay!=null&&fi.delay<=-10 ? ` (เร็ว ${-fi.delay} นาที)` : '';
+  const dd=+F.date.slice(8), txt = !fi ? `สถานะสดจะขึ้นวันที่ ${dd-1}–${dd} พ.ย. (ดึงจากสนามบินฮ่องกง)`
     : fi.kind==='cancel' ? '❗ เที่ยวบินถูกยกเลิก ติดต่อ Emirates ทันที'
     : fi.kind==='landed' ? `ลงแล้ว เข้าประตู ${hhmm(fi.tm)} น.${late}`
     : fi.kind==='est' ? `คาดว่าลงฮ่องกง ${hhmm(fi.tm)} น.${late}`
-    : fi.kind==='delay' ? 'สนามบินแจ้งว่าล่าช้า ยังไม่มีเวลาใหม่' : 'ยังไม่ออกเดินทาง · ตามตารางลง 17:40 น.';
-  return `<div class="flt${fi&&(fi.kind==='cancel'||fi.delay>=30)?' late':''}"><b>✈️ ${FLIGHT_NO} · ${txt}</b>
-    ${fi&&fi.belt?`<small>สายพานรับกระเป๋า ${esc(fi.belt)}${fi.hall?' · Hall '+esc(fi.hall):''}</small>`:''}
-    ${fi?`<small>สนามบินฮ่องกง · อัปเดตเมื่อ ${fi.age} นาทีก่อน</small>`:''}
+    : fi.kind==='dep' ? `เครื่องออกแล้ว ${hhmm(fi.tm)} น.${late}`
+    : fi.kind==='boarding' ? 'กำลังเรียกขึ้นเครื่อง ไปที่ประตูเลย!'
+    : fi.kind==='closed' ? 'ประตูขึ้นเครื่องปิดแล้ว'
+    : fi.kind==='delay' ? 'สนามบินแจ้งว่าล่าช้า ยังไม่มีเวลาใหม่' : (F.arrival ? `ยังไม่ออกเดินทาง · ตามตารางลง ${F.sched} น.` : `ตรงเวลา · ออก ${F.sched} น.`);
+  const extra = fi ? [fi.belt?'สายพานกระเป๋า '+esc(fi.belt):'', fi.hall?'Hall '+esc(fi.hall):'', fi.gate?'ประตู '+esc(fi.gate):'', fi.aisle?'เคาน์เตอร์แถว '+esc(fi.aisle):''].filter(Boolean).join(' · ') : '';
+  return `<div class="flt${fi&&(fi.kind==='cancel'||fi.delay>=30)?' late':''}"><b>✈️ ${no} · ${txt}</b>
+    ${extra?`<small>${extra}</small>`:''}${fi?`<small>สนามบินฮ่องกง · อัปเดตเมื่อ ${fi.age} นาทีก่อน</small>`:''}
     <div class="acts"><a class="btn-s" href="https://www.emirates.com/english/manage-booking/flight-status/" target="_blank" rel="noopener">สถานะบนเว็บ Emirates</a>
-      <a class="btn-s" href="https://www.flightstats.com/v2/flight-tracker/EK/384" target="_blank" rel="noopener">ติดตามเครื่องบิน</a></div></div>`;
+      <a class="btn-s" href="https://www.flightstats.com/v2/flight-tracker/EK/${no.slice(2)}" target="_blank" rel="noopener">ติดตามเครื่องบิน</a></div></div>`;
 }
+const flightFor = id => ({'1s':'EK384','1f':'EK384','1a':'EK384','4e':'EK385','4f':'EK385'})[id];
+
+/* ---------- start and end of the trip ---------- */
+const tripStarted = () => !!S.done.start;
+const tripEnded = () => !!S.done['4g'] || hkNow().date>'2026-11-18';
+async function letsGo(){
+  if(S.done.start) return; S.done={...S.done, start:{at:hhmm(hkNow().min), ts:Date.now()}}; saveProgress(); confetti(); renderAll(); toast('เริ่มทริปแล้ว! เที่ยวให้สนุกนะ');
+}
+function confetti(){
+  const c=document.createElement('canvas'), g=c.getContext('2d'), W=c.width=innerWidth, H=c.height=innerHeight, cols=['#FF4F8B','#FFC23D','#3FB2E6','#22C08B','#9B7BFF'];
+  Object.assign(c.style,{position:'fixed',inset:0,zIndex:40,pointerEvents:'none'}); document.body.appendChild(c);
+  const P=Array.from({length:140},()=>({x:Math.random()*W, y:-20-Math.random()*H*.5, v:2+Math.random()*4, r:Math.random()*6.3, s:4+Math.random()*6, c:cols[Math.floor(Math.random()*5)]}));
+  let f=0; (function step(){ g.clearRect(0,0,W,H); for(const p of P){ p.y+=p.v; p.x+=Math.sin((p.y+p.r*40)/30); p.r+=.1; g.save(); g.translate(p.x,p.y); g.rotate(p.r); g.fillStyle=p.c; g.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); g.restore() }
+    if(++f<170) requestAnimationFrame(step); else c.remove() })();
+}
+function heroHTML(){
+  const n=hkNow(), td=tripDay(), me=S.me, days=Math.ceil((Date.parse(DAYS[0].date)-Date.parse(n.date))/864e5);
+  const hi=`<div class="hi">สวัสดี${me!=null?' '+nm(me):''}!</div>`, foot=`<div class="hdate">ส. 14 – อ. 17 พ.ย. 2569 · ${nm(0)} & ${nm(1)}</div>`;
+  let mid;
+  if(tripEnded()) mid=`<div class="hbig">จบทริปแล้ว 🎉</div><div class="hsub">ขอบคุณที่เที่ยวด้วยกันนะ</div>
+    <div class="hgo"><button type="button" class="gobtn" data-summary="1">ดูสรุปทริป</button><button type="button" class="gobtn alt" data-story="1">สร้าง Story</button></div>`;
+  else if(td && !tripStarted()) mid=`<div class="hbig">วันนี้แล้ว!</div><div class="hsub">กดปุ่มเพื่อเริ่มทริปพร้อมกัน</div>
+    <div class="hgo"><button type="button" class="gobtn big" data-letsgo="1">LET'S GO! ✈️</button></div>`;
+  else if(td) mid=`<div class="hbig num">วันที่ ${td}</div><div class="hsub">${esc(DAYS[td-1].title)}</div>`;
+  else mid=`<div class="hbig num">อีก ${days} วัน</div><div class="hsub">ได้บินไปฮ่องกงแล้ว!</div>`;
+  return `<div class="hhero"><div class="plane" aria-hidden="true">${PLANE_SVG}</div>${hi}${mid}${foot}</div>`;
+}
+
+/* ---------- trip summary ---------- */
+function tripStats(){
+  const me=S.me??0, visited=[], ridesBy={mtr:0,bus:0,taxi:0,other:0};
+  for(const d of DAYS) for(const it of dayItems(d.n)) if(S.done[it.id] && !it.flight && !HOTEL_IDS.has(it.id)) visited.push({d, it, at:tShow(arrivedAt(it.id)||it.t,it)});
+  const mine=allExp().filter(e=>share(e,me)>0), spent=mine.reduce((s,e)=>s+share(e,me),0), byCat={};
+  for(const e of mine) byCat[e.cat]=(byCat[e.cat]||0)+share(e,me);
+  for(const e of mine.filter(e=>e.cat==='transport')){ const k=/MTR|รถไฟ/.test(e.note)?'mtr':/แท็กซี่|taxi/i.test(e.note)?'taxi':/บัส|bus|มินิบัส/i.test(e.note)?'bus':'other'; ridesBy[k]++ }
+  const dz=Object.keys(DZ_RIDES).filter(k=>S.done['dz:'+k]).length, st=stampList(), ch=Object.entries(((S.ch||{}).r)||{}).map(([d,r])=>({d, c:r['m'+me]})).filter(x=>x.c);
+  const start=S.done.start, end=S.done['4g'];
+  const rides=visited.filter(x=>{ const {opts}=optionsFor(x.d.n,x.it), sel=opts.length?chosen(x.d.n,x.it,opts):null; return sel && sel.mode!=='walk' }).length;
+  return {me, visited, spent, byCat, ridesBy, rides, dz, stamps:st.filter(s=>s.got).length, stampsAll:st.length, ch, start, end, bal:balance(), oct:octoState()};
+}
+function summarySheetHTML(){
+  const s=tripStats(), cats=Object.entries(s.byCat).sort((a,b)=>b[1]-a[1]), max=cats.length?cats[0][1]:1;
+  const owe = Math.abs(s.bal)<0.05 ? 'เคลียร์เงินกันครบแล้ว ✓' : `${nm(s.bal>0?1:0)} ต้องคืน ${nm(s.bal>0?0:1)} ${hk(Math.abs(s.bal))}`;
+  return `<div class="wrap"><div class="grab"></div><h2 id="sheet-title">สรุปทริปฮ่องกง <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
+    <div class="sumgrid"><div><b class="num">${s.visited.length}</b><small>ที่เที่ยว</small></div><div><b class="num">${s.rides}</b><small>เที่ยวรถ</small></div><div><b class="num">${s.dz}</b><small>เครื่องเล่น Disney</small></div><div><b class="num">${s.stamps}/${s.stampsAll}</b><small>แสตมป์</small></div></div>
+    <div class="panel"><h3>เงินของ${nm(s.me)} <small>เห็นคนเดียว</small></h3><div class="hbig2 num">${hk(s.spent)}</div>
+      ${cats.map(([k,v])=>`<div class="sbar"><span>${esc((CATS.find(c=>c.k===k)||{}).n||k)}</span><i style="width:${Math.max(4,v/max*100)}%;background:${(CATS.find(c=>c.k===k)||{}).c||'var(--pink)'}"></i><b class="num">${hk(v)}</b></div>`).join('')}
+      <p class="mini" style="margin:8px 0 0">Octopus ใช้ไป ${hk(s.oct.spent)}${s.oct.bal!=null?' · เหลือ '+hk(s.oct.bal)+' (คืนบัตรหรือเก็บไว้ใช้ครั้งหน้าได้)':''} · ${owe}</p></div>
+    <div class="panel"><h3>เส้นทางของเรา</h3>${DAYS.map(d=>{ const v=s.visited.filter(x=>x.d.n===d.n); return `<div class="sday"><b>${d.dow} ${d.d} พ.ย.</b><span>${v.length?v.map(x=>esc(x.it.h)).join(' → '):'–'}</span></div>` }).join('')}
+      ${s.start?`<p class="mini" style="margin:8px 0 0">เริ่มทริป ${s.start.at} น. วันที่ 14${s.end?` · กลับถึงไทย ${tShow(s.end.at,{tz:'TH'})} น.`:''}</p>`:''}</div>
+    <button type="button" class="save" data-story="1">📸 สร้าง Story ความทรงจำ</button></div>`;
+}
+
+/* ---------- story journey: Instagram-story images (1080×1920) ---------- */
+function cssColors(svg){ const cs=getComputedStyle(document.documentElement); return svg.replace(/var\(--([a-z0-9-]+)\)/g,(m,v)=>cs.getPropertyValue('--'+v).trim()||'#888') }
+async function svgImage(svg, w, h){
+  const src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(cssColors(svg).replace('<svg ',`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" `));
+  const im=new Image(); im.src=src; await im.decode(); return im;
+}
+function rr(g,x,y,w,h,r){ g.beginPath(); g.roundRect ? g.roundRect(x,y,w,h,r) : g.rect(x,y,w,h) }
+function wrapText(g, txt, x, y, maxW, lh, maxLines=2){
+  const words=String(txt).split(/(\s+)/); let line='', n=0;
+  for(const w of words){ const t=line+w; if(g.measureText(t).width>maxW && line){ g.fillText(line.trim(),x,y); y+=lh; line=w.trimStart(); if(++n>=maxLines-1){ break } } else line=t }
+  if(line) g.fillText(line.trim().length>40?line.trim().slice(0,38)+'…':line.trim(), x, y); return y+lh;
+}
+async function coverPhoto(g, key, x, y, w, h, r){
+  const b=await PDB.get(key).catch(()=>null); if(!b) return false;
+  const bm=await createImageBitmap(b), s=Math.max(w/bm.width,h/bm.height); g.save(); rr(g,x,y,w,h,r); g.clip(); g.drawImage(bm, x+(w-bm.width*s)/2, y+(h-bm.height*s)/2, bm.width*s, bm.height*s); g.restore(); return true;
+}
+async function storyMake(){
+  toast('กำลังสร้าง Story…'); const s=tripStats(), W=1080, H=1920, out=[];
+  try{ await document.fonts.load('600 60px Mitr'); await document.fonts.load('500 30px Anuphan') }catch(e){}
+  const name=(S.settings.names||DEFAULTS.names);
+  // 1: cover — map of the whole trip and the numbers
+  { const c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+    const gr=g.createLinearGradient(0,0,W,H); gr.addColorStop(0,'#FF4F8B'); gr.addColorStop(.55,'#9B7BFF'); gr.addColorStop(1,'#3FB2E6'); g.fillStyle=gr; g.fillRect(0,0,W,H);
+    g.fillStyle='rgba(255,255,255,.9)'; g.font='500 40px Mitr, sans-serif'; g.fillText('MY TRIP TO', 80, 190);
+    g.fillStyle='#fff'; g.font='600 150px Mitr, sans-serif'; g.fillText('HONG KONG', 70, 340);
+    g.font='500 46px Mitr, sans-serif'; g.fillText('14 – 17 NOV 2026 · '+name[0]+' & '+name[1], 80, 420);
+    const mh=Math.round((W-160)*MAP.h/MAP.w); rr(g,60,480,W-120,mh+40,48); g.fillStyle='#fff'; g.fill();
+    const prevSel=S.homeDay; S.homeDay=null; const map=await svgImage(tripMapSVG(), W-160, mh); S.homeDay=prevSel;
+    g.save(); rr(g,80,500,W-160,mh,36); g.clip(); g.drawImage(map,80,500); g.restore();
+    const stats=[[s.visited.length,'ที่เที่ยว'],[s.rides,'เที่ยวรถ'],[s.dz,'เครื่องเล่น Disney'],[`${s.stamps}/${s.stampsAll}`,'แสตมป์']];
+    stats.forEach(([v,l],i)=>{ const x=60+i*((W-120)/4); g.fillStyle='rgba(255,255,255,.18)'; rr(g,x+8,1230,(W-120)/4-16,200,32); g.fill();
+      g.fillStyle='#fff'; g.textAlign='center'; g.font='600 76px Mitr, sans-serif'; g.fillText(String(v), x+(W-120)/8, 1330); g.font='500 30px Anuphan, Mitr, sans-serif'; g.fillText(l, x+(W-120)/8, 1385); g.textAlign='left' });
+    g.fillStyle='#fff'; g.font='500 44px Mitr, sans-serif'; g.textAlign='center';
+    g.fillText(DAYS.map(d=>d.d).join(' · ')+' พฤศจิกายน', W/2, 1580); g.font='500 34px Anuphan, Mitr, sans-serif'; g.fillStyle='rgba(255,255,255,.85)';
+    g.fillText('4 วัน · 1 เมือง · ความทรงจำเต็มกระเป๋า', W/2, 1640); g.font='600 34px Mitr, sans-serif'; g.fillText('#HongKong #TripDiary', W/2, 1840); g.textAlign='left';
+    out.push(c) }
+  // 2: the journey day by day, with our photos (or the place's stamp)
+  { const c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+    g.fillStyle='#FFF5F9'; g.fillRect(0,0,W,H); g.fillStyle='#2A1931'; g.font='600 84px Mitr, sans-serif'; g.fillText('OUR JOURNEY', 70, 160);
+    g.font='500 36px Anuphan, Mitr, sans-serif'; g.fillStyle='#7D6684'; g.fillText('ฮ่องกง 4 วัน ไปไหนมาบ้าง', 72, 220);
+    const colW=W-140, per=4, tw=(colW-(per-1)*18)/per, days=DAYS.map(d=>{ const seen=new Set(); return {d, v:s.visited.filter(x=>{ if(x.d.n!==d.n) return false; const sp=MAP_SPOT[x.it.id], k=sp?sp[0]+sp[1]:x.it.id; if(seen.has(k)) return false; seen.add(k); return true })} }).filter(x=>x.v.length);
+    const rows=days.reduce((a,x)=>a+Math.ceil(x.v.length/per),0), th=Math.max(110, Math.min(tw, (H-280-150-days.length*92-rows*76)/Math.max(1,rows)));
+    let y=280;
+    for(const {d,v} of days){
+      const col=getComputedStyle(document.documentElement).getPropertyValue('--'+DAY_C[d.n-1].slice(6,-1)).trim()||'#FF4F8B';
+      g.fillStyle=col; rr(g,70,y,210,64,32); g.fill(); g.fillStyle='#fff'; g.font='600 34px Mitr, sans-serif'; g.fillText(`DAY ${d.n} · ${d.d}`, 92, y+45); y+=92;
+      for(let i=0;i<v.length;i+=per){ const row=v.slice(i,i+per);
+        for(let j=0;j<row.length;j++){ const x=70+j*(tw+18), it=row[j].it, sp=MAP_SPOT[it.id], key='st:'+(sp?sp[0]+'|'+sp[1]:'c|'+it.id);
+          if(!(await coverPhoto(g,key,x,y,tw,th,22))){ g.fillStyle='#fff'; rr(g,x,y,tw,th,22); g.fill(); const isz=Math.min(th,tw)*.6, ic=await svgImage(`<svg viewBox="-16 -16 32 32">${MAP_ICON[sp?sp[0]:'pin']}</svg>`, isz, isz); g.drawImage(ic, x+(tw-isz)/2, y+(th-isz)/2) }
+          g.fillStyle='#2A1931'; g.font='600 24px Anuphan, Mitr, sans-serif'; wrapText(g, sp?sp[1]:it.h, x+2, y+th+32, tw-4, 28, 1); }
+        y+=th+76 }
+    }
+    g.fillStyle='#7D6684'; g.font='500 30px Mitr, sans-serif'; g.textAlign='center'; g.fillText('14–17 NOV 2026 · '+name[0]+' & '+name[1], W/2, H-70); g.textAlign='left';
+    out.push(c) }
+  // 3: Color Hunt days, if we played
+  if(s.ch.length){ const c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+    g.fillStyle='#FFFDF8'; g.fillRect(0,0,W,H); g.fillStyle='#2A1931'; g.font='600 84px Mitr, sans-serif'; g.fillText('COLOR HUNT', 70, 160);
+    g.font='500 36px Anuphan, Mitr, sans-serif'; g.fillStyle='#7D6684'; g.fillText('สีที่'+name[s.me]+'ตามล่าในฮ่องกง', 72, 220);
+    let y=290; for(const {d,c:cc} of s.ch.slice(0,3)){ const col=chColor(cc.c); if(!col) continue;
+      g.fillStyle=col.c; g.beginPath(); g.arc(110,y+40,34,0,7); g.fill(); g.fillStyle='#2A1931'; g.font='600 44px Mitr, sans-serif'; g.fillText(`${col.en} · ${+d.slice(8)} NOV`, 170, y+56);
+      const sz=(W-140-4*12)/5; for(let i=0;i<9;i++){ const x=70+(i%5)*(sz+12), yy=y+100+Math.floor(i/5)*(sz+12); if(!(await coverPhoto(g,`ch:${d}:${i}`,x,yy,sz,sz,18))){ g.fillStyle=col.c; g.globalAlpha=.25; rr(g,x,yy,sz,sz,18); g.fill(); g.globalAlpha=1 } }
+      y+=100+2*sz+12+70 }
+    g.fillStyle='#7D6684'; g.font='500 30px Mitr, sans-serif'; g.textAlign='center'; g.fillText('#ColorHunt #HongKong', W/2, H-70); g.textAlign='left';
+    out.push(c) }
+  S.story=await Promise.all(out.map((c,i)=>new Promise(r=>c.toBlob(b=>r({b, url:URL.createObjectURL(b), name:`hongkong-story-${i+1}.jpg`}),'image/jpeg',.9))));
+  openSheet({kind:'story'});
+}
+function storySheetHTML(){
+  return `<div class="wrap"><div class="grab"></div><h2 id="sheet-title">Story ความทรงจำ <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
+    <div class="storys">${(S.story||[]).map(x=>`<img src="${x.url}" alt="">`).join('')}</div>
+    <button type="button" class="save" data-storyshare="1">แชร์ไป IG Story / บันทึกรูป</button>
+    <p class="mini">ได้ ${(S.story||[]).length} ภาพขนาด Story · ภาพใส่รูปที่คุณแนบไว้ในสมุดแสตมป์อัตโนมัติ ยิ่งแนบรูปเยอะ Story ยิ่งสวย</p></div>`;
+}
+async function storyShare(){
+  const files=(S.story||[]).map(x=>new File([x.b], x.name, {type:'image/jpeg'})); if(!files.length) return;
+  try{ if(navigator.canShare && navigator.canShare({files})){ await navigator.share({files, title:'Hong Kong trip'}); return } }catch(e){ if(e&&e.name==='AbortError') return }
+  for(const x of S.story){ const a=document.createElement('a'); a.href=x.url; a.download=x.name; document.body.appendChild(a); a.click(); a.remove() } toast('บันทึกรูปแล้ว');
+}
+
 // times of stops still in Thailand are kept in Hong Kong time inside the app, shown in Thai time
 const tShow = (t,it) => it && it.tz==='TH' ? hhmm(toMin(t)-60) : t;
 const tzTag = it => it && it.tz==='TH' ? ' (เวลาไทย)' : '';
@@ -1370,7 +1512,7 @@ function renderPlan(){
           ${x&&x.planRef?`<span class="tag" style="background:var(--sun-soft)">แผนเดิมเขียน Exit ${esc(x.planRef)} · ปรับตามข้อมูลจริงแล้ว</span>`:''}</div>` })():''}
         <h3>${esc(it.h)}</h3>
         ${it.p?`<p>${it.p}</p>`:''}
-        ${it.id==='1f'||(it.id==='1a'&&!done)?flightHTML():''}
+        ${['1f','4f'].includes(it.id)||(['1a','4e'].includes(it.id)&&!done)?flightHTML(flightFor(it.id)):''}
         ${it.tip?`<div class="tip">${esc(it.tip)}</div>`:''}
         ${gh}
         <div class="acts">
@@ -1816,7 +1958,7 @@ function nextStopHTML(){
     ${how?`<div class="nhow">${how}</div>`:''}
     <div class="acts">${it.flight||(prev&&prev.flight)?'':`<button type="button" class="hbtn main" data-nextnav="${it.id}">${ic('pin',2.2)}นำทาง</button>`}
       <button type="button" class="hbtn" data-arrive="${it.id}">${ic('check',2.4)}ถึงแล้ว</button>
-      <button type="button" class="hbtn" data-gotoday="${td}">ดูแผน</button></div>${['1s','1f','1a'].includes(it.id)?flightHTML():''}</div>`;
+      <button type="button" class="hbtn" data-gotoday="${td}">ดูแผน</button></div>${flightFor(it.id)?flightHTML(flightFor(it.id)):''}</div>`;
 }
 /* ---------- home: alerts (only when something needs attention) ---------- */
 function alertsHTML(){
@@ -1898,13 +2040,7 @@ function renderHome(){
     ${S.needKey?`<div class="panel" style="border:2px solid var(--pink)"><h3>เข้าใช้ด้วยลิงก์ส่วนตัว</h3>
       <p class="mini" style="margin:0 0 8px">เปิดแอปจากลิงก์ส่วนตัวที่ได้รับครั้งเดียว ข้อมูลของแบงค์กับเจจะตรงกัน หรือวางรหัสท้ายลิงก์ (หลัง #k=) ตรงนี้ ตอนนี้แอปบันทึกไว้เฉพาะในเครื่องนี้</p>
       <div class="fin"><input id="keyin" class="txt" style="width:auto;flex:1" autocomplete="off" placeholder="รหัสส่วนตัว"><button type="button" class="btn-s pay" data-setkey="1">เข้าใช้</button></div></div>`:''}
-    <div class="hhero">
-      <div class="plane" aria-hidden="true">${PLANE_SVG}</div>
-      <div class="hi">สวัสดี${me!=null?' '+nm(me):''}!</div>
-      <div class="hbig num">${big}</div>
-      <div class="hsub">${esc(sub)}</div>
-      <div class="hdate">ส. 14 – อ. 17 พ.ย. 2569 · ${nm(0)} & ${nm(1)}</div>
-    </div>
+    ${heroHTML()}
     ${warnHTML()}
     ${alertsHTML()}
     ${nextStopHTML()}
@@ -2139,6 +2275,8 @@ function drawSheet(){
   if(d.kind==='hotel'){ el.innerHTML = '<div class="wrap"><div class="grab"></div><h2 id="sheet-title">ที่พักของเรา <button class="x" type="button" data-close aria-label="ปิด">'+ic('x')+'</button></h2>'+hotelCardHTML()+'</div>'; return }
   if(d.kind==='water'){ el.innerHTML = waterSheetHTML(); return }
   if(d.kind==='sos'){ el.innerHTML = sosSheetHTML(); return }
+  if(d.kind==='summary'){ el.innerHTML = summarySheetHTML(); return }
+  if(d.kind==='story'){ el.innerHTML = storySheetHTML(); return }
   if(d.kind==='fun'){ el.innerHTML = funSheetHTML(); fillPhotos(el); return }
   if(d.kind==='taxi'){ el.innerHTML = `<div class="wrap"><div class="grab"></div>
       <h2 id="sheet-title">ยื่นให้คนขับดู <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
@@ -2265,6 +2403,7 @@ async function saveExpense(){
 }
 function fixHotel(items){ const defs=Object.fromEntries(DEFAULT_PLAN.flat().map(d=>[d.id,d]));
   if(items && items.some(i=>i.id==='1a')) for(const id of ['1f','1s']) if(!items.some(i=>i.id===id)) items.unshift(clone(defs[id]));
+  if(items && items.some(i=>i.id==='4e')) for(const id of ['4f','4g']) if(!items.some(i=>i.id===id)) items.push(clone(defs[id]));
   for(const it of items||[]){ const d=defs[it.id]; if(!d || it.custom) continue;
     for(const k of ['p','tip','map','ll']) if(d[k]!==undefined) it[k]=clone(d[k]); else delete it[k];
     if(!it.exitUser){ if(d.exit) it.exit=d.exit; else delete it.exit } }
@@ -2450,6 +2589,10 @@ document.addEventListener('click', e=>{
   if(ds.live) return liveShow(ds.live);
   if(ds.gps){ if(ds.gps==='on') gpsStart(true); else gpsStop(); renderHome(); return }
   if(ds.sos){ openSheet({kind:'sos'}); return }
+  if(ds.letsgo) return letsGo();
+  if(ds.summary){ openSheet({kind:'summary'}); return }
+  if(ds.story) return storyMake();
+  if(ds.storyshare) return storyShare();
   if(ds.fun){ S.funTab=ds.fun; openSheet({kind:'fun'}); fillPhotos(document.getElementById('sheet')); return }
   if(ds.funtab){ S.funTab=ds.funtab; drawFun(); return }
   if(ds.chspin) return chSpin();
