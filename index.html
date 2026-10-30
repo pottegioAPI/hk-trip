@@ -71,6 +71,16 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .pkind i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
 .pkind.on i{background:var(--mint)}
 .pkind.on i::after{left:19px}
+.eats{margin:10px 0 4px;display:flex;flex-direction:column;gap:6px}
+.eats .lab{font-weight:700;font-size:14px}
+.eats .lab small{font-weight:400;color:var(--muted);margin-left:6px}
+.card .eats .eat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 12px;font:inherit;color:var(--ink);white-space:normal;height:auto;line-height:1.35}
+.card .eats .eat>*{display:block}
+.card .eats .eat b{font-size:14.5px}
+.card .eats .eat span{font-size:13px}
+.card .eats .eat small{font-size:12px;color:var(--muted)}
+.card .eats .eat.on{border:2px solid var(--mint);background:var(--mint-soft)}
+.card .eats .eat.on b::before{content:"✓ ";color:var(--mint)}
 .save svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
 .pushc{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;border:2px dashed var(--sky)}
 .pushc small{grid-column:1;color:var(--muted);font-size:12.5px}
@@ -698,6 +708,51 @@ const DEFAULT_PLAN = [
  ]
 ];
 
+/* ---------- where to eat at each meal stop: tap one, and that stop's navigation goes there ----------
+   ll = the restaurant itself (navigation and walking go there); no ll = it is part of the stop (map link only) */
+const EATS = {
+  '1c': [
+    {k:'street', n:'ของกินข้างทาง ตลาดเลดี้ส์ / Sai Yeung Choi St South', th:'ขนมไข่ ลูกชิ้นแกง ปลาหมึกย่าง เต้าหู้เหม็น', price:'ชิ้นละ HK$12–30', hours:'ราว 15:00–23:00', q:'Sai Yeung Choi Street South Mong Kok'},
+  ],
+  '2a': [
+    {k:'kamwah', n:'Kam Wah Cafe 金華冰廳', th:'ขนมปังสับปะรดสอดเนย (โบโล่เปา) ชาเย็น', price:'ชุดเช้า HK$38–45', hours:'06:30–23:00', note:'เงินสดเท่านั้น · เดิน ~10 นาที', q:'Kam Wah Cafe 47 Bute Street Mong Kok', ll:[22.32230,114.16975]},
+    {k:'muikee', n:'Mui Kee Congee 妹記生滾粥品', th:'โจ๊กปลาสด ตับหมู (ชั้น 3 ศูนย์อาหาร Fa Yuen St)', price:'HK$35–55', hours:'07:00–15:00', note:'เงินสดเท่านั้น', q:'Mui Kee Congee Fa Yuen Street', ll:[22.32080,114.17071]},
+  ],
+  '3a': [
+    {k:'muikee', n:'Mui Kee Congee 妹記生滾粥品', th:'โจ๊กร้อนๆ อิ่มท้องก่อนเดินทั้งวัน', price:'HK$35–55', hours:'07:00–15:00', note:'เงินสดเท่านั้น', q:'Mui Kee Congee Fa Yuen Street', ll:[22.32080,114.17071]},
+    {k:'kamwah', n:'Kam Wah Cafe 金華冰廳', th:'โบโล่เปา ไข่ แฮม ชาเย็น', price:'ชุดเช้า HK$38–45', hours:'06:30–23:00', note:'เงินสดเท่านั้น', q:'Kam Wah Cafe 47 Bute Street Mong Kok', ll:[22.32230,114.16975]},
+  ],
+  '4a': [
+    {k:'kamwah', n:'Kam Wah Cafe 金華冰廳', th:'มื้อเช้าส่งท้ายก่อนเช็คเอาท์', price:'ชุดเช้า HK$38–45', hours:'06:30–23:00', note:'เงินสดเท่านั้น', q:'Kam Wah Cafe 47 Bute Street Mong Kok', ll:[22.32230,114.16975]},
+    {k:'muikee', n:'Mui Kee Congee 妹記生滾粥品', th:'โจ๊กปลาสด', price:'HK$35–55', hours:'07:00–15:00', note:'⚠️ บางแหล่งบอกปิดวันอังคาร', q:'Mui Kee Congee Fa Yuen Street', ll:[22.32080,114.17071]},
+  ],
+  '2d': [
+    {k:'tsimchai', n:'Tsim Chai Kee 沾仔記', th:'เกี๊ยวกุ้งตัวใหญ่ ลูกชิ้นปลา เนื้อสไลซ์', price:'ชามละ ~HK$40–60', hours:'11:00–21:30 ทุกวัน', note:'ไปก่อนเที่ยงคิวสั้น', q:'Tsim Chai Kee 98 Wellington Street Central', ll:[22.28297,114.15448]},
+    {k:'lanfong', n:'Lan Fong Yuen 蘭芳園', th:'ชานมถุงน่อง ขนมปังหมูชิ้น', price:'~HK$40–70', hours:'⚠️ วันอาทิตย์อาจปิด (ข้อมูลไม่ตรงกัน)', q:'Lan Fong Yuen 2 Gage Street Central', ll:[22.28264,114.15380]},
+  ],
+  '2g': [
+    {k:'yungkee', n:'Yung Kee Roast Goose (จิมซาจุ่ย)', th:'ห่านย่าง หมูกรอบ ข้าวหน้าห่าน+หมูแดง', price:'ชุด+ชาเย็น ~HK$73', hours:'ถึงเที่ยงคืน', note:'เงินสดเท่านั้น · คนละร้านกับ Yung Kee ที่ Central', q:'Yung Kee Roast Goose Restaurant Kimberley Road Tsim Sha Tsui', ll:[22.30045,114.17208]},
+    {k:'tsuiwah', n:'Tsui Wah 翠華餐廳', th:'ร้านชาจ้านเท้งเครือดัง ปีกไก่ซอสสวิส ชานม', price:'~HK$60–100', hours:'เปิดดึก', note:'จ่ายบัตรได้', q:'Tsui Wah Restaurant 2 Carnarvon Road Tsim Sha Tsui', ll:[22.29777,114.17274]},
+  ],
+  '4c': [
+    {k:'polin', n:'อาหารเจวัดโป่วหลิน 寶蓮禪寺齋堂', th:'ชุดอาหารเจในวัด ข้าว ผัก หมี่ ซุป', price:'~HK$80–100', hours:'11:30–16:30', note:'อยู่ในบริเวณพระใหญ่', q:'Po Lin Monastery vegetarian restaurant Ngong Ping'},
+  ],
+};
+const eatOf = it => it && it.eat ? (EATS[it.id]||[]).find(r=>r.k===it.eat) || null : null;
+function eatHTML(it){
+  const list=EATS[it.id]; if(!list) return '';
+  const pick=eatOf(it);
+  return `<div class="eats"><div class="lab">🍽️ กินร้านไหนดี? ${pick?'<small>เลือกแล้ว แตะอีกครั้งเพื่อยกเลิก</small>':'<small>แตะเพื่อเลือก แล้วกดนำทาง</small>'}</div>
+    ${list.map(r=>`<button type="button" class="eat${pick&&pick.k===r.k?' on':''}${r.off?' off':''}" data-eat="${it.id}|${r.k}" aria-pressed="${!!(pick&&pick.k===r.k)}">
+      <b>${esc(r.n)}</b><span>${esc(r.th)}</span><small>${esc(r.price)} · ${esc(r.hours)}${r.note?' · '+esc(r.note):''}</small></button>`).join('')}
+    ${pick?`<div class="acts"><a class="btn-s pay" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(pick.q+' Hong Kong')}&travelmode=walking" target="_blank" rel="noopener">${ic('pin')}นำทางไป ${esc(pick.n.split(' ')[0])} ${esc(pick.n.split(' ')[1]||'')}</a></div>`:''}</div>`;
+}
+async function pickEat(id, k){
+  const f=findItem(id); if(!f) return; const it=f.it;
+  if(it.eat===k) delete it.eat; else it.eat=k;
+  renderPlan(); renderHome();
+  try{ await savePlanDay(f.dn); toast(it.eat?'เลือก '+eatOf(it).n.split(' ')[0]+' แล้ว':'ยกเลิกแล้ว') }catch(e){ toast('บันทึกไม่สำเร็จ') }
+}
 /* ---------- MTR network + fares (MTR Open Data, opendata.mtr.com.hk) ---------- */
 const PLACES = [
   {n:'ที่พัก มงก๊ก',s:'MOK',ex:'E1',ll:[22.3174,114.1694]},
@@ -815,7 +870,7 @@ function exitFor(it){
 const exitTxt = x => x ? `Exit ${x.ref}${x.name?' · '+x.name:''}` : '';
 const HOTEL_LL = [22.3174,114.1694]; // Sun Hing Building, 603-609 Nathan Road, Mong Kok (MTR Mong Kok Exit E1, ~100 m south)
 const DEF_LL = Object.fromEntries([...DEFAULT_PLAN.flat().filter(i=>i.ll).map(i=>[i.id,i.ll]), ...['1b','2a','3a','3d','4a'].map(id=>[id,HOTEL_LL]), ['3c',[22.3130,114.0413]], ['4c',[22.2893,113.9408]], ['4d',[22.2896,113.9417]]]); // also covers saved plans made before coordinates existed
-const locOf = it => it ? (it.ll || DEF_LL[it.id] || (it.st ? stLL(it.st) : null)) : null;
+const locOf = it => it ? ((eatOf(it)||{}).ll || it.ll || DEF_LL[it.id] || (it.st ? stLL(it.st) : null)) : null;
 function metres(a,b){ const dy=(a[0]-b[0])*111320, dx=(a[1]-b[1])*111320*Math.cos(a[0]*Math.PI/180); return Math.hypot(dx,dy) }
 const dowOf = iso => (new Date(iso+'T12:00:00Z').getUTCDay()+6)%7; // Mon=0 … Sun=6
 const stopLL = i => [BUS.stops[i][0]/1e5, BUS.stops[i][1]/1e5];
@@ -910,7 +965,7 @@ function hkNow(){ const d=new Date(Date.now()+8*3600e3); return {date:d.toISOStr
 const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return h*60+(m||0) };
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('5a68c8af5a|30 ต.ค. 22:47');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('44958cb36c|30 ต.ค. 23:18');
 let APP_NEWER=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1827,10 +1882,11 @@ function renderPlan(){
         ${['1f','4f'].includes(it.id)||(['1a','4e'].includes(it.id)&&!done)?flightHTML(flightFor(it.id)):''}
         ${it.id==='3b'&&!S.done['3c']?dzMiniHTML():''}
         ${it.tip?`<div class="tip">${esc(it.tip)}</div>`:''}
+        ${eatHTML(it)}
         ${gh}
         <div class="acts">
           <button class="arrive${done?' undo':''}" type="button" data-arrive="${it.id}">${ic('check',2.4)}${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}</button>
-          ${it.map||it.h?`<a class="btn-s" href="${mapUrl(it.map||it.h)}" target="_blank" rel="noopener">${ic('pin')}แผนที่</a>`:''}
+          ${it.map||it.h?`<a class="btn-s" href="${mapUrl((eatOf(it)||{}).q||it.map||it.h)}" target="_blank" rel="noopener">${ic('pin')}แผนที่</a>`:''}
           ${it.cost?(allExp().some(e=>e.planId===it.id)?`<span class="btn-s paid">${ic('check')}จด ${hk(it.cost.amt)} แล้ว</span>`:`<button class="btn-s pay" type="button" data-cost="${it.id}">${ic('plus')}จด ${esc(it.cost.note)} ${hk(it.cost.amt)}</button>`):''}
           ${/disney/i.test((it.map||'')+it.h)&&it.id!=='3b'?`<button class="btn-s pay" type="button" data-tab="dz">${ic('ticket')}แผนเครื่องเล่น</button>`:''}
           ${locOf(it)&&WATER?`<button class="btn-s" type="button" data-wnear="${it.id}" aria-expanded="${S.wOpen.has(it.id)}">${ic('drop')}น้ำดื่มใกล้ที่นี่</button>`:''}
@@ -2552,7 +2608,7 @@ function nextStopHTML(){
   const how = sel ? (sel.legs ? sel.legs.filter(l=>l.line!=='WALK').map(l=>`<span class="ln" style="background:${LINES[l.line].c}">${LINES[l.line].n.split(' ')[0]}</span>`).join(' → ')+` ลง ${esc(stName(sel.legs[sel.legs.length-1].to))}${x?' · Exit '+esc(x.ref):''}`
     : sel.bx ? `${esc(sel.n)} ลงป้าย ${esc(stopName(sel.bx.to))}` : esc(sel.n)) : '';
   return `<div class="nextc"><div class="nk">ถัดไป · ${shiftOn?'≈ '+hhmm(toMin(it.t)+delay):esc(tShow(it.t,it))} น.${tzTag(it)}</div>
-    <b>${esc(it.h)}</b>${prev?`<small>จาก ${esc(prev.h)}${sel&&sel.fare!=null?' · '+(sel.fare?hk(sel.fare):'ฟรี'):''}${sel&&sel.mins?' · ~'+sel.mins+' นาที':''}</small>`:''}
+    <b>${esc(it.h)}</b>${eatOf(it)?`<div class="mini">🍽️ ${esc(eatOf(it).n)}</div>`:""}${prev?`<small>จาก ${esc(prev.h)}${sel&&sel.fare!=null?' · '+(sel.fare?hk(sel.fare):'ฟรี'):''}${sel&&sel.mins?' · ~'+sel.mins+' นาที':''}</small>`:''}
     ${how?`<div class="nhow">${how}</div>`:''}
     <div class="acts">${it.flight||(prev&&prev.flight)?'':`<button type="button" class="hbtn main" data-nextnav="${it.id}">${ic('pin',2.2)}นำทาง</button>`}
       <button type="button" class="hbtn" data-arrive="${it.id}">${ic('check',2.4)}ถึงแล้ว</button>
@@ -3250,6 +3306,7 @@ document.addEventListener('click', e=>{
   if(ds.savephones){ const p=[0,1].map(i=>(document.getElementById('ph'+i).value||'').trim().slice(0,24)); S.settings={...S.settings, phones:p}; if(db) db.doc('trip/settings').set(S.settings).catch(()=>toast('บันทึกไม่สำเร็จ')); else lsSave(); toast('บันทึกเบอร์แล้ว'); drawSheet(); return }
   if(ds.pinwho!=null){ S.pinWho=Number(ds.pinwho); renderHome(); document.getElementById('pinin')?.focus(); return }
   if(ds.pinlogin) return pinLogin();
+  if(ds.eat){ const [id,k]=ds.eat.split('|'); return pickEat(id,k) }
   if(ds.pushon) return pushOn();
   if(ds.pushtest) return pushTest();
   if(ds.pushoff) return pushOff();
