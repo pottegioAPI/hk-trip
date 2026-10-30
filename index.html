@@ -892,6 +892,17 @@ const mapUrl = q => 'https://www.google.com/maps/search/?api=1&query='+encodeURI
 const uid = () => 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 function hkNow(){ const d=new Date(Date.now()+8*3600e3); return {date:d.toISOString().slice(0,10), min:d.getUTCHours()*60+d.getUTCMinutes()} }
 const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return h*60+(m||0) };
+// (defined early: the first screen is drawn before the end of this script)
+// which copy of the app this is (stamped by the website build) and whether a newer one is online
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('bb574bf04d|30 ต.ค. 17:27');
+let APP_NEWER=null;
+async function verCheck(){
+  if(APP_VER.v==='dev') return;
+  try{ const t=await (await fetch('sw.js?t='+Date.now(),{cache:'no-store'})).text(), m=t.match(/VERSION='([0-9a-f]+)'/);
+    if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1]; renderAll() } }catch(e){}
+}
+const verHTML = () => `<div class="appver">${APP_NEWER?`<button type="button" class="btn-s pay" data-appupdate="1">มีเวอร์ชันใหม่ แตะเพื่ออัปเดต</button>`:''}
+  <small>เวอร์ชัน ${esc(APP_VER.v)}${APP_VER.at?' · สร้าง '+esc(APP_VER.at)+' น. (เวลาฮ่องกง)':''}${APP_NEWER?'':APP_VER.v==='dev'?'':' · ล่าสุดแล้ว ✓'}</small></div>`;
 function tripDay(){ const n=hkNow(); const d=DAYS.find(x=>x.date===n.date); return d?d.n:0 }
 const dayItems = dn => (S.plan[dn-1]||[]).slice().sort((a,b)=>toMin(a.t)-toMin(b.t));
 const hhmm = m => { m=((Math.round(m)%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0') };
@@ -3253,16 +3264,6 @@ fetch('places.json').then(r=>r.ok?r.json():null).then(j=>{ if(j) PL=j }).catch((
    Each person opens the app once from their own link (#k=...), the key then stays on the phone.
    Everything is cached on the phone, so the app opens and records offline; changes are sent when back online. */
 const SB = {url:'https://btagqhxhljlbhwwkzghr.supabase.co', key:'sb_publishable_S8yqxmseObhtyqdxmW2A7w_DCyZwPfd'};
-// which copy of the app this is (stamped by the website build) and whether a newer one is online
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('f09e0b90a0|30 ต.ค. 17:24');
-let APP_NEWER=null;
-async function verCheck(){
-  if(APP_VER.v==='dev') return;
-  try{ const t=await (await fetch('sw.js?t='+Date.now(),{cache:'no-store'})).text(), m=t.match(/VERSION='([0-9a-f]+)'/);
-    if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1]; renderAll() } }catch(e){}
-}
-const verHTML = () => `<div class="appver">${APP_NEWER?`<button type="button" class="btn-s pay" data-appupdate="1">มีเวอร์ชันใหม่ แตะเพื่ออัปเดต</button>`:''}
-  <small>เวอร์ชัน ${esc(APP_VER.v)}${APP_VER.at?' · สร้าง '+esc(APP_VER.at)+' น. (เวลาฮ่องกง)':''}${APP_NEWER?'':APP_VER.v==='dev'?'':' · ล่าสุดแล้ว ✓'}</small></div>`;
 function hkKey(){
   const m=location.hash.match(/[#&]k=([\w-]{16,})/);
   if(m){ lsSet('hk-key', m[1]); history.replaceState(null,'',location.pathname+location.search) }
