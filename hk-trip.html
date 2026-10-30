@@ -1204,8 +1204,9 @@ async function dzQueueFetch(force){
   try{ const j=await liveJSON(SB.url+'/functions/v1/hk-queue'), m={};
     for(const r of j.rides||[]){ if(/single rider/i.test(r.name)) continue; const k=Object.keys(DZ_RIDES).find(k=>dzNorm(r.name).startsWith(dzNorm(DZ_RIDES[k].n))); if(k) m[k]={open:r.open, w:r.wait, at:Date.parse(r.updated)} }
     const rb=(j.rides||[]).find(r=>dzNorm(r.name)==='royalbanquethall');
-    const food={}; for(const r of j.rides||[]) if(DZ_FOOD.some(x=>dzNorm(x.n)===dzNorm(r.name))) food[dzNorm(r.name)]={open:r.open, w:r.wait};
-    DZQ={at:Date.now(), m, food, anyOpen:Object.values(m).some(x=>x.open), rbh: rb ? {open:rb.open, w:rb.wait, at:Date.parse(rb.updated)} : null, upd:Math.max(0,...Object.values(m).map(x=>x.at||0))}; if(!S.sheet) renderAll() }catch(e){}
+    const food={}; for(const r of j.rides||[]) if(DZ_FOOD.some(x=>dzNorm(x.n)===dzNorm(r.name))) food[dzNorm(r.name)]={open:r.open, w:r.wait>0?r.wait:null};
+    DZQ={at:Date.now(), m, food, anyOpen:Object.values(m).some(x=>x.open), rbh: rb ? {open:rb.open, w:Math.max(10, rb.wait||0), at:Date.parse(rb.updated)} : null,   // restaurant waits: at least ~10 min (the feed sends 0)
+    upd:Math.max(0,...Object.values(m).map(x=>x.at||0))}; if(!S.sheet) renderAll() }catch(e){}
 }
 
 
@@ -2143,13 +2144,13 @@ function dzRouteHTML(full){
 // the queue numbers are Disney's own (official app feed via Queue-Times), with the time they were read
 function dzSrcHTML(){
   const live=DZQ&&DZQ.anyOpen&&Date.now()-DZQ.at<20*60e3;
-  if(live) return `<p class="dzsrc on">● คิวสดจากระบบ Disney (ตัวเลขเดียวกับในแอป Disney) · อัปเดต ${hhmm(hkNow().min-Math.round((Date.now()-(DZQ.upd||DZQ.at))/60e3))} น.</p>`;
+  if(live) return `<p class="dzsrc on">● คิวสดจากระบบ Disney (ตัวเลขเดียวกับในแอป Disney) · อัปเดต ${hhmm(hkNow().min-Math.round((Date.now()-(DZQ.upd||DZQ.at))/60e3))} น. เวลาฮ่องกง</p>`;
   return `<p class="dzsrc">${DZQ&&!DZQ.anyOpen?'สวนปิดอยู่':'ยังดึงคิวสดไม่ได้ (เช็คเน็ต)'} · ตอนนี้ใช้คิวเฉลี่ยย้อนหลัง</p>`;
 }
 function dzSmartHTML(){
   const today=dzLiveNow(), trial=today&&hkNow().date!=='2026-11-16';
   return `${dzMealHTML(dzNowMin())}<div class="panel dzsmart"><h3>🧭 เส้นทางแนะนำ <button type="button" class="btn-s" data-dzrefresh="1">${ic('swap')}คำนวณใหม่</button></h3>
-    <button type="button" class="dzwhere" data-dzset="1">📍 ตอนนี้อยู่ <b>${esc(DZ_LANDS[S.dzLand||'MS'][0])}</b>${trial?' · <span class="dzlv">● คิวจริงวันนี้</span>':today?'':` · ตัวอย่างเริ่ม ${hhmm(S.dzSimMin??630)}`} <span>${S.dzSetOpen?'ปิด ▴':'เปลี่ยน ▾'}</span></button>
+    <button type="button" class="dzwhere" data-dzset="1">📍 ตอนนี้อยู่ <b>${esc(DZ_LANDS[S.dzLand||'MS'][0])}</b>${today?'':` · ตัวอย่างเริ่ม ${hhmm(S.dzSimMin??630)}`} <span>${S.dzSetOpen?'ปิด ▴':'เปลี่ยน ▾'}</span></button>
     ${S.dzSetOpen?`<div class="dzset"><div class="mini">อยู่โซนไหน (ปกติไม่ต้องกด แอปเปลี่ยนให้เองเมื่อกด "เล่นแล้ว")</div>
       <div class="places" style="margin:0 -14px 6px">${Object.entries(DZ_LANDS).map(([k,l])=>`<button class="chip" type="button" data-dzland="${k}" aria-pressed="${(S.dzLand||'MS')===k}">${l[0]}</button>`).join('')}</div>
       ${today?'':`<div class="mini">ลองดูแผนถ้าเริ่มตอน (ใช้ดูก่อนวันจริงเท่านั้น วันที่ 16 แอปใช้เวลาจริงเอง)</div><div class="places" style="margin:0 -14px">${[10.5,12,14,17,19].map(h=>`<button type="button" class="chip num" data-dzsim="${h*60}" aria-pressed="${(S.dzSimMin??630)===h*60}">${hhmm(h*60)}</button>`).join('')}</div>`}</div>`:''}
