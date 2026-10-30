@@ -60,6 +60,8 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .hero .big small{display:block;font-size:15px;margin-top:2px;opacity:.9}
 .hdbud .cur{font-size:.85em}
 .save svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
+.appver{text-align:center;margin:14px 0 4px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.appver small{font-size:11.5px;color:var(--muted)}
 .pinlog{border:2px solid var(--pink)}
 .pinwho{margin-bottom:10px}
 .pinwho .chip{flex:1 1 0 !important;justify-content:center;text-align:center;font-size:16px;padding:12px}
@@ -2577,7 +2579,8 @@ function renderHome(){
       return `<button type="button" class="hday" data-gotoday="${d.n}" style="--dc:${DAY_C[i]}">
         <span class="hdn"><b>${d.d}</b><small>${d.dow}</small></span>
         <span class="hdt"><b>${esc(d.title)}</b><small>${list.slice(0,4).map(x=>esc(x.h)).join(' · ')}${list.length>4?` · +${list.length-4}`:''}</small>
-          <span class="hbar"><i style="width:${list.length?done/list.length*100:0}%"></i></span></span></button>` }).join('')}</div>`;
+          <span class="hbar"><i style="width:${list.length?done/list.length*100:0}%"></i></span></span></button>` }).join('')}</div>
+    ${verHTML()}`;
 }
 const PLANE_SVG = `<svg viewBox="0 0 120 60"><path d="M6 44 q30 -6 54 -18" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 5" opacity=".8"/><g transform="translate(64,10) rotate(-18)"><path d="M0 10 h34 a6 6 0 0 1 0 8 h-34 z" fill="#fff"/><path d="M14 10 l6 -10 h5 l-3 10 z M14 18 l6 10 h5 l-3 -10 z M2 10 l-2 -6 h4 l4 6z" fill="#fff"/><circle cx="26" cy="14" r="1.6" fill="var(--pink)"/><circle cx="21" cy="14" r="1.6" fill="var(--pink)"/></g><circle cx="100" cy="46" r="7" fill="#fff" opacity=".9"/><circle cx="108" cy="44" r="5" fill="#fff" opacity=".9"/></svg>`;
 
@@ -3140,6 +3143,7 @@ document.addEventListener('click', e=>{
   if(ds.savephones){ const p=[0,1].map(i=>(document.getElementById('ph'+i).value||'').trim().slice(0,24)); S.settings={...S.settings, phones:p}; if(db) db.doc('trip/settings').set(S.settings).catch(()=>toast('บันทึกไม่สำเร็จ')); else lsSave(); toast('บันทึกเบอร์แล้ว'); drawSheet(); return }
   if(ds.pinwho!=null){ S.pinWho=Number(ds.pinwho); renderHome(); document.getElementById('pinin')?.focus(); return }
   if(ds.pinlogin) return pinLogin();
+  if(ds.appupdate){ location.reload(); return }
   if(ds.setpin) return setPin();
   if(ds.setkey){ const v=(document.getElementById('keyin').value||'').trim().replace(/^.*#k=/,''); if(v.length<16){ toast('รหัสไม่ถูกต้อง'); return } lsSet('hk-key',v); location.reload(); return }
   if(ds.mapzoom){ S.mapBig=!S.mapBig; renderHome(); const w=document.querySelector('.tmwrap');
@@ -3225,7 +3229,7 @@ let savedTab = lsGet('hk-tab','home'); if(savedTab==='set'){ savedTab='money'; S
 S.tab = ['home','plan','go','dz','money'].includes(savedTab) ? savedTab : 'home';
 setTab(S.tab);
 // live feeds start once the whole script has run (the Supabase address is defined further down)
-setTimeout(()=>{ warnFetch(); nowFetch(); flightFetch(); dzQueueFetch() }, 0);
+setTimeout(()=>{ warnFetch(); nowFetch(); flightFetch(); dzQueueFetch(); verCheck() }, 0); setInterval(verCheck, 30*60e3);
 setInterval(warnFetch, 10*60e3); setInterval(nowFetch, 10*60e3); setInterval(()=>flightFetch(), 5*60e3); gpsStart(false);
 setInterval(()=>{ if(document.visibilityState==='visible') dzQueueFetch() }, 60e3);   // the plan's park stop needs it too, not only the Disney tab
 setInterval(()=>{ if(!S.sheet && S.tab==='home' && !['chk-new','pinin','keyin'].includes(document.activeElement?.id)) renderHome(); if(!S.sheet && S.tab==='plan') renderPlan(); if(!S.sheet && S.tab==='dz' && !S.dzEdit) renderDisney(); renderHeader() }, 60000);
@@ -3249,6 +3253,16 @@ fetch('places.json').then(r=>r.ok?r.json():null).then(j=>{ if(j) PL=j }).catch((
    Each person opens the app once from their own link (#k=...), the key then stays on the phone.
    Everything is cached on the phone, so the app opens and records offline; changes are sent when back online. */
 const SB = {url:'https://btagqhxhljlbhwwkzghr.supabase.co', key:'sb_publishable_S8yqxmseObhtyqdxmW2A7w_DCyZwPfd'};
+// which copy of the app this is (stamped by the website build) and whether a newer one is online
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('f09e0b90a0|30 ต.ค. 17:24');
+let APP_NEWER=null;
+async function verCheck(){
+  if(APP_VER.v==='dev') return;
+  try{ const t=await (await fetch('sw.js?t='+Date.now(),{cache:'no-store'})).text(), m=t.match(/VERSION='([0-9a-f]+)'/);
+    if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1]; renderAll() } }catch(e){}
+}
+const verHTML = () => `<div class="appver">${APP_NEWER?`<button type="button" class="btn-s pay" data-appupdate="1">มีเวอร์ชันใหม่ แตะเพื่ออัปเดต</button>`:''}
+  <small>เวอร์ชัน ${esc(APP_VER.v)}${APP_VER.at?' · สร้าง '+esc(APP_VER.at)+' น. (เวลาฮ่องกง)':''}${APP_NEWER?'':APP_VER.v==='dev'?'':' · ล่าสุดแล้ว ✓'}</small></div>`;
 function hkKey(){
   const m=location.hash.match(/[#&]k=([\w-]{16,})/);
   if(m){ lsSet('hk-key', m[1]); history.replaceState(null,'',location.pathname+location.search) }

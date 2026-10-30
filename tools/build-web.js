@@ -24,4 +24,8 @@ const h=crypto.createHash('sha1'); h.update(page); for(const f of DATA) if(fs.ex
 const ver=h.digest('hex').slice(0,10);
 const sw=fs.readFileSync(path.join(root,'tools','sw.template.js'),'utf8').replace('__VERSION__',ver).replace('__FILES__',JSON.stringify(['./','index.html','manifest.webmanifest','icon-192.png','icon-180.png',...DATA]));
 fs.writeFileSync(path.join(root,'sw.js'),sw);
+// the page shows its own version and build time, so a phone can tell whether it has the newest copy
+const built=new Date(Date.now()+8*3600e3), TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const stamp=ver+'|'+built.getUTCDate()+' '+TH[built.getUTCMonth()]+' '+String(built.getUTCHours()).padStart(2,'0')+':'+String(built.getUTCMinutes()).padStart(2,'0');
+fs.writeFileSync(path.join(root,'index.html'),page.replace('__APPVER__',stamp));
 console.log('index.html',page.length,'version',ver);

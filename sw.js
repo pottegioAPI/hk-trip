@@ -1,5 +1,5 @@
 // Offline copy of the app: opens without signal, updates itself when online.
-const VERSION='3b20dab064', CACHE='hk-'+VERSION, FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-180.png","bus.json","places.json","water.json","weather.json","lasttrain.json","dzcal.json"];
+const VERSION='f09e0b90a0', CACHE='hk-'+VERSION, FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-180.png","bus.json","places.json","water.json","weather.json","lasttrain.json","dzcal.json"];
 self.addEventListener('install', e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())) });
 self.addEventListener('activate', e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('hk-')&&k!==CACHE&&k!=='hk-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim())) });
 const timeout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('slow')),ms))]);
