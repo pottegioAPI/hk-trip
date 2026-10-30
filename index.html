@@ -58,6 +58,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.ghbtns{display:flex;gap:14px;flex-wrap:wrap}.opts.others{margin-top:4px}.opts.others .op{opacity:.92}
 .hgo{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.gobtn{border:none;border-radius:99px;background:#fff;color:var(--pink);font-family:var(--display);font-weight:600;font-size:16px;padding:10px 18px;box-shadow:0 4px 12px rgba(0,0,0,.15)}.gobtn.alt{background:rgba(255,255,255,.22);color:#fff}.gobtn.big{font-size:24px;padding:14px 28px;animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.06)}}@media (prefers-reduced-motion:reduce){.gobtn.big{animation:none}}
 .sumgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.sumgrid div{background:var(--surface2);border-radius:14px;padding:8px 4px;text-align:center}.sumgrid b{display:block;font-family:var(--display);font-size:22px}.sumgrid small{font-size:11px;color:var(--muted)}.hbig2{font-family:var(--display);font-size:30px;margin-bottom:8px}.sbar{display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center;font-size:13px;margin-top:4px}.sbar i{display:block;height:10px;border-radius:6px}.sday{display:grid;grid-template-columns:72px 1fr;gap:8px;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line)}.sday b{color:var(--pink)}.storys{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 12px;padding:0 16px}.storys img{height:360px;border-radius:14px;box-shadow:var(--shadow)}
 .flt{margin-top:8px;background:var(--sky-soft);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;font-size:13px}.flt b{font-size:13.5px}.flt small{color:var(--muted);font-size:11.5px}.flt.late{background:#FFE3E3}.flt .acts{margin-top:4px}
@@ -801,7 +802,7 @@ const clone = o => JSON.parse(JSON.stringify(o));
 const S = {settings:clone(DEFAULTS), expenses:[], done:{}, plan:clone(DEFAULT_PLAN), mode:'loading',
   tab:'plan', day:1, me:0, openEx:null, filt:'mine', sheet:null, go:{from:'TST',to:'CAB',place:null},
   // private to whoever is viewing: own expenses, own budget, auto-records they chose to remove
-  mine:[], budget:2000, meta:{skip:{}}, octo:[], ghOpen:new Set(), compact:false, wOpen:new Set(), wCenter:null, homeDay:null, moneySub:'exp', nav:{from:null,to:null}, navOpen:0, uid:null, members:{}, ready:{prog:false,mine:false}};
+  mine:[], budget:2000, meta:{skip:{}}, octo:[], ghOpen:new Set(), routeShut:new Set(), routeOn:new Set(), compact:false, wOpen:new Set(), wCenter:null, homeDay:null, moneySub:'exp', nav:{from:null,to:null}, navOpen:0, uid:null, members:{}, ready:{prog:false,mine:false}};
 let db = null;
 const LS_KEY = 'hk-trip-2569-v2';
 function lsGet(k,d){ try{ return localStorage.getItem(k) ?? d }catch(e){ return d } }
@@ -1479,10 +1480,13 @@ function stepsHTML(legs, inEx, outEx, dest){
       <div class="stn">${esc(stName(L.from))}</div>
       <div class="how">${walk?`เดินเชื่อมสถานีไป ${esc(stName(L.to))} (ประมาณ 5–10 นาที)`
         :`${enter} ขึ้นชานชาลา <span class="ln" style="background:${c}">${LINES[L.line].n}</span> มุ่งหน้า <b>${esc(L.toward)}</b> · ${L.stops} ป้าย`}</div>${walk?'':liveBtn({mtr:[L.line,L.from,L.to]})}</div></li>`;
-  }).join('') + `<li class="lg end" style="--c:var(--pink)"><span class="nd"></span><div><div class="stn">${esc(stName(endSt))}</div>
+  }).join('') + `<li class="lg end" style="--c:${(()=>{ const L=legs.filter(l=>l.line!=='WALK').pop(); return L?LINES[L.line].c:'var(--muted)' })()}"><span class="nd"></span><div><div class="stn">${esc(stName(endSt))} <small>ปลายทาง</small></div>
     <div class="how">${outEx?`ลงสถานีนี้ ออกทาง <span class="exit">Exit ${esc(outEx)}</span>`:'ลงสถานีนี้ ดูป้าย Exit ในสถานีให้ใกล้ที่หมาย'}</div>${outEx?`<div class="how">${exitWalkBtn(MTR.st[endSt][0], outEx, dest)}</div>`:''}</div></li></ol>`;
 }
 function autoIds(id){ return [`auto-${id}-0`,`auto-${id}-1`,`auto-${id}-t`] }
+// a stop's step-by-step route: open for the next stop, or when tapped open
+const routeIsOpen = (id,cur) => !S.routeShut.has(id) && (S.routeOn.has(id) || cur===id);
+function routeToggle(id){ const open=routeIsOpen(id, nextItem(S.day)); if(open){ S.routeShut.add(id); S.routeOn.delete(id) } else { S.routeShut.delete(id); S.routeOn.add(id) } renderPlan() }
 function renderPlan(){
   const d=DAYS[S.day-1], cur=nextItem(S.day), list=dayItems(S.day), {delay,idx:lastIdx}=dayDelay(list);
   const shift = delay!=null && Math.abs(delay)>=10;
@@ -1490,14 +1494,16 @@ function renderPlan(){
   const doneCount=list.filter(i=>S.done[i.id]).length;
   const items = list.map((it,k)=>{
     const done=!!S.done[it.id], {prev,opts}=optionsFor(S.day,it), sel=opts.length?chosen(S.day,it,opts):null;
-    const open = !done && S.ghOpen.has(it.id);
+    const open = !done && S.ghOpen.has(it.id), routeOpen = routeIsOpen(it.id, cur);   // the next stop's route is open by itself; other ways only on request
     if(S.compact) return compactItem(it, done, cur, sel, shift&&k>lastIdx&&!done ? delay : null);
     const gh = opts.length ? `<div class="gh"><div class="lab">วิธีไปจาก ${esc(prev.h)}${done?' (ถึงแล้ว)':''}</div>
-      <div class="opts">${done||!open ? optHTML(it,sel,true) : opts.map(o=>optHTML(it,o,o.key===sel.key)).join('')}</div>
-      ${!done ? `<button class="more" type="button" data-gh="${it.id}">${open?'ย่อ ▴':`เปลี่ยนวิธี / ดูเส้นทาง (${opts.length} แบบ) ▾`}</button>` : ''}
-      ${open && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it))}
-        <a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}ดูเวลารถไฟขบวนถัดไป (MTR)</a></div>` : ''}
-      ${open && sel.bx ? `<div class="route">${busSteps(sel.bx)}</div>` : ''}
+      <div class="opts">${optHTML(it,sel,true)}</div>
+      ${!done && routeOpen && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it))}
+        ${window.claude?`<a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}ดูเวลารถไฟขบวนถัดไป (MTR)</a>`:''}</div>` : ''}
+      ${!done && routeOpen && sel.bx ? `<div class="route">${busSteps(sel.bx)}</div>` : ''}
+      ${!done ? `<div class="ghbtns">${sel.legs&&sel.legs.length||sel.bx?`<button class="more" type="button" data-route="${it.id}">${routeOpen?'ซ่อนเส้นทาง ▴':'ดูเส้นทาง ▾'}</button>`:''}
+        <button class="more" type="button" data-gh="${it.id}">${open?'ปิดตัวเลือก ▴':`เปลี่ยนวิธี (${opts.length-1} แบบอื่น) ▾`}</button></div>` : ''}
+      ${open ? `<div class="opts others">${opts.filter(o=>o.key!==sel.key).map(o=>optHTML(it,o,false)).join('')}</div>` : ''}
       ${!done && sel.manual ? `<div class="fin">${sel.key==='bus:c'?`<input type="text" id="no-${it.id}" placeholder="เลขสาย" value="${esc(it.go&&it.go.no||'')}" style="width:80px">`:''}
          <label for="fare-${it.id}">${sel.shared?'ค่ารถรวม':'ค่ารถ/คน'} HK$</label><input type="number" inputmode="decimal" min="0" step="0.1" id="fare-${it.id}" data-fare="${it.id}" data-key="${sel.key}" value="${sel.fare??''}"></div>`:''}
     </div>` : '';
@@ -2615,8 +2621,10 @@ document.addEventListener('click', e=>{
   if(ds.gh){ S.ghOpen.has(ds.gh)?S.ghOpen.delete(ds.gh):S.ghOpen.add(ds.gh); renderPlan(); return }
   if(ds.compact){ S.compact=ds.compact==='1'; lsSet('hk-compact',ds.compact); renderPlan(); return }
   if(ds.full){ S.compact=false; lsSet('hk-compact','0'); renderPlan(); const el=document.querySelector('[data-edit="'+ds.full+'"]'); if(el) el.closest('.it').scrollIntoView({block:'start'}); return }
-  if(ds.opt){ if(!S.ghOpen.has(ds.opt)){ S.ghOpen.add(ds.opt); renderPlan(); return } // first tap on the collapsed choice opens the list
-    const f=findItem(ds.opt); if(f && !(f.it.go&&f.it.go.mode===ds.key)) setChoice(f.it,f.dn,ds.key,null); return }
+  if(ds.opt){ const f=findItem(ds.opt); if(!f) return;
+    if(f.it.go&&f.it.go.mode===ds.key || !S.ghOpen.has(ds.opt))return routeToggle(ds.opt) // tap the chosen way: show/hide its route
+    S.ghOpen.delete(ds.opt); S.routeShut.delete(ds.opt); S.routeOn.add(ds.opt); setChoice(f.it,f.dn,ds.key,null); return }
+  if(ds.route) return routeToggle(ds.route);
   if(ds.cost){ const f=findItem(ds.cost); return openExpense({amt:f.it.cost.amt, cat:f.it.cost.cat||'other', day:f.dn, note:f.it.cost.note, planId:f.it.id, type:'split'}) }
   if(ds.edit){ const f=findItem(ds.edit); return openItem(f.dn,f.it) }
   if(ds.additem) return openItem(Number(ds.additem), null);

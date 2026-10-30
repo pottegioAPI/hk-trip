@@ -17,7 +17,7 @@ function overflow(where){ const out=[]; document.querySelectorAll('main .wrap *,
 function renderAllViews(tag){
   const probs=[];
   for(const t of ['home','plan','go','dz','money']){ try{ setTab(t) }catch(e){ probs.push(`${tag} tab ${t}: ${e.message}`) } const j=junk(tag+' '+t); if(j) probs.push(j); const o=overflow(tag+' '+t); if(o) probs.push('ล้นจอ '+o) }
-  for(let d=1;d<=4;d++){ try{ S.day=d; S.compact=false; for(const it of dayItems(d)) S.ghOpen.add(it.id); setTab('plan') }catch(e){ probs.push(`${tag} plan day ${d}: ${e.message}`) } const j=junk(`${tag} plan day ${d}`); if(j) probs.push(j) }
+  for(let d=1;d<=4;d++){ try{ S.day=d; S.compact=false; for(const it of dayItems(d)){ S.ghOpen.add(it.id); S.routeOn.add(it.id) } setTab('plan') }catch(e){ probs.push(`${tag} plan day ${d}: ${e.message}`) } const j=junk(`${tag} plan day ${d}`); if(j) probs.push(j) }
   for(const sh of [{kind:'water'},{kind:'sos'},{kind:'fun'},{kind:'add'}]){ try{ if(sh.kind==='fun'){ for(const f of ['color','stamp']){ S.funTab=f; openSheet(sh); const j=junk(tag+' sheet fun '+f); if(j) probs.push(j); closeSheet() } } else { openSheet(sh); const j=junk(tag+' sheet '+sh.kind); if(j) probs.push(j); closeSheet() } }catch(e){ probs.push(`${tag} sheet ${sh.kind}: ${e.message}`); try{closeSheet()}catch(_){} } }
   try{ setTab('home'); document.getElementById('hotelbtn').click(); const j=junk(tag+' hotel'); if(j) probs.push(j); closeSheet() }catch(e){ probs.push(tag+' hotel: '+e.message) }
   return probs;
