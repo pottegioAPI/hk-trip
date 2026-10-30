@@ -457,7 +457,8 @@ button.sync{border:none;font-weight:600;color:var(--ink);background:var(--pink-s
 .filt{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
 .debt{display:flex;flex-direction:column;gap:10px}
 .mini{font-size:12.5px;color:var(--muted)}
-.tag{font-size:10.5px;background:var(--sky-soft);border-radius:99px;padding:0 6px;margin-left:4px}
+.tag{font-size:10.5px;background:var(--sky-soft);border-radius:99px;padding:0 6px;margin-left:4px;white-space:nowrap}
+.dzskip{background:var(--sun-soft);border-radius:12px;padding:8px 10px;margin:8px 0 0}
 .dels{display:flex;gap:8px;margin-top:14px}
 .dels button{flex:1;border:none;border-radius:16px;padding:12px;font-size:15px}
 .dels .rm{background:var(--surface2);color:var(--danger)}
@@ -1187,7 +1188,9 @@ const PDB = (()=>{ let p=null;
 })();
 // day 1 of the trip: photos and hand-typed waits from trying the app out beforehand don't count
 // (the shared ticks, expenses and game are cleared on the server at the same moment)
-if(hkNow().date>='2026-11-14' && lsGet('hk-fresh','')!=='1'){ lsSet('hk-dzlive','{}'); lsSet('hk-ch','null'); PDB.keys().then(ks=>Promise.all((ks||[]).map(k=>PDB.del(k)))).catch(()=>{}).finally(()=>lsSet('hk-fresh','1')) }
+function freshStart(){ if(hkNow().date<'2026-11-14' || lsGet('hk-fresh','')==='1') return Promise.resolve();
+  lsSet('hk-dzlive','{}'); lsSet('hk-ch','null'); return PDB.keys().then(ks=>Promise.all((ks||[]).map(k=>PDB.del(k)))).catch(()=>{}).finally(()=>lsSet('hk-fresh','1')) }
+freshStart();
 const photoURL = new Map();   // key -> object URL, so images show without re-reading
 async function photoSrc(k){ if(photoURL.has(k)) return photoURL.get(k); const b=await PDB.get(k).catch(()=>null); const u=b?URL.createObjectURL(b):''; photoURL.set(k,u); return u }
 async function shrinkPhoto(file, max=1280){
@@ -1799,7 +1802,7 @@ function exRow(e){
     : e.type==='adv' ? `${nm(p)} ออกให้ ${nm(other(p))} ก่อน` : `ส่วนตัว · เห็นคนเดียว`;
   return `<li class="ex"><button class="exbtn" type="button" data-ex="${esc(e.id)}" aria-expanded="${open}">
     <span class="ci" style="background:${e.kind==='settle'?'var(--mint-soft)':c.s};color:${e.kind==='settle'?'var(--mint)':c.c}">${ic(e.kind==='settle'?'swap':c.i)}</span>
-    <span class="t"><div>${esc(e.note||c.n)}${e.auto?'<span class="tag">อัตโนมัติ</span>':''}${e.oct&&e.payer===S.me?'<span class="tag" style="background:var(--mint-soft)">Octopus</span>':''}</div><small>${sub}</small></span>
+    <span class="t"><div>${esc(e.note||c.n)}</div><small>${sub}${e.auto?'<span class="tag">อัตโนมัติ</span>':''}${e.oct&&e.payer===S.me?'<span class="tag" style="background:var(--mint-soft)">Octopus</span>':''}</small></span>
     <span class="a">${hk(e.amt)}<small>${thb(e.amt)}</small></span></button>
     ${open?`<div class="confirm"><button type="button" data-cancel>ยกเลิก</button><button class="del" type="button" data-del="${esc(e.id)}">ลบรายการนี้</button></div>`:''}</li>`;
 }
@@ -2032,6 +2035,8 @@ function dzSim(seq, start, here){
   return {steps, end, walkSum:walkSum+back, waitSum, cost: end + walkSum*0.6 + late*8 + pen};
 }
 // zones with a Frozen Lollipop / Popcorn cart (Hong Kong Disneyland dining list)
+// how much two adults would miss each ride if time runs out (must-dos are never left out)
+const DZ_KEEP = {manor:9, oaken:7, jungle:6, para:6, philhar:6, antman:5, small:5, slinky:4, pooh:4, tea:3, dumbo:2};
 const DZ_CART_LANDS = ['MS','TL','FL','AL','GG','MP'];
 let DZ_LAST_ORDER=[], DZ_MEMO=null;
 function dzOptimize(){
@@ -2060,8 +2065,18 @@ function dzOptimizeRun(){
     }
     if(curR.cost<best.cost){ best=curR; seq=cur }
   }
+  // not everything fits before the fireworks: leave out the rides that matter least, never a must-do or a meal.
+  // Recomputed on every tap, so a left-out ride comes back by itself when the queues get shorter.
+  const deadline=fwBeThere(), skipped=[], fullEnd=best.end;
+  while(best.end>deadline){
+    let drop=null;
+    for(const x of seq){ if(!x.k || DZ_MUST.has(x.k)) continue;
+      const s=seq.filter(y=>y!==x), r=dzSim(s,start,here), score=(best.end-r.end)/(DZ_KEEP[x.k]||5);   // minutes saved per bit of fun given up
+      if(!drop || score>drop.score) drop={x,s,r,score} }
+    if(!drop) break; seq=drop.s; best=drop.r; skipped.push(drop.x.k);
+  }
   DZ_LAST_ORDER=seq.map(key);
-  return {...best, start};
+  return {...best, start, skipped, fullEnd};
 }
 function dzRouteHTML(full){
   const p=dzOptimize(), now=dzNowMin(), today=dzLiveNow(), deadline=fwBeThere();
@@ -2080,7 +2095,8 @@ function dzRouteHTML(full){
   const shown = full ? p.steps : p.steps.slice(0,3);
   return `${shown.map(row).join('')}
     ${full?`<div class="dzstep fw"><span class="num">${hhmm(deadline)}</span><span><b>🎆 ไปจองที่ดูพลุหน้าปราสาท</b><small>พลุเริ่ม ${hhmm(fwTime())} น.</small></span></div>`:''}
-    <p class="mini" style="margin:6px 0 0">${p.end<=deadline?`✅ ครบทุกอย่างประมาณ ${hhmm(p.end)} น. ก่อนเวลาจองที่ดูพลุ`:`⚠️ ตามคิวตอนนี้จะเกินเวลาไปจองที่ดูพลุ ~${p.end-deadline} นาที`} · เดินรวม ~${p.walkSum} นาที · รอคิวรวม ~${p.waitSum} นาที${today?'':' · คำนวณจากสถิติคิว'}</p>`;
+    ${p.skipped&&p.skipped.length?`<p class="mini dzskip">⏭️ เวลาไม่พอเล่นทุกเครื่องก่อนพลุ เลยข้ามไว้ก่อน: <b>${p.skipped.map(k=>esc(DZ_RIDES[k].n)).join(', ')}</b> ถ้าคิวสั้นลง แอปจะใส่กลับเข้าแผนให้เอง</p>`:''}
+    <p class="mini" style="margin:6px 0 0">${p.end<=deadline?`✅ ${p.skipped&&p.skipped.length?'ห้ามพลาดครบ กินครบ 2 มื้อ':'ครบทุกอย่าง'} ประมาณ ${hhmm(p.end)} น. ก่อนเวลาจองที่ดูพลุ`:`⚠️ ตามคิวตอนนี้จะเกินเวลาไปจองที่ดูพลุ ~${p.end-deadline} นาที`} · เดินรวม ~${p.walkSum} นาที · รอคิวรวม ~${p.waitSum} นาที${today?'':' · คำนวณจากสถิติคิว'}</p>`;
 }
 
 function dzSmartHTML(){
@@ -2212,7 +2228,7 @@ function dzDayHTML(){
 /* ---------- the day's goal: every ride + both voucher meals + the fireworks, with no paid extras ---------- */
 function dzGoal(){
   const p=dzOptimize(), now=dzNowMin(), start=Math.max(now, dzOpenT()), end=fwBeThere();
-  if(p) return {left:Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]), meals:['lunch','dinner'].filter(k=>!dzMealDone(k)), need:p.end-start, avail:Math.max(0,end-start), fw:!!S.done['3c']};
+  if(p) return {left:Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]), meals:['lunch','dinner'].filter(k=>!dzMealDone(k)), need:(p.fullEnd??p.end)-start, avail:Math.max(0,end-start), fw:!!S.done['3c']};
   const left=Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]), meals=['lunch','dinner'].filter(k=>!dzMealDone(k));
   // in the plan's order: walk between lands + the wait at about the time we get there + ~5 min on the ride
   const order=[...DZ_PLAN.flatMap(b=>b.rides), ...Object.keys(DZ_RIDES)].filter((k,i,a)=>a.indexOf(k)===i && left.includes(k));
