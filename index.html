@@ -59,6 +59,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .cur{font-size:.55em;font-weight:500;opacity:.85;letter-spacing:.02em}
 .hero .big small{display:block;font-size:15px;margin-top:2px;opacity:.9}
 .hdbud .cur{font-size:.85em}
+.save svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
 .dzsrc{font-size:12.5px;color:var(--muted);margin:2px 0 8px}
 .dzsrc.on{color:var(--mint);font-weight:600}
 .dzplayed{margin-top:10px;padding-top:8px;border-top:1.5px dashed var(--line)}
@@ -2468,7 +2469,7 @@ function alertsHTML(){
     else if(left<=60) out.push(['warn',`รถไฟเที่ยวสุดท้ายกลับที่พัก: ขึ้นที่ ${stName(NET.byCode[lh.st])} ก่อน ${hhmm(lh.m%1440)} น. (อีก ${left} นาที)`,'home']) }
   else if(td && (n.min>=23*60 || n.min<60) && planSpot().src!=='hotel' && metres(planSpot().ll,HOTEL_LL)>300) out.push(['warn','ดึกแล้ว รถไฟ MTR เที่ยวสุดท้ายส่วนใหญ่ราวเที่ยงคืนถึงตีหนึ่ง กด "พากลับที่พัก" เพื่อดูทาง','home']);
   if(!td && daysTo>0 && daysTo<=7){
-    const c=checkStats(); if(me!=null && c.mine<c.total) out.push(['info',`อีก ${daysTo} วันบิน เช็คลิสต์ของคุณยังเหลือ ${c.total-c.mine} อย่าง`,'check']);
+    const c=checkStats(); if(me!=null && c.mine<c.total && checkDue()) out.push(['info',`อีก ${daysTo} วันบิน เช็คลิสต์ของคุณยังเหลือ ${c.total-c.mine} อย่าง`,'check']);
     out.push(['info','เช็คเวลาเปิด Disneyland วันที่ 16 และกระเช้า Ngong Ping 360 วันที่ 17 (มีปิดซ่อมเป็นช่วงๆ)','dz']);
   }
   if(!out.length) return '';
@@ -2490,15 +2491,19 @@ const CHECK_DEFAULT = ['พาสปอร์ต (อายุเหลือเ
   .map((t,i)=>({id:'d'+i, t, d:[false,false]}));
 function checkItems(){ return S.check || CHECK_DEFAULT }
 function checkStats(){ const it=checkItems(), me=S.me??0; return {total:it.length, mine:it.filter(x=>x.d&&x.d[me]).length, other:it.filter(x=>x.d&&x.d[other(me)]).length} }
+// packing is done the day before: shown on 13 Nov and on the 14th until LET'S GO, until this phone taps "finished"
+const checkDue = () => { const d=hkNow().date; return (d==='2026-11-13' || d===DAYS[0].date && !S.done.start) && lsGet('hk-chk-done','')!=='1' };
 function checklistHTML(){
-  const td=tripDay(), n=hkNow(); if(td || n.date>DAYS[0].date) return '';   // before the trip only
+  if(!checkDue()) return '';
   const items=checkItems(), me=S.me??0, c=checkStats(), open=S.checkOpen;
   return `<div class="panel chk"><button type="button" class="chkh" data-chkopen="1" aria-expanded="${!!open}"><b>เช็คลิสต์ก่อนบิน</b>
       <span class="mini num">${nm(me)} ${c.mine}/${c.total} · ${nm(other(me))} ${c.other}/${c.total} ${open?'▴':'▾'}</span></button>
     ${open?`<ul class="clist">${items.map(x=>`<li><button type="button" class="ck2${x.d[me]?' on':''}" data-chk="${esc(x.id)}" aria-pressed="${!!x.d[me]}">${ic('check',3)}</button>
         <span class="ct">${esc(x.t)}${x.d[other(me)]?`<small>${nm(other(me))} เตรียมแล้ว</small>`:''}</span>
-        ${x.id.startsWith('u')?`<button type="button" class="x" data-chkdel="${esc(x.id)}" aria-label="ลบ">${ic('x')}</button>`:''}</li>`).join('')}</ul>
-      <div class="fin"><input id="chk-new" type="text" maxlength="60" placeholder="เพิ่มรายการ เช่น ครีมกันแดด" style="flex:1;width:auto"><button type="button" class="btn-s pay" data-chkadd="1">${ic('plus')}เพิ่ม</button></div>`:''}</div>`;
+        <button type="button" class="x" data-chkdel="${esc(x.id)}" aria-label="ลบรายการนี้">${ic('x')}</button></li>`).join('')}</ul>
+      <div class="fin"><input id="chk-new" type="text" maxlength="60" placeholder="เพิ่มรายการ เช่น ครีมกันแดด" style="flex:1;width:auto"><button type="button" class="btn-s pay" data-chkadd="1">${ic('plus')}เพิ่ม</button></div>
+      <button type="button" class="save" data-chkfin="1" style="margin-top:10px">${ic('check',2.4)}เสร็จสิ้น เก็บเช็คลิสต์</button>
+      <p class="mini" style="margin:4px 0 0;text-align:center">ลบรายการ = ลบออกจากลิสต์ของทั้งสองคน · เสร็จสิ้น = ซ่อนในเครื่องนี้</p>`:''}</div>`;
 }
 async function saveCheck(items){
   S.check=items; renderHome();
@@ -2539,7 +2544,7 @@ function renderHome(){
     ${alertsHTML()}
     ${nextStopHTML()}
     ${phase==='pre' ? `${checklistHTML()}${weatherHTML(td)}`            // before the trip: pack, then the forecast
-      : phase==='trip' ? `${gpsCardHTML()}${daySummaryHTML()}${nowHTML()}${weatherHTML(td)}${funCardHTML()}`   // on the road: where we are, today, weather, games
+      : phase==='trip' ? `${checklistHTML()}${gpsCardHTML()}${daySummaryHTML()}${nowHTML()}${weatherHTML(td)}${funCardHTML()}`   // on the road: where we are, today, weather, games
       : funCardHTML()}
     <div class="hstats">
       <div><small>ที่เที่ยว</small><b class="num">${doneAll}/${stopsAll}</b><span>ไปแล้ว</span></div>
@@ -3072,6 +3077,7 @@ document.addEventListener('click', e=>{
   if(ds.chk) return toggleCheck(ds.chk);
   if(ds.chkadd) return addCheck();
   if(ds.chkdel) return delCheck(ds.chkdel);
+  if(ds.chkfin){ lsSet('hk-chk-done','1'); renderAll(); toast('เก็บเช็คลิสต์แล้ว เดินทางปลอดภัย!'); return }
   if(ds.algo){ const g=ds.algo; if(g==='oct'){ S.moneySub='oct'; return setTab('money') } if(g==='money'){ S.moneySub='exp'; return setTab('money') } if(g==='plan'){ S.day=tripDay()||S.day; return setTab('plan') } if(g==='home') return goHome(); if(g==='check'){ S.checkOpen=true; renderHome(); return } if(g==='dz') return setTab('dz') }
   if(ds.water){ if(S.sheet) closeSheet(); const p=WATER.w[Number(ds.water)], fr=ds.wfrom&&findItem(ds.wfrom); if(fr) S.nav.from=navSpot(fr.it.h, locOf(fr.it), {st:fr.it.st||undefined});
     window.scrollTo(0,0); if(S.tab!=='go'){ S.nav.to=navSpot('จุดกดน้ำ '+p[0], [p[2]/1e5,p[3]/1e5]); S.navOpen=0; return setTab('go') } return setNav('to', navSpot('จุดกดน้ำ '+p[0], [p[2]/1e5,p[3]/1e5])) }
