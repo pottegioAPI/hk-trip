@@ -2744,6 +2744,7 @@ function setPanelHTML(){
     <div class="grid2"><div><label class="fl" for="set-n0">คนที่ 1</label><input class="txt" id="set-n0" maxlength="16" value="${esc(s.names[0])}"></div>
       <div><label class="fl" for="set-n1">คนที่ 2</label><input class="txt" id="set-n1" maxlength="16" value="${esc(s.names[1])}"></div></div>
     <button class="save" type="button" id="set-save">บันทึก</button>
+    ${!S.web?`<div class="fl">PIN เข้าแอป</div><div class="mini">เครื่องนี้ยังไม่ได้เข้าด้วยลิงก์ส่วนตัว เปิดลิงก์ส่วนตัวของคุณก่อน แล้วช่องตั้ง PIN จะขึ้นตรงนี้</div>`:''}
     ${S.web&&S.me!=null?`<label class="fl" for="set-pin">PIN เข้าแอป 4 ตัว ของ${nm(S.me)} <small>${S.pinSet?'· ตั้งแล้ว':'· ยังไม่ได้ตั้ง'}</small></label>
     <div class="fin"><input id="set-pin" class="txt num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="${S.pinSet?'ใส่ PIN ใหม่เพื่อเปลี่ยน':'ตั้ง PIN 4 ตัว'}" style="flex:1;width:auto"><button type="button" class="btn-s pay" data-setpin="1">${S.pinSet?'เปลี่ยน PIN':'ตั้ง PIN'}</button></div>
     <div class="mini">ใช้เข้าแอปแทนลิงก์ยาว เช่นตอนเปิดจากไอคอนหน้าจอ · อีกคนใช้ PIN นี้เข้าข้อมูลของคุณไม่ได้ เพราะต้องเลือกชื่อคุณด้วย และใส่ผิด 5 ครั้งจะล็อก 15 นาที</div>`:''}
@@ -3049,11 +3050,14 @@ async function saveSettings(){
 }
 function resolveMe(){
   if(S.uid){ const m=S.members||{}; S.me = m.m0===S.uid ? 0 : m.m1===S.uid ? 1 : null }
-  if(S.me==null && S.uid && !S.sheet) openSheet({kind:'who'});
+  if(S.me==null && S.uid && !S.sheet && (!db || !db.synced || db.synced())) openSheet({kind:'who'});   // ask only once the real members list has arrived
 }
 async function claim(p){
   if(db && S.uid){
-    const m={...(S.members||{})}; for(const k of ['m0','m1']) if(m[k]===S.uid) delete m[k];
+    // start from the newest members list this phone has, and only ever change my own entry
+    const cur=await db.doc('trip/members').get(), m={...(cur.exists?cur.data():{}), ...(S.members||{})};
+    if(m['m'+p] && m['m'+p]!==S.uid){ toast('ชื่อนี้ผูกกับลิงก์ของอีกคนแล้ว เลือกชื่อของคุณเอง'); return }
+    for(const k of ['m0','m1']) if(m[k]===S.uid) delete m[k];
     m['m'+p]=S.uid; S.members=m; S.me=p;
     try{ await db.doc('trip/members').set(m) }catch(e){ toast('บันทึกไม่สำเร็จ') }
   } else { S.me=p; lsSet('hk-me',String(p)) }
@@ -3257,8 +3261,9 @@ fetch('places.json').then(r=>r.ok?r.json():null).then(j=>{ if(j) PL=j }).catch((
    Everything is cached on the phone, so the app opens and records offline; changes are sent when back online. */
 const SB = {url:'https://btagqhxhljlbhwwkzghr.supabase.co', key:'sb_publishable_S8yqxmseObhtyqdxmW2A7w_DCyZwPfd'};
 function hkKey(){
-  const m=location.hash.match(/[#&]k=([\w-]{16,})/);
-  if(m){ lsSet('hk-key', m[1]); history.replaceState(null,'',location.pathname+location.search) }
+  // the personal link carries the key after #k= ; some chat apps drop the # part, so ?k= works too
+  const m=location.hash.match(/[#&]k=([\w-]{16,})/) || location.search.match(/[?&]k=([\w-]{16,})/);
+  if(m){ lsSet('hk-key', m[1]); history.replaceState(null,'',location.pathname) }
   return lsGet('hk-key','');
 }
 async function pinLogin(){
@@ -3356,7 +3361,7 @@ function hkStore(key){
   const loop = () => { clearTimeout(timer); timer=setTimeout(async()=>{ if(document.visibilityState==='visible') await sync(); loop() }, queue.length?3000:6000) };
   addEventListener('online', sync); document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') sync() });
   sync(); loop();
-  return {doc:docRef, collection:c=>colRef(c), sync};
+  return {doc:docRef, collection:c=>colRef(c), sync, synced:()=>fullDone};
 }
 async function hkStoreStart(){
   const key=hkKey(); if(!key) return null;
