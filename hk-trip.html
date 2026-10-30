@@ -918,9 +918,14 @@ const pushInfo = () => {
   return {ios, standalone, ok, perm: ok ? Notification.permission : 'unsupported'};
 };
 const b64u = s => { const p='='.repeat((4-s.length%4)%4), r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(r, c=>c.charCodeAt(0)) };
-const PUSH_KINDS = [['weather','🌀 พายุ / ฝนหนัก (หอดูดาวฮ่องกง)'],['flight','✈️ เที่ยวบิน: ดีเลย์ ประตู ไปสนามบิน'],['mtr','🚇 MTR ขัดข้อง'],['morning','☀️ สรุปเช้าทุกวัน'],
+// the first three are raised by the app itself from the phone's GPS (the app must be open); the rest come from the server
+const PUSH_KINDS = [['ride','🚌 ป้ายหน้าลง (โหมดนับป้ายรถบัส · เปิดแอปค้างไว้)'],['arrive','📍 ถึงจุดหมายถัดไปแล้ว (GPS · เปิดแอปค้างไว้)'],['wrongway','🧭 เดินห่างออกจากจุดหมาย (GPS · เปิดแอปค้างไว้)'],['weather','🌀 พายุ / ฝนหนัก (หอดูดาวฮ่องกง)'],['flight','✈️ เที่ยวบิน: ดีเลย์ ประตู ไปสนามบิน'],['mtr','🚇 MTR ขัดข้อง'],['morning','☀️ สรุปเช้าทุกวัน'],
   ['meal','🍽️ มื้อ voucher ที่ Disney'],['fireworks','🎆 ไปจองที่ดูพลุ'],['dzwait','🎢 เครื่องห้ามพลาดคิวสั้น'],['dzstatus','🔧 เครื่องห้ามพลาดหยุด / กลับมาเปิด'],
   ['night','🌙 ใกล้รถไฟเที่ยวสุดท้าย'],['depart','🧳 วันกลับ: เช็คเอาท์ รับกระเป๋า'],['budget','💰 วันนี้ใช้เกินงบ (ส่วนตัว)'],['pack','📋 คืนก่อนบิน: เช็คลิสต์']];
+function localNotify(kind, title, body){
+  try{ if('Notification' in window && Notification.permission==='granted' && !(S.pushOff||[]).includes(kind) && navigator.serviceWorker)
+    navigator.serviceWorker.ready.then(r=>r.showNotification(title, {body, tag:kind, renotify:true, icon:'icon-192.png'})) }catch(e){}
+}
 async function pushKind(k){
   const off=new Set(S.pushOff||[]); off.has(k)?off.delete(k):off.add(k); S.pushOff=[...off]; refreshSet();
   try{ await sbRpc('hk_push_prefs_set',{p_key:lsGet('hk-key',''), p_off:S.pushOff}) }catch(e){ toast('บันทึกไม่สำเร็จ ลองใหม่') }
@@ -1193,9 +1198,10 @@ function gpsNext(){ const td=tripDay(); if(!td) return null; const id=nextItem(t
 function gpsCheck(){
   if(!gpsFresh()) return; const it=gpsNext(), ll=targetLL(it); if(!ll) return;
   const d=metres(S.gps.ll,ll);
-  if(d < Math.max(150, S.gps.acc) && !S.done[it.id] && S.askedArrive!==it.id){ S.askedArrive=it.id; toast('ดูเหมือนถึง '+it.h+' แล้ว กด "ถึงแล้ว" ได้เลย') }
+  if(d < Math.max(150, S.gps.acc) && !S.done[it.id] && S.askedArrive!==it.id){ S.askedArrive=it.id; toast('ดูเหมือนถึง '+it.h+' แล้ว กด "ถึงแล้ว" ได้เลย'); localNotify('arrive', '📍 ถึง '+it.h+' แล้ว', 'เปิดแอปแล้วกด "ถึงแล้ว" แอปจะจดค่ารถและบอกจุดถัดไปให้') }
   const old=gpsTrail.find(x=>S.gps.at-x.at>=3*60e3);
   if(old && d<2500){ const d0=metres(old.ll,ll); S.walkAway = d-d0>200 ? {id:it.id, d:Math.round(d)} : null } else S.walkAway=null;
+  if(S.walkAway && S.warnedAway!==it.id){ S.warnedAway=it.id; localNotify('wrongway', '🧭 กำลังเดินห่างจาก '+it.h, 'ตอนนี้ห่าง '+wDist(S.walkAway.d)+' เปิดแอปกด "นำทาง" ดูทางที่ถูก') }
 }
 function gpsCardHTML(){
   if(window.claude || !navigator.geolocation) return '';
@@ -1684,7 +1690,7 @@ function rideDraw(){
     let best=R.at, bd=Infinity; for(let i=R.at;i<R.stops.length;i++){ const d=metres(S.gps.ll, stopLL(R.stops[i])); if(d<bd){ bd=d; best=i } } R.at=best; R.dist=bd }
   const last=R.stops.length-1, left=last-R.at, nextD=gpsFresh()&&R.at<last?metres(S.gps.ll, stopLL(R.stops[R.at+1])):null;
   if(left<=1 && !R.warned && gpsFresh()){ R.warned=true; try{ navigator.vibrate && navigator.vibrate([400,150,400,150,400]) }catch(e){} toast(R.gmb?'ป้ายหน้าลง! บอกคนขับ "เหยา ล็อก" (有落)':'ป้ายหน้าลง! กดกริ่งได้เลย');
-    try{ if('Notification' in window && Notification.permission==='granted') navigator.serviceWorker.ready.then(r=>r.showNotification('🚌 ป้ายหน้าลง!', {body: R.gmb?'บอกคนขับว่า "เหยา ล็อก" (有落)':'กดกริ่ง (ปุ่ม STOP) ตอนนี้เลย · ลงที่ '+stopName(R.stops[R.stops.length-1]), tag:'ride', renotify:true, icon:'icon-192.png'})) }catch(e){} }
+    localNotify('ride', '🚌 ป้ายหน้าลง!', R.gmb?'บอกคนขับว่า "เหยา ล็อก" (有落)':'กดกริ่ง (ปุ่ม STOP) ตอนนี้เลย · ลงที่ '+stopName(R.stops[R.stops.length-1])) }
   el.innerHTML = `<div class="ridehead${left<=1?' hot flash':''}"><b class="num">${left<=0?'ถึงป้ายลงแล้ว 🎉':left===1?'ป้ายหน้าลง!':'อีก '+left+' ป้าย'}</b>
       <span>${left<=1?(R.gmb?'บอกคนขับว่า "เหยา ล็อก" (有落) แปลว่าขอลง':'กดกริ่ง (ปุ่ม STOP สีแดง) ตอนนี้เลย'):`ลงที่ ${esc(stopName(R.stops[last]))}`}</span>
       ${!gpsFresh()?'<small>เปิด GPS เพื่อให้แอปนับป้ายให้อัตโนมัติ</small>':nextD!=null?`<small>ป้ายถัดไปอีก ~${wDist(nextD)}</small>`:''}</div>
