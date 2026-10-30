@@ -3,7 +3,7 @@
 const fs=require('fs'), path=require('path'), crypto=require('crypto');
 const root=process.argv[2]||path.join(__dirname,'..');
 const src=fs.readFileSync(path.join(root,'hk-trip.html'),'utf8');
-const DATA=['bus.json','places.json','water.json','weather.json','lasttrain.json'];
+const DATA=['bus.json','places.json','water.json','weather.json','lasttrain.json','dzcal.json'];
 const head=`<!doctype html><html lang="th"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#FF4F8B">

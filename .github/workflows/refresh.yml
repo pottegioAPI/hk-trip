@@ -24,6 +24,6 @@ jobs:
         run: |
           git config user.name "hk-trip-bot"
           git config user.email "hk-trip-bot@users.noreply.github.com"
-          git add -A index.html sw.js hk-trip.html bus.json places.json water.json weather.json lasttrain.json data-cache/last-osm
+          git add -A index.html sw.js hk-trip.html bus.json places.json water.json weather.json lasttrain.json dzcal.json data-cache/last-osm
           git diff --cached --quiet || git commit -m "Daily data refresh $(date -u +%F)"
           git push
