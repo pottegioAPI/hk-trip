@@ -2086,18 +2086,22 @@ function dzOptimizeRun(){
   const now=dzNowMin(), start=Math.max(now, dzOpenT()), here=S.dzLand||'MS', tasks=dzTasks();
   if(!tasks.length) return {steps:[], end:start, walkSum:0, waitSum:0, start};
   const key=x=>x.k||(x.snack?'snack':'m:'+x.meal), byKey=new Map(tasks.map(x=>[key(x),x]));
+  // a voucher meal that is due now (short restaurant queue while rides are long, or getting late) goes first,
+  // so the route and the meal card never disagree and a paid meal isn't pushed past its hours
+  const due=dzMealNow(now), first=due&&due.go?tasks.find(x=>x.meal===due.k):null, lock=first?1:0, front=a=>first?[first,...a.filter(x=>x!==first)]:a;
   // start from the previous plan (so it doesn't jump around), else nearest-first
   let seq=DZ_LAST_ORDER.map(k=>byKey.get(k)).filter(Boolean); for(const x of tasks) if(!seq.includes(x)) seq.push(x);
+  seq=front(seq);
   let best=dzSim(seq,start,here);
   const greedy=[]; { const left=[...tasks]; let land=here, t=start; const gc=x=>x.snack?15:dzWalk(land,x.land)+(x.meal?20:dzPredWait(x.k,t,now));
     while(left.length){ left.sort((a,b)=>gc(a)-gc(b)); const x=left.shift(); greedy.push(x); land=x.land||land; t+=20 } }
   // three starting points (last plan, nearest-first, must-dos first), each improved by a small local search
   const mustFirst=[...greedy.filter(x=>x.k&&DZ_MUST.has(x.k)||x.meal==='lunch'), ...greedy.filter(x=>!(x.k&&DZ_MUST.has(x.k)||x.meal==='lunch'))];
   let seed=tasks.length*7919+start; const rnd=()=>((seed=(seed*16807)%2147483647)/2147483647);
-  for(const init of [seq, greedy, mustFirst]){
+  for(const init of [seq, front(greedy), front(mustFirst)]){
     let cur=init.slice(), curR=dzSim(cur,start,here);
     for(let i=0;i<1200;i++){                                 // move one stop elsewhere, or swap two (kept small: phones redo this on every tap)
-      const s=cur.slice(), a=Math.floor(rnd()*s.length), b=Math.floor(rnd()*s.length); if(a===b) continue;
+      const s=cur.slice(), a=lock+Math.floor(rnd()*(s.length-lock)), b=lock+Math.floor(rnd()*(s.length-lock)); if(a===b) continue;
       if(rnd()<.5){ const [x]=s.splice(a,1); s.splice(b,0,x) } else [s[a],s[b]]=[s[b],s[a]];
       const r=dzSim(s,start,here); if(r.cost<curR.cost){ curR=r; cur=s }
     }
@@ -2116,7 +2120,7 @@ function dzOptimizeRun(){
   // then give back any left-out ride that still fits somewhere before the fireworks (most missed first)
   for(const k of skipped.slice().sort((a,b)=>(DZ_KEEP[b]||5)-(DZ_KEEP[a]||5))){
     const x=byKey.get(k); let put=null;
-    for(let i=0;i<=seq.length;i++){ const s=[...seq.slice(0,i), x, ...seq.slice(i)], r=dzSim(s,start,here); if(r.end<=deadline && (!put || r.cost<put.r.cost)) put={s,r} }
+    for(let i=lock;i<=seq.length;i++){ const s=[...seq.slice(0,i), x, ...seq.slice(i)], r=dzSim(s,start,here); if(r.end<=deadline && (!put || r.cost<put.r.cost)) put={s,r} }
     if(put){ seq=put.s; best=put.r; skipped.splice(skipped.indexOf(k),1) }
   }
   DZ_LAST_ORDER=seq.map(key);
@@ -2175,7 +2179,7 @@ async function dzReset(){
 
 /* ---------- Disney meals (ticket includes lunch + dinner at Royal Banquet Hall) and the fireworks ---------- */
 // 3-in-1 Park Meal Voucher (Klook): lunch combo ≤ HK$170 redeemed before 16:00, dinner combo ≤ HK$170 from 16:30
-const DZ_MEALS = {lunch:{n:'มื้อเที่ยง', from:11*60+30, to:15*60+45, late:13*60+30}, dinner:{n:'มื้อเย็น', from:16*60+30, to:19*60, late:18*60+15}};
+const DZ_MEALS = {lunch:{n:'มื้อเที่ยง', from:11*60+30, to:15*60+55, late:13*60+30}, dinner:{n:'มื้อเย็น', from:16*60+30, to:19*60, late:18*60+15}};
 let DZCAL=null;
 fetch('dzcal.json').then(r=>r.ok?r.json():null).then(j=>{ if(j){ DZCAL=j; rerender() } }).catch(()=>{});
 const dzShow = re => DZCAL && (DZCAL.shows||[]).find(s=>re.test(s.name));
@@ -2228,6 +2232,8 @@ function dzMealHTML(min){
     parts.push(`<div class="dzmeal${x.go?' go':''}"><b>🍽️ ${x.go?'แนะนำ: ไปกิน'+x.m.n+'ตอนนี้':x.m.n+' Royal Banquet Hall'}</b><small>${why} · ร้านอยู่ Fantasyland ใกล้ปราสาท · ใช้ Meal Voucher (โชว์ QR ตอนสั่ง)${x.k==='lunch'?' · แลกก่อน 16:00':''}</small>
       <div class="acts"><button type="button" class="btn-s pay" data-dzmeal="${x.k}">กิน${x.m.n.replace('มื้อ','')}แล้ว</button></div></div>`);
     if(x.rbh && (!x.rbh.open || x.rbh.w>=25)) parts.push(dzFoodHTML(min, x.rbh.open ? `Royal Banquet Hall คิว ~${x.rbh.w} นาที ใช้ voucher ที่ร้านอื่นแทนได้:` : 'Royal Banquet Hall ปิดอยู่ ใช้ voucher ที่ร้านอื่นแทนได้:')) }
+  if(!dzMealDone('dinner') && min>=DZ_MEALS.dinner.to && min<19*60+30) parts.push(`<div class="dzmeal go"><b>🍽️ ยังไม่ได้กินมื้อเย็น voucher ยังแลกได้ถึง ~19:30</b><small>สั่งชุดคอมโบแบบกลับบ้าน (ไม่เกิน HK$170) ที่ร้านใกล้สุด แล้วถือไปกินระหว่างรอพลุหน้าปราสาท</small>
+      <div class="acts"><button type="button" class="btn-s pay" data-dzmeal="dinner">กินเย็นแล้ว</button></div></div>`);
   const left=fwBeThere()-min;
   if(left<=25) parts.unshift(`<div class="dzfw now"><b>🎆 ${left<=0?'ไปที่ดูพลุเลย!':'อีก '+left+' นาที ไปจองที่ดูพลุ'}</b><small>เดินไปลานหน้าปราสาท / ปลาย Main Street หันหน้าเข้าปราสาท · พลุเริ่ม ${hhmm(fwTime())} น.</small></div>`);
   return parts.join('');
@@ -2457,7 +2463,8 @@ function alertsHTML(){
     const spent=allExp().filter(e=>e.day===td).reduce((s,e)=>s+share(e,me),0), per=Number(S.budget)/4;
     if(spent>per) out.push(['warn',`วันนี้ใช้ไป ${hk(spent)} เกินงบเฉลี่ยต่อวัน (${hk(per)})`,'money']);
   }
-  if(td===3 && !dzMealDone('lunch') && n.min>=15*60 && n.min<16*60) out.unshift(['warn',`🍽️ voucher มื้อเที่ยงต้องแลกก่อน 16:00 (อีก ${16*60-n.min} นาที)`,'dz']);
+  if(td===3 && !dzMealDone('lunch') && n.min>=14*60+30 && n.min<16*60) out.unshift(['warn',`🍽️ ยังไม่ได้กินมื้อเที่ยง voucher ต้องสั่งก่อน 16:00 (อีก ${16*60-n.min} นาที) ไปกินตอนนี้เลย`,'dz']);
+  if(td===3 && !dzMealDone('dinner') && n.min>=18*60+15 && n.min<19*60+30) out.unshift(['warn', n.min<19*60 ? `🍽️ ยังไม่ได้กินมื้อเย็น ไปกินตอนนี้ (อีก ${19*60-n.min} นาที) จะทันไปจองที่ดูพลุ` : `🍽️ มื้อเย็น voucher ยังแลกได้ถึงประมาณ 19:30 สั่งแบบกลับบ้าน ถือไปกินระหว่างรอพลุ`,'dz']);
   if(td===3 && !S.done['3c']){ const left=fwBeThere()-n.min; if(left<=30 && left>-40) out.unshift(['warn',`🎆 ${left>0?'อีก '+left+' นาที':'ถึงเวลา'}ไปจองที่ดูพลุหน้าปราสาท (พลุเริ่ม ${hhmm(fwTime())} น.)`,'dz']) }
   if(td){ const {delay}=dayDelay(dayItems(td)); if(delay!=null && delay>=30) out.push(['info',`ช้ากว่าแผน ${delay} นาที ลองตัดหรือเลื่อนบางจุดในแผนวันนี้`,'plan']) }
   const now=n.min<4*60?n.min+1440:n.min, lh=(td||n.date==='2026-11-18') && now>=21*60 ? lastHome() : null;
