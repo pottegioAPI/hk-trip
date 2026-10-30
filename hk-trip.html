@@ -50,6 +50,8 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.dzchips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:-4px 0 12px}.dzc{border:none;background:var(--surface);border-radius:18px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:0 2px 8px rgba(155,123,255,.15);color:var(--ink)}.dzci{width:38px;height:38px;border-radius:50%;background:var(--grape-soft);display:grid;place-items:center;font-size:20px;margin-bottom:2px}.dzc b{font-size:12px;font-weight:600}.dzc small{font-size:11px;color:var(--muted)}
+.dznext{display:flex;align-items:center;gap:10px;background:var(--sun-soft);border:2px solid var(--sun);border-radius:16px;padding:10px 12px;margin:4px 0 6px}.dznext>div{flex:1;display:flex;flex-direction:column;gap:1px}.dznext b{font-family:var(--display);font-weight:500;font-size:17px}.dznext small{font-size:12px;color:var(--muted)}.dznext.late,.dzstep.late{opacity:.7}.dzstep{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:center;padding:7px 0;border-top:1px dashed var(--line)}.dzstep .num{font-size:12.5px;color:var(--pink);font-weight:700}.dzstep b{display:block;font-size:13.5px;font-weight:600}.dzstep small{font-size:11.5px;color:var(--muted)}.dzstep.fw b{color:#6B3FA0}.dzok{border:none;border-radius:99px;background:var(--mint);color:#fff;font-weight:700;font-size:13px;padding:8px 12px;white-space:nowrap}.dzref summary{list-style:none;cursor:pointer}.dzref summary::-webkit-details-marker{display:none}.dzref h3{font-family:var(--display);font-weight:500;font-size:15px;margin:0 0 10px;color:var(--muted)}
 .dzgoal{background:var(--mint-soft);border-radius:16px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:4px}.dzgoal.tight{background:var(--sun-soft)}.dzgoal>b{font-size:15px}.dzgoal small{font-size:12.5px;color:var(--muted)}.dzgl{display:flex;gap:6px;flex-wrap:wrap}.dzgl span{background:var(--surface);border-radius:99px;padding:2px 10px;font-size:12.5px}.dzgl span.ok{background:var(--mint);color:#fff}.dzgoal .tips{font-size:12.5px;margin:2px 0 0;padding-left:18px}
 .dzmini{margin-top:10px;background:var(--grape-soft);border-radius:16px;padding:10px 12px}.dzmh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}.dzmh small{font-size:11.5px;color:var(--muted)}.dzmr{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px dashed var(--line)}.dzmr .rk{width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}.dzmr span b{display:block;font-size:13.5px}.dzmr small{font-size:11.5px;color:var(--muted)}.dzmini .dzmeal{margin-bottom:6px}.dzday{background:var(--mint-soft);border-radius:16px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:2px}.dzday b{font-size:15px}.dzday small{font-size:12.5px;color:var(--muted)}
 .wxnow{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:center;background:var(--sky-soft);border-radius:16px;padding:10px 14px;margin-bottom:10px}.wxnow b{grid-row:span 2;font-family:var(--display);font-size:30px;color:var(--sky)}.wxnow span{font-size:13.5px}.wxnow small{font-size:11.5px;color:var(--muted)}
@@ -1962,23 +1964,94 @@ function dzWait(k, min){
   const h=Math.floor(min/60), f=DZ_HOUR[h] ?? (h<9?.5:.4); return {w:Math.round(DZ_RIDES[k].avg*f/5)*5, live:false};
 }
 function dzRecommend(any){
-  const n=hkNow(), min = n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 600), here=S.dzLand||'MS';
+  const n=hkNow(), min = n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 630), here=S.dzLand||'MS';
   return Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]).map(k=>{ const w=dzWait(k,min), walk=dzWalk(here,DZ_LAND_OF[k]);
     if(!any && min+walk+w.w+10+dzWalk(DZ_LAND_OF[k],'MS') > fwBeThere()) return null;   // would miss the fireworks
     return w.closed ? null : {k, w, walk, score:w.w + walk + (DZ_RIDES[k].avg>=25 && min<11*60 ? -10 : 0)} }).filter(Boolean).sort((a,b)=>a.score-b.score).slice(0,3);
 }
+
+/* ---------- the whole rest of the day, planned: which ride next, in what order ----------
+   Every remaining ride and voucher meal is a stop. A stop costs the walk from where we are,
+   the queue at the time we would get there (live now, scaled along the day's crowd curve), and
+   the ride itself. The order that finishes earliest — with little walking, meals inside their
+   voucher hours and everything done before going to the fireworks — wins. Recomputed on every tap. */
+const dzCurve = m => { const h=m/60, a=Math.floor(h), f0=DZ_HOUR[a] ?? (a<9?.5:.4), f1=DZ_HOUR[a+1] ?? f0; return f0+(f1-f0)*(h-a) };
+function dzPredWait(k, at, now){
+  const w=dzWait(k, now); if(w.closed) return null;
+  const c = m => Math.pow(dzCurve(m), DZ_RIDES[k].avg>=25 ? 1.8 : 1);              // headline rides swing harder: short at opening, long midday
+  if(w.live) return Math.max(0, Math.round(w.w * c(at)/c(now)));                  // what the board says now, along the day's shape
+  return Math.round(DZ_RIDES[k].avg * c(at));
+}
+function dzTasks(){
+  const now=dzNowMin(), t=[];
+  for(const k of Object.keys(DZ_RIDES)) if(!S.done['dz:'+k] && dzPredWait(k,now,now)!=null) t.push({k, land:DZ_LAND_OF[k], dur:5});
+  for(const [k,m] of Object.entries(DZ_MEALS)) if(!dzMealDone(k) && now<=m.to) t.push({meal:k, land:'FL', dur:35, from:m.from, to:m.to});
+  return t;
+}
+function dzSim(seq, start, here){
+  const now=dzNowMin(), deadline=fwBeThere(), rbh=DZQ&&DZQ.rbh&&DZQ.rbh.open?DZQ.rbh.w:12;
+  let t=start, land=here, walkSum=0, waitSum=0, pen=0; const steps=[];
+  for(const s of seq){
+    const walk=dzWalk(land,s.land); t+=walk; walkSum+=walk;
+    let wait;
+    if(s.meal){ if(t<s.from){ pen+=(s.from-t)*0.5; t=s.from } wait=rbh; if(t+wait>s.to) pen+=400;   // eat inside the voucher hours
+      const pref=s.meal==='lunch'?13*60+30:18*60; if(t>pref) pen+=(t-pref)*0.4 }                    // and not too late to be hungry
+    else { wait=dzPredWait(s.k,t,now);
+      // leaving a headline ride for late is a gamble (queues and breakdowns stack up): do the big ones while there's slack
+      if(DZ_RIDES[s.k].avg>=25) pen+=Math.max(0,t-16*60)*0.35 }
+    steps.push({...s, at:t, walk, wait}); t+=wait+s.dur; waitSum+=wait; land=s.land;
+  }
+  const back=dzWalk(land,'MS'), end=t+back, late=Math.max(0,end-deadline);
+  return {steps, end, walkSum:walkSum+back, waitSum, cost: end + walkSum*0.6 + late*8 + pen};
+}
+let DZ_LAST_ORDER=[], DZ_MEMO=null;
+function dzOptimize(){
+  const mk=[dzNowMin(), S.dzLand, JSON.stringify(Object.keys(S.done).filter(k=>/^dz:|^3[lnc]$/.test(k)).sort()), DZQ&&DZQ.at, dzLive&&lsGet('hk-dzlive',''), fwTime(), dzOpenT()].join('|');
+  if(DZ_MEMO && DZ_MEMO.k===mk) return DZ_MEMO.v;
+  const v=dzOptimizeRun(); DZ_MEMO={k:mk, v}; return v;
+}
+function dzOptimizeRun(){
+  const now=dzNowMin(), start=Math.max(now, dzOpenT()), here=S.dzLand||'MS', tasks=dzTasks();
+  if(!tasks.length) return {steps:[], end:start, walkSum:0, waitSum:0, start};
+  const key=x=>x.k||'m:'+x.meal, byKey=new Map(tasks.map(x=>[key(x),x]));
+  // start from the previous plan (so it doesn't jump around), else nearest-first
+  let seq=DZ_LAST_ORDER.map(k=>byKey.get(k)).filter(Boolean); for(const x of tasks) if(!seq.includes(x)) seq.push(x);
+  let best=dzSim(seq,start,here);
+  const greedy=[]; { const left=[...tasks]; let land=here, t=start; while(left.length){ left.sort((a,b)=>(dzWalk(land,a.land)+(a.meal?20:dzPredWait(a.k,t,now)))-(dzWalk(land,b.land)+(b.meal?20:dzPredWait(b.k,t,now)))); const x=left.shift(); greedy.push(x); land=x.land; t+=20 } }
+  const g=dzSim(greedy,start,here); if(g.cost<best.cost){ best=g; seq=greedy }
+  let seed=tasks.length*7919+start; const rnd=()=>((seed=(seed*16807)%2147483647)/2147483647);
+  for(let i=0;i<4000;i++){                                   // small local search: move one stop elsewhere, or swap two
+    const s=seq.slice(), a=Math.floor(rnd()*s.length), b=Math.floor(rnd()*s.length); if(a===b) continue;
+    if(rnd()<.5){ const [x]=s.splice(a,1); s.splice(b,0,x) } else [s[a],s[b]]=[s[b],s[a]];
+    const r=dzSim(s,start,here); if(r.cost<best.cost){ best=r; seq=s }
+  }
+  DZ_LAST_ORDER=seq.map(key);
+  return {...best, start};
+}
+function dzRouteHTML(full){
+  const p=dzOptimize(), now=dzNowMin(), today=hkNow().date==='2026-11-16', deadline=fwBeThere();
+  if(!p.steps.length) return `<p class="mini">เล่นครบและกินครบแล้ว! ไปจองที่ดูพลุได้เลย 🎆</p>`;
+  const row=(s,i)=>{ const late=s.at+s.wait+s.dur>deadline, name=s.meal?`🍽️ ${DZ_MEALS[s.meal].n} · Royal Banquet Hall`:esc(DZ_RIDES[s.k].n);
+    const btn=s.meal?`<button type="button" class="dzok" data-dzmeal="${s.meal}">กินแล้ว</button>`:`<button type="button" class="dzok" data-dz="${s.k}">เล่นแล้ว</button>`;
+    const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'} · ${s.meal?`คิวร้าน ~${s.wait} นาที`:`รอ ~${s.wait} นาที`}${!s.meal&&DZ_RIDES[s.k].single?' · มีแถว Single Rider':''}`;
+    return i===0 ? `<div class="dznext${late?' late':''}"><div><small>ไปต่อเลย · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small></div>${btn}</div>`
+      : `<div class="dzstep${late?' late':''}"><span class="num">${hhmm(s.at)}</span><span><b>${name}</b><small>${info}${late?' · ⚠️ อาจไม่ทันก่อนพลุ':''}</small></span>${btn}</div>`;
+  };
+  const shown = full ? p.steps : p.steps.slice(0,3);
+  return `${shown.map(row).join('')}
+    ${full?`<div class="dzstep fw"><span class="num">${hhmm(deadline)}</span><span><b>🎆 ไปจองที่ดูพลุหน้าปราสาท</b><small>พลุเริ่ม ${hhmm(fwTime())} น.</small></span></div>`:''}
+    <p class="mini" style="margin:6px 0 0">${p.end<=deadline?`✅ ครบทุกอย่างประมาณ ${hhmm(p.end)} น. ก่อนเวลาจองที่ดูพลุ`:`⚠️ ตามคิวตอนนี้จะเกินเวลาไปจองที่ดูพลุ ~${p.end-deadline} นาที`} · เดินรวม ~${p.walkSum} นาที · รอคิวรวม ~${p.waitSum} นาที${today?'':' · คำนวณจากสถิติคิว'}</p>`;
+}
+
 function dzSmartHTML(){
-  const recs=dzRecommend(), n=hkNow(), today=n.date==='2026-11-16';
-  return `${dzMealHTML(dzNowMin())}<div class="panel dzsmart"><h3>เล่นอะไรต่อดี? <button type="button" class="btn-s" data-dzrefresh="1">${ic('swap')}รีเฟรช</button></h3>
-    <div class="mini" style="margin-bottom:6px">ตอนนี้อยู่โซนไหน</div>
+  const today=hkNow().date==='2026-11-16';
+  return `${dzMealHTML(dzNowMin())}<div class="panel dzsmart"><h3>🧭 เส้นทางแนะนำ <button type="button" class="btn-s" data-dzrefresh="1">${ic('swap')}คำนวณใหม่</button></h3>
+    <div class="mini" style="margin-bottom:6px">ตอนนี้อยู่โซนไหน (กด "เล่นแล้ว" แอปจะย้ายให้เอง)</div>
     <div class="places" style="margin:0 -14px 8px">${Object.entries(DZ_LANDS).map(([k,l])=>`<button class="chip" type="button" data-dzland="${k}" aria-pressed="${(S.dzLand||'MS')===k}">${l[0]}</button>`).join('')}</div>
-    ${today?'':`<div class="mini" style="margin-bottom:6px">ยังไม่ถึงวันที่ 16 ลองดูคำแนะนำตามเวลา: ${[10,12,14,17,19].map(h=>`<button type="button" class="chip num" data-dzsim="${h*60}" aria-pressed="${(S.dzSimMin??600)===h*60}" style="padding:2px 8px;font-size:12px">${h}:00</button>`).join(' ')}</div>`}
-    ${recs.length ? recs.map((r,i)=>{ const R=DZ_RIDES[r.k]; return `<div class="dzrec${i===0?' top':''}"><span class="rk">${i+1}</span>
-      <span class="rn"><b>${esc(R.n)}</b><small>${DZ_LANDS[DZ_LAND_OF[r.k]][0]} · เดิน ~${r.walk} นาที · ${r.w.qt?`รอ ${r.w.w} นาที (สดเมื่อ ${r.w.ago} นาทีก่อน)`:r.w.live?`รอ ${r.w.w} นาที (ข้อมูลจริงที่กรอกเมื่อ ${r.w.ago} นาทีก่อน)`:`คาดว่ารอ ~${r.w.w} นาที`}</small></span>
-      <b class="num tot">~${r.w.w+r.walk}<small>นาที</small></b></div>` }).join('') : (dzNowMin()>=fwBeThere()-15 ? '<p class="mini">ใกล้เวลาพลุแล้ว ไม่แนะนำเครื่องเล่นเพิ่ม ไปจองที่ดูพลุกัน 🎆</p>' : '<p class="mini">เล่นครบทุกเครื่องแล้ว!</p>')}
-    <div class="note">${ic('info')}${DZQ&&DZQ.anyOpen?`เวลารอสดทุก 5 นาที Powered by Queue-Times.com (อัปเดต ${new Date(DZQ.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.) · `:''}เวลารอคาดจากสถิติย้อนหลังตามช่วงเวลา ถ้าเห็นเวลารอจริงที่ป้ายหน้าเครื่องเล่นหรือในแอป Disney แตะป้ายเวลารอของเครื่องนั้นด้านล่างแล้วกรอก แอปจะใช้ตัวเลขจริงแทนเป็นเวลา 40 นาที</div>
-    <div class="acts"><a class="btn-s" href="https://queue-times.com/parks/31/queue_times" target="_blank" rel="noopener">${ic('info')}ดูเวลารอสด</a>
-      <button type="button" class="btn-s" data-dzreset="1">${S.dzResetSure?'แตะอีกครั้งเพื่อล้าง':'ล้างที่เล่นแล้วทั้งหมด'}</button></div></div>`;
+    ${today?'':`<div class="mini" style="margin-bottom:6px">ยังไม่ถึงวันที่ 16 ลองดูแผนเริ่มตอน: ${[10.5,12,14,17,19].map(h=>`<button type="button" class="chip num" data-dzsim="${h*60}" aria-pressed="${(S.dzSimMin??630)===h*60}" style="padding:2px 8px;font-size:12px">${hhmm(h*60)}</button>`).join(' ')}</div>`}
+    ${dzRouteHTML(true)}
+    <div class="note">${ic('info')}เรียงลำดับให้เดินน้อยและรอคิวน้อยที่สุด กินตามเวลา voucher และเสร็จก่อนไปจองที่ดูพลุ${DZQ&&DZQ.anyOpen?` · คิวสดจาก Queue-Times.com อัปเดต ${new Date(DZQ.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.`:' · ตอนนี้ใช้สถิติคิวย้อนหลัง วันจริงใช้คิวสด'} · ถ้าเห็นคิวจริงที่ป้ายไม่ตรง แตะป้ายเวลารอในรายการด้านล่างแล้วกรอก</div>
+    <div class="acts"><button type="button" class="btn-s" data-dzreset="1">${S.dzResetSure?'แตะอีกครั้งเพื่อล้าง':'ล้างที่เล่นแล้วทั้งหมด'}</button></div></div>`;
 }
 async function dzSetLive(k){
   const el=document.getElementById('dzw-'+k), v=Number(el&&el.value); if(!(v>=0) || !el || el.value===''){ toast('ใส่เวลารอเป็นนาที'); return }
@@ -2009,7 +2082,7 @@ function dzParkHTML(){
   if(n.min<o) return `<div class="dzpk"><small>สวนเปิดใน</small><b class="num">${dur(o-n.min)}</b><small>เปิด ${hhmm(o)} น.</small></div>`;
   return '<div class="dzpk off"><small>สวน</small><b>ปิดแล้ว</b></div>';
 }                       // be at the castle 40 minutes before the show
-function dzNowMin(){ const n=hkNow(); return n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 600) }
+function dzNowMin(){ const n=hkNow(); return n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 630) }
 function dzMealNow(min){
   // which meal is due now, and should we go now? (restaurant queue short while rides are long, or getting late)
   for(const [k,m] of Object.entries(DZ_MEALS)){
@@ -2070,16 +2143,15 @@ const dzMealDone = k => !!(S.done['dz:'+k] || S.done[{lunch:'3l',dinner:'3n'}[k]
 function dzLinkToggle(key){        // key is a plan id (3l/3n/3c) or a dz: key — both sides follow
   const plan=Object.keys(DZ_LINK).find(p=>p===key||DZ_LINK[p]===key), dz=plan?DZ_LINK[plan]:key, on=!(S.done[plan]||S.done[dz]), next={...S.done};
   if(on){ const v={at:hhmm(hkNow().min)}; next[dz]=v; if(plan) next[plan]=v } else { delete next[dz]; if(plan) delete next[plan] }
-  S.done=next; saveProgress(); renderAll(); return on;
+  S.done=next; saveProgress(); renderAll(); if(S.sheet&&S.sheet.kind==='dzinfo') drawSheet(); return on;
 }
 // the park, right inside the plan's Disneyland stop
 function dzMiniHTML(){
   const min=dzNowMin(), recs=dzRecommend(), today=hkNow().date==='2026-11-16';
   return `<div class="dzmini">
     <div class="dzmh"><b>🏰 ในสวนตอนนี้</b>${today?'':'<small>ตัวอย่าง (ข้อมูลจริงขึ้นวันที่ 16)</small>'}</div>
-    ${dzGoalHTML()}
     ${dzMealHTML(min)}
-    ${recs.length?`<div class="mini" style="margin:2px 0 4px">เล่นอะไรต่อดี</div>${recs.map((r,i)=>`<div class="dzmr"><span class="rk">${i+1}</span><span><b>${esc(DZ_RIDES[r.k].n)}</b><small>${DZ_LANDS[DZ_LAND_OF[r.k]][0]} · ${r.w.qt||r.w.live?'รอ':'คาดว่ารอ ~'} ${r.w.w} นาที · เดิน ~${r.walk} นาที</small></span><button type="button" class="btn-s" data-dz="${r.k}">เล่นแล้ว</button></div>`).join('')}`:''}
+    ${dzRouteHTML(false)}
     <div class="acts"><button type="button" class="btn-s pay" data-tab="dz">${ic('ticket')}เปิดแท็บ Disneyland ทั้งหมด</button></div></div>`;
 }
 // the day around the park, at the top of the Disney tab
@@ -2098,7 +2170,8 @@ function dzDayHTML(){
 
 /* ---------- the day's goal: every ride + both voucher meals + the fireworks, with no paid extras ---------- */
 function dzGoal(){
-  const now=dzNowMin(), start=Math.max(now, dzOpenT()), end=fwBeThere();
+  const p=dzOptimize(), now=dzNowMin(), start=Math.max(now, dzOpenT()), end=fwBeThere();
+  if(p) return {left:Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]), meals:['lunch','dinner'].filter(k=>!dzMealDone(k)), need:p.end-start, avail:Math.max(0,end-start), fw:!!S.done['3c']};
   const left=Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]), meals=['lunch','dinner'].filter(k=>!dzMealDone(k));
   // in the plan's order: walk between lands + the wait at about the time we get there + ~5 min on the ride
   const order=[...DZ_PLAN.flatMap(b=>b.rides), ...Object.keys(DZ_RIDES)].filter((k,i,a)=>a.indexOf(k)===i && left.includes(k));
@@ -2122,6 +2195,21 @@ function dzGoalHTML(){
     ${tips.length?`<ul class="tips">${tips.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</div>`;
 }
 
+
+// the less urgent cards live behind four round buttons under the Disney header
+function dzChipsHTML(){
+  const done=Object.keys(DZ_RIDES).filter(k=>S.done['dz:'+k]).length, total=Object.keys(DZ_RIDES).length;
+  const vleft=DZ_VOUCHER.filter(([k])=>!(k==='lunch'||k==='dinner'?dzMealDone(k):S.done['dz:'+k])).length;
+  const min=dzNowMin(), next=DZCAL?DZCAL.shows.map(s=>s.times.find(x=>toMin(x)>=min)).filter(Boolean).sort()[0]:null;
+  const c=(k,icon,lab,val)=>`<button type="button" class="dzc" data-dzinfo="${k}"><span class="dzci">${icon}</span><b>${lab}</b><small>${val}</small></button>`;
+  return `<div class="dzchips">${c('goal','🎯','เป้าหมาย',done+'/'+total)}${c('fw','🎆','พลุ',hhmm(fwTime()))}${c('voucher','🎟️','Voucher','เหลือ '+vleft)}${c('shows','🎭','โชว์',next||'ดูเวลา')}</div>`;
+}
+function dzInfoSheetHTML(){
+  const k=S.dzInfo, open=h=>h.replace('<details','<details open');
+  const body = k==='goal'?dzGoalHTML() : k==='fw'?dzFwHTML() : k==='voucher'?open(dzVoucherHTML()) : open(dzShowsHTML());
+  const title = {goal:'🎯 เป้าหมายวันนี้', fw:'🎆 พลุหน้าปราสาท', voucher:'🎟️ Meal Voucher', shows:'🎭 โชว์และพาเหรด'}[k];
+  return `<div class="wrap"><div class="grab"></div><h2 id="sheet-title">${title} <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>${body}</div>`;
+}
 function dzFwHTML(){
   const min=dzNowMin(), left=fwTime()-min, wx=WARN&&WARN.list.some(w=>/TC|WRAIN|WTS/.test(w.code));
   return `<div class="dzfw"><b>🎆 พลุและโชว์หน้าปราสาท · ห้ามพลาด!</b>
@@ -2137,6 +2225,7 @@ function dzFwHTML(){
 }
 
 function renderDisney(){
+  if(S.sheet&&S.sheet.kind==='dzinfo') drawSheet();     // an open info card follows changes too
   const n=hkNow(), today = n.date==='2026-11-16';
   const slot = today ? DZ_PLAN.findIndex(b=>toMin(b.t)<=n.min && n.min<toMin(b.e)) : -1;
   const doneN = Object.keys(DZ_RIDES).filter(k=>S.done['dz:'+k]).length;
@@ -2144,20 +2233,17 @@ function renderDisney(){
     <div class="dzhero">${DZ_CASTLE}
       <div><div class="eyebrow">จันทร์ 16 พ.ย. 2569</div><h2>Hong Kong Disneyland</h2>
       <div class="pillrow"><span class="pill mint">วันจันทร์ คนค่อนข้างน้อย</span><span class="pill">เล่นแล้ว ${doneN}/${Object.keys(DZ_RIDES).length}</span></div></div>${dzParkHTML()}</div>
+    ${dzChipsHTML()}
     ${dzDayHTML()}
-    ${dzGoalHTML()}
-    ${dzFwHTML()}
-    ${dzVoucherHTML()}
-    ${dzShowsHTML()}
     ${dzSmartHTML()}
-    <ol class="dzplan">${DZ_PLAN.map((b,bi)=>`<li class="dzb${bi===slot?' now':''}">
+    <details class="dzref"><summary><h3>แผนตามโซน (ร่างเดิม) + เวลารอทุกเครื่อง ▾</h3></summary><ol class="dzplan">${DZ_PLAN.map((b,bi)=>`<li class="dzb${bi===slot?' now':''}">
       <div class="dzt num">${b.t}–${b.e}${bi===slot?' <span class="nowtag">ตอนนี้</span>':''}</div>
       <h3>${esc(b.zone)}</h3><p class="mini">${esc(b.why)}</p>
       ${b.rides.map(k=>{ const r=DZ_RIDES[k], done=!!S.done['dz:'+k];
         return `<button type="button" class="dzr${done?' done':''}" data-dz="${k}"><span class="ck">${ic('check',3)}</span>
           <span class="rn"><b>${esc(r.n)}</b><small>${esc(r.th)} · ${DZ_LV[r.lv]}</small></span>${waitTag(r,k)}</button>
           ${S.dzEdit===k?`<div class="fin" style="margin:6px 0 0 38px"><label for="dzw-${k}">ตอนนี้รอ</label><input id="dzw-${k}" type="number" inputmode="numeric" min="0" step="5" value="${dzLive()[k]?dzLive()[k].w:''}"><span>นาที</span><button type="button" class="btn-s pay" data-dzsave="${k}">บันทึก</button></div>`:''}` }).join('')}
-      ${b.meal?`<div class="tip">${esc(b.meal)}</div>`:''}</li>`).join('')}</ol>
+      ${b.meal?`<div class="tip">${esc(b.meal)}</div>`:''}</li>`).join('')}</ol></details>
     <div class="panel"><h3>ทิปประหยัดเวลา</h3><ul class="tips">
       <li>ไปถึงก่อนเปิดสวน แล้วเดินไปโซน Frozen ก่อนเลย แถวโซนนี้ยาวที่สุดทั้งวัน</li>
       <li>Hyperspace Mountain, Big Grizzly และ Parachute Drop มีแถวคนเดียว (Single Rider) เร็วกว่ามาก ถ้าไม่ต้องนั่งคู่กัน</li>
@@ -2165,7 +2251,7 @@ function renderDisney(){
       <li>เวลารอในแผนเป็นค่าเฉลี่ยย้อนหลัง ไม่ใช่ของวันจริง เช็คเวลารอสดในแอป Hong Kong Disneyland หรือลิงก์ด้านบน</li></ul>
       <div class="src">สถิติเวลารอจาก queue-times.com (ไม่ใช่ข้อมูลทางการของ Disney) · เวลาเปิดสวนและโชว์อาจเปลี่ยน</div></div>`;
 }
-function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else next['dz:'+k]={at:hhmm(hkNow().min)}; S.done=next; renderAll(); saveProgress() }
+function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else { next['dz:'+k]={at:hhmm(hkNow().min)}; S.dzLand=DZ_LAND_OF[k] } S.done=next; renderAll(); saveProgress() }
 const DZ_CASTLE = `<svg class="castle" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 58V30l4-6 4 6v28M46 58V30l4-6 4 6v28M18 58V36h28v22" fill="var(--pink-soft)" stroke="var(--pink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 36V22l8-12 8 12v14" fill="var(--sky-soft)" stroke="var(--sky)" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 58v-9a4 4 0 0 1 8 0v9" fill="var(--surface)" stroke="var(--pink)" stroke-width="2.5"/><path d="M32 10V4l5 2-5 2" fill="var(--sun)" stroke="var(--sun)" stroke-width="2"/><circle cx="32" cy="27" r="2.5" fill="var(--sun)"/></svg>`;
 
 /* ---------- home: countdown, trip map, four days at a glance ---------- */
@@ -2578,6 +2664,7 @@ function drawSheet(){
   if(d.kind==='hotel'){ el.innerHTML = '<div class="wrap"><div class="grab"></div><h2 id="sheet-title">ที่พักของเรา <button class="x" type="button" data-close aria-label="ปิด">'+ic('x')+'</button></h2>'+hotelCardHTML()+'</div>'; return }
   if(d.kind==='water'){ el.innerHTML = waterSheetHTML(); return }
   if(d.kind==='sos'){ el.innerHTML = sosSheetHTML(); return }
+  if(d.kind==='dzinfo'){ el.innerHTML = dzInfoSheetHTML(); return }
   if(d.kind==='walk'){ el.innerHTML = walkSheetHTML(); arrowDraw(); return }
   if(d.kind==='ride'){ el.innerHTML = rideSheetHTML(); S.ride.scrolled=false; rideDraw(); return }
   if(d.kind==='summary'){ el.innerHTML = summarySheetHTML(); return }
@@ -2901,6 +2988,7 @@ document.addEventListener('click', e=>{
   if(ds.live) return liveShow(ds.live);
   if(ds.gps){ if(ds.gps==='on') gpsStart(true); else gpsStop(); renderHome(); return }
   if(ds.sos){ openSheet({kind:'sos'}); return }
+  if(ds.dzinfo){ S.dzInfo=ds.dzinfo; openSheet({kind:'dzinfo'}); return }
   if(ds.walk){ const ll=ds.walk.split(',').map(Number); return walkTo(ds.wname||'ที่หมาย', ll) }
   if(ds.ride){ const o=RIDES.get(ds.ride); if(o) rideStart(o); return }
   if(ds.letsgo) return letsGo();

@@ -73,7 +73,7 @@ window.HKT = {
     // 3 Disney: everything closed / all ridden
     DZQ={at:Date.now(), anyOpen:true, m:Object.fromEntries(Object.keys(DZ_RIDES).map(k=>[k,{open:false,w:0,at:Date.now()}]))};
     let h=dzSmartHTML(); check(!/undefined|NaN/.test(h),'Disney ปิดทุกเครื่องไม่พัง');
-    DZQ=saveQ; S.done={...S.done, ...Object.fromEntries(Object.keys(DZ_RIDES).map(k=>['dz:'+k,{at:'12:00'}]))}; h=dzSmartHTML(); check(/เล่นครบ/.test(h),'Disney เล่นครบทุกเครื่อง'); S.done=saveDone;
+    DZQ=saveQ; S.done={...S.done, ...Object.fromEntries(Object.keys(DZ_RIDES).map(k=>['dz:'+k,{at:'12:00'}]))}; h=dzSmartHTML(); check(!/data-dz="/.test(h),'Disney เล่นครบทุกเครื่อง (ไม่มีเครื่องเล่นค้างในเส้นทาง)'); S.done=saveDone;
     // 4 a stop with no place / odd names
     const day=S.plan[1], extra={id:'tX', t:'16:00', h:'ร้าน "ลับ" <b>&</b> ชื่อยาวมากๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆๆ'};
     S.plan[1]=[...day, extra]; try{ S.day=2; setTab('plan'); const j=junk('จุดไม่มีตำแหน่ง'); check(!j,'จุดที่ไม่มีตำแหน่ง/ชื่อแปลกไม่พัง', j); check(!document.querySelector('main b b, main .card h3 b'),'ชื่อที่มี <b> ไม่กลายเป็นตัวหนา (ป้องกันโค้ดแทรก)') }catch(e){ bad('จุดไม่มีตำแหน่ง', e.message) } S.plan[1]=day;
