@@ -59,6 +59,12 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .cur{font-size:.55em;font-weight:500;opacity:.85;letter-spacing:.02em}
 .hero .big small{display:block;font-size:15px;margin-top:2px;opacity:.9}
 .hdbud .cur{font-size:.85em}
+.gearb{position:relative;background:var(--surface2);color:var(--ink)}
+.gearb i{position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:var(--muted);border:2px solid var(--bg)}
+.gearb.on i{background:var(--mint)}
+.gearb.wait i{background:var(--sun)}
+.setsec{border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:12px}
+.setsec h4{margin:0 0 6px;font-size:15px}
 .save svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
 .pushc{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;border:2px dashed var(--sky)}
 .pushc small{grid-column:1;color:var(--muted);font-size:12.5px}
@@ -563,8 +569,8 @@ input[type=time].txt{appearance:none;min-height:46px}
     <div class="ttl"><h1>ทริปฮ่องกง</h1><p id="countdown">14–17 พ.ย. 2569</p></div>
     <button class="wbtn hbtn2" id="hotelbtn" type="button" aria-label="ที่พักของเรา และพากลับที่พัก"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" fill="currentColor"/></svg></button>
     <button class="wbtn" id="waterbtn" type="button" aria-label="จุดกดน้ำฟรีใกล้ฉัน"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z" fill="currentColor"/><path d="M9.5 15.5q2.5 2 5 0" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></button>
-    <button class="sync" id="sync" type="button" aria-label="สลับว่าใครใช้เครื่องนี้"><i></i><span>…</span></button>
     <button class="wbtn sosb" type="button" data-sos="1" aria-label="บัตรฉุกเฉิน โทร 999 และสถานกงสุลไทย">SOS</button>
+    <button class="wbtn gearb" id="gearbtn" type="button" aria-label="ตั้งค่า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><i></i></button>
   </div>
 </header>
 
@@ -897,7 +903,7 @@ function hkNow(){ const d=new Date(Date.now()+8*3600e3); return {date:d.toISOStr
 const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return h*60+(m||0) };
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('3db2e9e6dd|30 ต.ค. 18:03');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('942cb33181|30 ต.ค. 18:13');
 let APP_NEWER=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -928,7 +934,7 @@ async function pushOn(){
     const reg=await navigator.serviceWorker.ready, {pub}=await (await fetch(PUSH_FN)).json();
     const sub=await reg.pushManager.getSubscription() || await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64u(pub)});
     await sbRpc('hk_push_save',{p_key:lsGet('hk-key',''), p_sub:sub.toJSON()});
-    S.pushOn=true; renderAll(); pushTest();
+    S.pushOn=true; renderAll(); refreshSet(); pushTest();
   }catch(e){ toast('เปิดแจ้งเตือนไม่สำเร็จ ลองใหม่อีกครั้ง') }
 }
 async function pushTest(){
@@ -938,7 +944,7 @@ async function pushTest(){
 async function pushOff(){
   try{ const reg=await navigator.serviceWorker.getRegistration(), sub=reg && await reg.pushManager.getSubscription();
     if(sub){ await sbRpc('hk_push_remove',{p_key:lsGet('hk-key',''), p_endpoint:sub.endpoint}).catch(()=>{}); await sub.unsubscribe() }
-    S.pushOn=false; renderAll(); toast('ปิดแจ้งเตือนแล้ว') }catch(e){ toast('ปิดไม่สำเร็จ') }
+    S.pushOn=false; renderAll(); refreshSet(); toast('ปิดแจ้งเตือนแล้ว') }catch(e){ toast('ปิดไม่สำเร็จ') }
 }
 // the card on the home page: shown until this phone has notifications on
 function pushCardHTML(){
@@ -1090,9 +1096,9 @@ function renderHeader(){
   const when = td ? `วันที่ ${td}/4 · ${DAYS[td-1].dow} ${DAYS[td-1].d} พ.ย.` : n.date<DAYS[0].date ? `อีก ${Math.ceil((Date.parse(DAYS[0].date)-Date.parse(n.date))/864e5)} วันบิน` : 'จบทริปแล้ว';
   const B=Number(S.budget)||0, left = S.me!=null && B>0 ? B-allExp().reduce((t,e)=>t+share(e,S.me),0) : null;
   cd.innerHTML = left==null ? esc(when)+' · 14–17 พ.ย. 2569' : `<button type="button" class="hdbud${left<0?' neg':left<B*.15?' low':''}" data-tab="money">${left<0?'เกินงบ '+hkH(-left):'เหลือ '+hkH(left)}</button> · ${esc(when)}`;
-  const sy=document.getElementById('sync');
-  sy.className='sync'+(S.mode==='shared' && S.net!=='off' && S.net!=='wait'?' on':'')+(S.net==='wait'?' wait':'');
-  sy.querySelector('span').innerHTML = S.me==null ? 'คุณคือใคร?' : nm(S.me);
+  const sy=document.getElementById('gearbtn');
+  sy.className='wbtn gearb'+(S.mode==='shared' && S.net!=='off' && S.net!=='wait'?' on':'')+(S.net==='wait'?' wait':'')+(S.net==='off'?' off':'');
+  sy.setAttribute('aria-label', 'ตั้งค่า'+(S.me==null?'':' · '+nm(S.me)));
   sy.title = S.net==='off' ? 'ออฟไลน์ ข้อมูลจะส่งเมื่อมีเน็ต' : S.net==='wait' ? 'กำลังส่งข้อมูล' : S.mode==='shared' ? 'ข้อมูลแชร์กัน 2 คน' : 'บันทึกในเครื่องนี้';
 }
 
@@ -1669,7 +1675,8 @@ function rideDraw(){
   if(gpsFresh()){ // the stop we are at or just passed: the closest one, never going backwards
     let best=R.at, bd=Infinity; for(let i=R.at;i<R.stops.length;i++){ const d=metres(S.gps.ll, stopLL(R.stops[i])); if(d<bd){ bd=d; best=i } } R.at=best; R.dist=bd }
   const last=R.stops.length-1, left=last-R.at, nextD=gpsFresh()&&R.at<last?metres(S.gps.ll, stopLL(R.stops[R.at+1])):null;
-  if(left<=1 && !R.warned && gpsFresh()){ R.warned=true; try{ navigator.vibrate && navigator.vibrate([400,150,400,150,400]) }catch(e){} toast(R.gmb?'ป้ายหน้าลง! บอกคนขับ "เหยา ล็อก" (有落)':'ป้ายหน้าลง! กดกริ่งได้เลย') }
+  if(left<=1 && !R.warned && gpsFresh()){ R.warned=true; try{ navigator.vibrate && navigator.vibrate([400,150,400,150,400]) }catch(e){} toast(R.gmb?'ป้ายหน้าลง! บอกคนขับ "เหยา ล็อก" (有落)':'ป้ายหน้าลง! กดกริ่งได้เลย');
+    try{ if('Notification' in window && Notification.permission==='granted') navigator.serviceWorker.ready.then(r=>r.showNotification('🚌 ป้ายหน้าลง!', {body: R.gmb?'บอกคนขับว่า "เหยา ล็อก" (有落)':'กดกริ่ง (ปุ่ม STOP) ตอนนี้เลย · ลงที่ '+stopName(R.stops[R.stops.length-1]), tag:'ride', renotify:true, icon:'icon-192.png'})) }catch(e){} }
   el.innerHTML = `<div class="ridehead${left<=1?' hot flash':''}"><b class="num">${left<=0?'ถึงป้ายลงแล้ว 🎉':left===1?'ป้ายหน้าลง!':'อีก '+left+' ป้าย'}</b>
       <span>${left<=1?(R.gmb?'บอกคนขับว่า "เหยา ล็อก" (有落) แปลว่าขอลง':'กดกริ่ง (ปุ่ม STOP สีแดง) ตอนนี้เลย'):`ลงที่ ${esc(stopName(R.stops[last]))}`}</span>
       ${!gpsFresh()?'<small>เปิด GPS เพื่อให้แอปนับป้ายให้อัตโนมัติ</small>':nextD!=null?`<small>ป้ายถัดไปอีก ~${wDist(nextD)}</small>`:''}</div>
@@ -1876,7 +1883,6 @@ function renderMoney(){
   document.getElementById('v-money').innerHTML = `
     ${S.mode==='local'?`<div class="banner">ตอนนี้บันทึกไว้ในเครื่องนี้เท่านั้น เปิดลิงก์ผ่านบัญชี claude.ai เพื่อให้ 2 คนเห็นรายการเดียวกัน</div>`:''}
     ${moneySw()}
-    ${setPanelHTML()}
     <div class="hero">
       ${B ? `<div class="lab"><b>${left>=0?'เงินคงเหลือ':'เกินงบแล้ว'}</b> ของ${nm(me)}</div>
       <div class="big num">${hkH(Math.abs(left))} <small>${thb(Math.abs(left))}</small></div>`
@@ -2796,10 +2802,12 @@ function waterNavHTML(){
     <div class="src">ข้อมูลจุดกดน้ำของรัฐบาลฮ่องกง (LCSD และ FEHD, data.gov.hk) ${WATER.w.length} จุด ส่วนใหญ่อยู่ในสวนสาธารณะ พิพิธภัณฑ์ ตลาด และห้องน้ำสาธารณะ</div></div>`;
 }
 const WATER_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z" fill="var(--sky)"/><circle cx="9.8" cy="14.5" r="1.1" fill="#fff"/><circle cx="14.2" cy="14.5" r="1.1" fill="#fff"/><path d="M10.3 17q1.7 1.3 3.4 0" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>';
-function setPanelHTML(){
-  const s=S.settings, unset=!Number(S.budget);
-  return `<details class="panel setp"${unset?' open':''}><summary><h3 style="margin:0">ตั้งงบและชื่อ <small>งบ ${hk(Number(S.budget)||0)}</small></h3></summary>
+function setSheetHTML(){
+  const s=S.settings;
+  return `<div class="wrap"><div class="grab"></div><h2 id="sheet-title">⚙️ ตั้งค่า <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
+    <div class="setsec"><h4>👤 ฉัน</h4>
     <div class="fl">คุณคือใคร</div><div class="chips">${[0,1].map(p=>`<button class="chip" type="button" data-claim="${p}" aria-pressed="${S.me===p}">${nm(p)}</button>`).join('')}</div>
+    </div><div class="setsec"><h4>💰 งบ เรท และชื่อ</h4>
     <label class="fl" for="set-b">งบของ${S.me==null?'ฉัน':nm(S.me)} (HK$ · ส่วนตัว)</label>
     <input class="txt num" id="set-b" type="number" inputmode="decimal" min="0" step="50" value="${esc(S.budget??'')}"><div class="mini num">${thb(Number(S.budget)||0)}</div>
     <label class="fl" for="set-rate">เรทที่แลกมา (1 HKD = ? บาท)</label>
@@ -2807,14 +2815,17 @@ function setPanelHTML(){
     <div class="grid2"><div><label class="fl" for="set-n0">คนที่ 1</label><input class="txt" id="set-n0" maxlength="16" value="${esc(s.names[0])}"></div>
       <div><label class="fl" for="set-n1">คนที่ 2</label><input class="txt" id="set-n1" maxlength="16" value="${esc(s.names[1])}"></div></div>
     <button class="save" type="button" id="set-save">บันทึก</button>
-    ${pushSetHTML()}
+    </div><div class="setsec">${pushSetHTML()}</div><div class="setsec">
     ${!S.web?`<div class="fl">PIN เข้าแอป</div><div class="mini">เครื่องนี้ยังไม่ได้เข้าด้วยลิงก์ส่วนตัว เปิดลิงก์ส่วนตัวของคุณก่อน แล้วช่องตั้ง PIN จะขึ้นตรงนี้</div>`:''}
     ${S.web&&S.me!=null?`<label class="fl" for="set-pin">PIN เข้าแอป 4 ตัว ของ${nm(S.me)} <small>${S.pinSet?'· ตั้งแล้ว':'· ยังไม่ได้ตั้ง'}</small></label>
     ${S.pinSet?`<input id="set-pin-old" class="txt num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="PIN เดิม" aria-label="PIN เดิม" style="margin-bottom:6px">`:''}
     <div class="fin"><input id="set-pin" class="txt num" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="${S.pinSet?'PIN ใหม่':'ตั้ง PIN 4 ตัว'}" aria-label="PIN ใหม่" style="flex:1;width:auto"><button type="button" class="btn-s pay" data-setpin="1">${S.pinSet?'เปลี่ยน PIN':'ตั้ง PIN'}</button></div>
     <div class="mini">ใช้เข้าแอปแทนลิงก์ยาว เช่นตอนเปิดจากไอคอนหน้าจอ · อีกคนใช้ PIN นี้เข้าข้อมูลของคุณไม่ได้ เพราะต้องเลือกชื่อคุณด้วย และใส่ผิด 5 ครั้งจะล็อก 15 นาที</div>`:''}
-    <div class="mini" style="margin-top:8px">${S.uid?'งบและค่าใช้จ่ายส่วนตัวผูกกับบัญชี claude.ai ของคุณ อีกคนมองไม่เห็น':'งบและค่าใช้จ่ายส่วนตัวเก็บในเครื่องนี้เท่านั้น'}</div></details>`;
+    <div class="mini" style="margin-top:8px">${S.uid?'งบและค่าใช้จ่ายส่วนตัวผูกกับบัญชี claude.ai ของคุณ อีกคนมองไม่เห็น':'งบและค่าใช้จ่ายส่วนตัวเก็บในเครื่องนี้เท่านั้น'}</div></div>
+    <div class="setsec"><h4>📶 สถานะ</h4><div class="mini">${S.mode!=='shared'?'ยังไม่ได้เข้าด้วยลิงก์ส่วนตัว บันทึกไว้ในเครื่องนี้เท่านั้น':S.net==='off'?'⚪ ออฟไลน์ ข้อมูลจะส่งเมื่อมีเน็ต':S.net==='wait'?'🟡 กำลังส่งข้อมูล':'🟢 ซิงค์กับอีกเครื่องแล้ว'}</div>${verHTML()}</div></div>`;
 }
+// the settings sheet redraws itself after an action taken in it (never on sync, so typing isn't lost)
+const refreshSet = () => { if(S.sheet && S.sheet.kind==='set') drawSheet() };
 /* ---------- sheets ---------- */
 function openSheet(sh){ S.sheet=sh; drawSheet(); document.getElementById('scrim').hidden=false; document.getElementById('sheet').hidden=false;
   setTimeout(()=>{ const a=document.getElementById(sh.kind==='exp'?'f-amt':'i-h'); if(a && !(sh.kind==='exp'?sh.amt:sh.h)) a.focus() },60) }
@@ -2878,6 +2889,7 @@ function drawSheet(){
       <div class="acts"><button class="btn-s" type="button" id="copyaddr">${ic('link')}คัดลอกที่อยู่</button>
         <a class="btn-s" href="https://www.google.com/maps/search/?api=1&query=${HOTEL_LL.join(',')}" target="_blank" rel="noopener">${ic('pin')}เปิดแผนที่</a></div></div>`; return }
   if(d.kind==='navpick'){ el.innerHTML = navPickHTML(d); return }
+  if(d.kind==='set'){ el.innerHTML = setSheetHTML(); return }
   if(d.kind==='who'){ el.innerHTML = `<div class="wrap"><div class="grab"></div>${whoCard()}</div>`; return }
   if(d.kind==='stpick'){
     const c=LINES[d.line].c;
@@ -3111,7 +3123,7 @@ async function saveSettings(){
   S.settings=s; S.budget=b;
   try{ await saveProfile(); if(sharedChanged){ if(db) await db.doc('trip/settings').set(s); else lsSave() } toast('บันทึกแล้ว') }
   catch(e){ toast(e&&e.code==='invalid_argument'?'บัญชีนี้ยังไม่มีสิทธิ์แก้ไข':'บันทึกไม่สำเร็จ') }
-  renderAll();
+  renderAll(); refreshSet();
 }
 function resolveMe(){
   if(S.uid){ const m=S.members||{}; S.me = m.m0===S.uid ? 0 : m.m1===S.uid ? 1 : null }
@@ -3127,7 +3139,7 @@ async function claim(p){
     try{ await db.doc('trip/members').set(m) }catch(e){ toast('บันทึกไม่สำเร็จ') }
   } else { S.me=p; lsSet('hk-me',String(p)) }
   if(S.sheet && S.sheet.kind==='who') closeSheet();
-  toast('สวัสดี '+(S.settings.names||DEFAULTS.names)[p]+'!'); renderAll(); reconcile();
+  toast('สวัสดี '+(S.settings.names||DEFAULTS.names)[p]+'!'); renderAll(); refreshSet(); reconcile();
 }
 
 /* ---------- render + events ---------- */
@@ -3150,7 +3162,7 @@ document.addEventListener('click', e=>{
   const t=e.target.closest('button'); if(!t) return;
   const ds=t.dataset;
   if(ds.tab) return setTab(ds.tab);
-  if(t.id==='sync') return openSheet({kind:'who'});
+  if(t.id==='gearbtn') return openSheet({kind:'set'});
   if(ds.claim) return claim(Number(ds.claim));
   if(ds.oc) return octoAdd(ds.oc);
   if(ds.ocq){ const el=document.getElementById('oc-amt'); if(el) el.value=ds.ocq; return }
@@ -3351,7 +3363,7 @@ async function setPin(){
   if(S.pinSet && !/^[0-9]{4}$/.test(o)){ toast('ใส่ PIN เดิมก่อน'); old&&old.focus(); return }
   if(!/^[0-9]{4}$/.test(v)){ toast('PIN ใหม่ต้องเป็นตัวเลข 4 หลัก'); return }
   let r; try{ r=await sbRpc('hk_set_pin',{p_key:lsGet('hk-key',''), p_pin:v, p_old:S.pinSet?o:null}) }catch(e){ toast(e.http?'ตั้ง PIN ไม่สำเร็จ':'ไม่มีเน็ต ตั้ง PIN ไม่ได้'); return }
-  if(r&&r.ok){ const was=S.pinSet; S.pinSet=true; toast(was?'เปลี่ยน PIN แล้ว':'ตั้ง PIN แล้ว ใช้เข้าแอปได้เลย'); renderAll(); return }
+  if(r&&r.ok){ const was=S.pinSet; S.pinSet=true; toast(was?'เปลี่ยน PIN แล้ว':'ตั้ง PIN แล้ว ใช้เข้าแอปได้เลย'); renderAll(); refreshSet(); return }
   if(old) old.value='';
   toast(r&&r.err==='locked' ? `ใส่ผิดหลายครั้ง ล็อก ${r.mins} นาที` : r&&r.err==='old' ? `PIN เดิมไม่ถูกต้อง (ลองได้อีก ${r.left} ครั้ง)` : 'PIN ต้องเป็นตัวเลข 4 หลัก');
 }
