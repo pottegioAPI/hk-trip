@@ -2000,12 +2000,16 @@ function dzTasks(){
   const now=dzNowMin(), t=[];
   for(const k of Object.keys(DZ_RIDES)) if(!S.done['dz:'+k]) t.push({k, land:DZ_LAND_OF[k], dur:5});
   for(const [k,m] of Object.entries(DZ_MEALS)) if(!dzMealDone(k) && now<=m.to) t.push({meal:k, land:'FL', dur:35, from:m.from, to:m.to});
+  if(!S.done['dz:snack']) t.push({snack:true, land:null, dur:5});
   return t;
 }
 function dzSim(seq, start, here){
   const now=dzNowMin(), deadline=fwBeThere(), rbh=DZQ&&DZQ.rbh&&DZQ.rbh.open?DZQ.rbh.w:12;
   let t=start, land=here, walkSum=0, waitSum=0, pen=0; const steps=[];
   for(const s of seq){
+    if(s.snack){ const cart=DZ_CART_LANDS.includes(land)?land:DZ_CART_LANDS.slice().sort((a,b)=>dzWalk(land,a)-dzWalk(land,b))[0];
+      const walk=dzWalk(land,cart); steps.push({...s, land:cart, at:t+walk, walk, wait:3}); t+=walk+8; walkSum+=walk; land=cart;
+      if(t<13*60) pen+=(13*60-t)*0.2; continue }   // a treat in the afternoon heat, at a cart on the way
     const walk=dzWalk(land,s.land); t+=walk; walkSum+=walk;
     let wait;
     if(s.meal){ if(t<s.from){ pen+=(s.from-t)*0.5; t=s.from } wait=rbh; if(t>s.to) pen+=3000;   // a free meal missed costs real money   // eat inside the voucher hours
@@ -2020,6 +2024,8 @@ function dzSim(seq, start, here){
   const back=dzWalk(land,'MS'), end=t+back, late=Math.max(0,end-deadline);
   return {steps, end, walkSum:walkSum+back, waitSum, cost: end + walkSum*0.6 + late*8 + pen};
 }
+// zones with a Frozen Lollipop / Popcorn cart (Hong Kong Disneyland dining list)
+const DZ_CART_LANDS = ['MS','TL','FL','AL','GG','MP'];
 let DZ_LAST_ORDER=[], DZ_MEMO=null;
 function dzOptimize(){
   const mk=[dzNowMin(), S.dzLand, JSON.stringify(S.dzLater||{}), JSON.stringify(Object.keys(S.done).filter(k=>/^dz:|^3[lnc]$/.test(k)).sort()), DZQ&&DZQ.at, dzLive&&lsGet('hk-dzlive',''), fwTime(), dzOpenT()].join('|');
@@ -2029,11 +2035,12 @@ function dzOptimize(){
 function dzOptimizeRun(){
   const now=dzNowMin(), start=Math.max(now, dzOpenT()), here=S.dzLand||'MS', tasks=dzTasks();
   if(!tasks.length) return {steps:[], end:start, walkSum:0, waitSum:0, start};
-  const key=x=>x.k||'m:'+x.meal, byKey=new Map(tasks.map(x=>[key(x),x]));
+  const key=x=>x.k||(x.snack?'snack':'m:'+x.meal), byKey=new Map(tasks.map(x=>[key(x),x]));
   // start from the previous plan (so it doesn't jump around), else nearest-first
   let seq=DZ_LAST_ORDER.map(k=>byKey.get(k)).filter(Boolean); for(const x of tasks) if(!seq.includes(x)) seq.push(x);
   let best=dzSim(seq,start,here);
-  const greedy=[]; { const left=[...tasks]; let land=here, t=start; while(left.length){ left.sort((a,b)=>(dzWalk(land,a.land)+(a.meal?20:dzPredWait(a.k,t,now)))-(dzWalk(land,b.land)+(b.meal?20:dzPredWait(b.k,t,now)))); const x=left.shift(); greedy.push(x); land=x.land; t+=20 } }
+  const greedy=[]; { const left=[...tasks]; let land=here, t=start; const gc=x=>x.snack?15:dzWalk(land,x.land)+(x.meal?20:dzPredWait(x.k,t,now));
+    while(left.length){ left.sort((a,b)=>gc(a)-gc(b)); const x=left.shift(); greedy.push(x); land=x.land||land; t+=20 } }
   // three starting points (last plan, nearest-first, must-dos first), each improved by a small local search
   const mustFirst=[...greedy.filter(x=>x.k&&DZ_MUST.has(x.k)||x.meal==='lunch'), ...greedy.filter(x=>!(x.k&&DZ_MUST.has(x.k)||x.meal==='lunch'))];
   let seed=tasks.length*7919+start; const rnd=()=>((seed=(seed*16807)%2147483647)/2147483647);
@@ -2052,7 +2059,8 @@ function dzOptimizeRun(){
 function dzRouteHTML(full){
   const p=dzOptimize(), now=dzNowMin(), today=hkNow().date==='2026-11-16', deadline=fwBeThere();
   if(!p.steps.length) return `<p class="mini">เล่นครบและกินครบแล้ว! ไปจองที่ดูพลุได้เลย 🎆</p>`;
-  const row=(s,i)=>{ const late=s.at+s.wait+s.dur>deadline, must=s.k&&DZ_MUST.has(s.k), name=s.meal?`🍽️ ${DZ_MEALS[s.meal].n} · Royal Banquet Hall`:(must?'⭐ ':'')+esc(DZ_RIDES[s.k].n)+(must?' <span class="mustt">ห้ามพลาด</span>':'');
+  const row=(s,i)=>{ if(s.snack) return `<div class="dzstep snack"><span class="dzwb" style="--wc:var(--sun)"><b>🍿</b><small>ฟรี</small></span><span><b>รับ Frozen Lollipop หรือ Popcorn ฟรี</b><small>${hhmm(s.at)} น. · รถเข็นแถว ${esc(DZ_LANDS[s.land][0])} ${s.walk?`(เดิน ${s.walk} นาที)`:'(อยู่โซนนี้)'} · Meal Voucher เลือก 1 อย่าง โชว์ QR ตอนรับ</small></span><div class="dzbtns"><button type="button" class="dzok" data-dzmeal="snack">รับแล้ว</button></div></div>`;
+    const late=s.at+s.wait+s.dur>deadline, must=s.k&&DZ_MUST.has(s.k), name=s.meal?`🍽️ ${DZ_MEALS[s.meal].n} · Royal Banquet Hall`:(must?'⭐ ':'')+esc(DZ_RIDES[s.k].n)+(must?' <span class="mustt">ห้ามพลาด</span>':'');
     const btn=s.meal?`<button type="button" class="dzok" data-dzmeal="${s.meal}">กินแล้ว</button>`:`<button type="button" class="dzok" data-dz="${s.k}">เล่นแล้ว</button>`;
     const later=s.meal?'':`<button type="button" class="dzlater" data-dzlater="${s.k}">ไว้ทีหลัง</button>`;
     // the queue is what decides "go now or skip", so it is the biggest thing on the row
