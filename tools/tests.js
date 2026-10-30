@@ -31,7 +31,7 @@ window.HKT = {
     R.length=0; errs=[];
     for(let d=1;d<=4;d++) for(const it of dayItems(d)){
       const {prev,opts}=optionsFor(d,it), sel=opts.length?chosen(d,it,opts):null, tag=`วัน ${d} ${it.h}`;
-      if(prev && targetLL(it) && !opts.length) bad(tag+' ไม่มีวิธีเดินทาง');
+      if(prev && !prev.flight && targetLL(it) && !opts.length) bad(tag+' ไม่มีวิธีเดินทาง');
       for(const o of opts){ if(o.fare!=null && !(o.fare>=0)) bad(tag+' ค่ารถผิด', o.n+' '+o.fare); if(o.mins!=null && !(o.mins>0)) bad(tag+' เวลาเดินทางผิด', o.n+' '+o.mins);
         if(o.legs){ const f=mtrFare(o.legs[0].from, o.legs[o.legs.length-1].to); if(f!==o.fare) bad(tag+' ค่า MTR ไม่ตรงตาราง', o.fare+' vs '+f);
           const h=stepsHTML(o.legs,'A','B',locOf(it)); if(/undefined|NaN/.test(h)) bad(tag+' ขั้นตอน MTR มีค่าว่าง', h.slice(0,120)) }

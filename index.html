@@ -58,6 +58,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.flt{margin-top:8px;background:var(--sky-soft);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;font-size:13px}.flt b{font-size:13.5px}.flt small{color:var(--muted);font-size:11.5px}.flt.late{background:#FFE3E3}.flt .acts{margin-top:4px}
 .funcard{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-bottom:8px}.funcard button{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 12px;color:var(--ink);min-width:0}.funcard b{font-size:14px}.funcard small{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .chdot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--cc);border:1.5px solid rgba(0,0,0,.12);flex:none}
 .chspin{text-align:center;padding:6px 0 4px}.chspin p{font-size:14px;color:var(--muted);margin:10px 0 0}.chsw{width:120px;height:120px;border-radius:50%;margin:6px auto 0;background:conic-gradient(#E53935,#FB8C00,#FDD835,#43A047,#29B6F6,#1E4FBF,#8E24AA,#EC407A,#E53935);display:grid;place-items:center;font-family:var(--display);font-size:26px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4);box-shadow:var(--shadow)}
@@ -583,6 +584,8 @@ const DAYS = [
 // default itinerary from แพลนฮ่องกง 14-17.11.2026.pdf — each stop says how to get there (bus presets) and its nearest MTR station (st)
 const DEFAULT_PLAN = [
  [
+  {id:'1s',t:'11:45',tz:'TH',flight:true,h:'ถึงสนามบินสุวรรณภูมิ (BKK)',p:'เช็คอิน Emirates โหลดกระเป๋า แล้วผ่าน ตม. ขาออก',tip:'มาถึงก่อนเครื่องออกอย่างน้อย 3 ชั่วโมง เคาน์เตอร์เช็คอินมักปิดประมาณ 1 ชั่วโมงก่อนเครื่องออก ดูเวลาที่แน่นอนบนตั๋ว'},
+  {id:'1f',t:'14:45',tz:'TH',flight:true,h:'บิน EK384 สุวรรณภูมิ → ฮ่องกง',p:'ออก 13:45 น. เวลาไทย · ถึงฮ่องกง 17:40 น. เวลาฮ่องกง · บินประมาณ 3 ชั่วโมง',tip:'ขึ้นเครื่องประมาณ 45 นาทีก่อนออก ดูประตูและเวลาขึ้นเครื่องบนบอร์ดดิ้งพาส · ตั้งนาฬิกาเร็วขึ้น 1 ชั่วโมงเมื่อถึงฮ่องกง'},
   {id:'1a',t:'17:40',h:'ถึงสนามบินฮ่องกง (HKG)',p:'ผ่าน ตม. และรับกระเป๋าให้เรียบร้อย',tip:'ซื้อหรือเติมเงินบัตร Octopus ที่สนามบินได้เลย ใช้ได้ทั้ง MTR และรถบัส',map:'Hong Kong International Airport',st:null,ll:[22.3155,113.9365]},
   {id:'1b',t:'19:00',e:'20:15',h:'เช็คอิน Kam Mun Guest House',p:'ขึ้นบัส A21 ที่สนามบิน ลงป้าย <b>"Bank Centre, Nathan Road"</b> (มงก๊ก ป้ายที่ 8) แล้วข้ามถนน Nathan Road ไปตึก <b>Sun Hing Building</b> เลขที่ 603-609 ขึ้นชั้น 21 ห้อง 2101',exit:'E1',tip:'บนรถมีจอ LED บอกชื่อป้าย ป้ายก่อนหน้าคือ "Argyle Centre, Nathan Road" ถ้าเลยไปลงป้าย "Sino Centre, Nathan Road" แล้วเดินย้อนขึ้นไปทางเหนือประมาณ 100 เมตร',map:'Sun Hing Building 607 Nathan Road Mong Kok',st:'MOK',bus:[{n:'บัส A21',d:'สนามบิน → Bank Centre, Nathan Road (มงก๊ก)',fare:34.6,mins:60}],go:{mode:'bus:0'}},
   {id:'1c',t:'20:30',e:'22:00',h:'Avenue of Stars',p:'ชมวิวอ่าววิคตอเรีย ถ่ายรูปรับลมเย็นๆ',map:'Avenue of Stars Hong Kong',st:'TST',ll:[22.2930,114.1740]}
@@ -824,7 +827,10 @@ const hhmm = m => { m=((Math.round(m)%1440)+1440)%1440; return String(Math.floor
 const arrivedAt = id => { const v=S.done[id]; return v && typeof v==='object' ? v.at : null };
 function nextItem(dn){ if(DAYS[dn-1].date!==hkNow().date) return null; const it=dayItems(dn).find(i=>!S.done[i.id]); return it?it.id:null }
 // how late (+) or early (−) the trip is running, from the latest stop marked as arrived
-function dayDelay(list){ let delay=null, idx=-1; list.forEach((it,k)=>{ const a=arrivedAt(it.id); if(a){ delay=toMin(a)-toMin(it.t); idx=k } }); return {delay,idx} }
+function dayDelay(list){ let delay=null, idx=-1; list.forEach((it,k)=>{ const a=arrivedAt(it.id); if(a){ delay=toMin(a)-toMin(it.t); idx=k } });
+  const ka=list.findIndex(i=>i.id==='1a'), fi=typeof flightInfo==='function'?flightInfo():null;
+  if(ka>=0 && idx<ka && !S.done['1a'] && fi && fi.delay!=null && fi.kind!=='cancel'){ delay=fi.delay; idx=ka }   // landing time from the airport board
+  return {delay,idx} }
 let toastT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2800) }
 
 /* ---------- getting here: options for one stop ---------- */
@@ -837,7 +843,7 @@ function prevStop(dn,id){
 function optionsFor(dn,it){ return optionsBetween(dn, prevStop(dn,it.id), it) }
 function optionsBetween(dn,prev,it){
   const opts=[];
-  if(!prev) return {prev,opts};
+  if(!prev || prev.flight || it.flight) return {prev,opts};
   const a = NET && prev.st && prev.st in NET.byCode ? NET.byCode[prev.st] : null;
   const b = NET && it.st && it.st in NET.byCode ? NET.byCode[it.st] : null;
   if(a!=null && b!=null){
@@ -1170,7 +1176,7 @@ function fillPhotos(root){ (root||document).querySelectorAll('img[data-ph]').for
 function stampList(){
   const seen=new Map();
   for(const d of DAYS) for(const it of dayItems(d.n)){
-    const sp=MAP_SPOT[it.id]; if(!sp && HOTEL_IDS.has(it.id)) continue;
+    const sp=MAP_SPOT[it.id]; if(!sp && (HOTEL_IDS.has(it.id) || it.flight)) continue;
     const key=sp?sp[0]+'|'+sp[1]:'c|'+it.id, s=seen.get(key)||{key, ic:sp?sp[0]:'pin', name:sp?sp[1]:it.h, ids:[], di:d.n-1};
     s.ids.push(it.id); seen.set(key,s);
   }
@@ -1280,6 +1286,42 @@ function funCardHTML(){
     <button type="button" data-fun="stamp"><b>📮 แสตมป์ ${got}/${st.length}</b><small>${got===st.length?'ครบแล้ว 🏆':'สะสมจากที่เที่ยว'}</small></button></div>`;
 }
 
+
+/* ---------- the flight: EK384 Bangkok → Hong Kong, live from Hong Kong airport's flight board ---------- */
+const FLIGHT_NO='EK384', FLIGHT_DATE='2026-11-14';
+let FLIGHT=null;
+try{ FLIGHT=JSON.parse(lsGet('hk-flight','null')) }catch(e){}
+async function flightFetch(force){
+  if(window.claude) return; const n=hkNow();
+  if(n.date<'2026-11-13' || n.date>FLIGHT_DATE) return;                 // the airport board only covers the days around today
+  if(!force && FLIGHT && Date.now()-FLIGHT.at<4*60e3) return;
+  try{ const j=await liveJSON(SB.url+'/functions/v1/hk-flight?flight='+FLIGHT_NO+'&date='+FLIGHT_DATE);
+    if(j && !j.error){ FLIGHT={at:Date.now(), found:j.found}; lsSet('hk-flight', JSON.stringify(FLIGHT)); rerender() } }catch(e){}
+}
+// "Est at 18:10", "At gate 18:56", "Landed 18:40", "Cancelled" → what it means for us
+function flightInfo(){
+  const fl=FLIGHT&&FLIGHT.found; if(!fl) return null;
+  const s=fl.status||'', m=s.match(/(\d{1,2}:\d{2})/), sched=toMin(fl.time), tm=m?toMin(m[1]):null;
+  const kind=/cancel/i.test(s)?'cancel':/gate|landed|arrived/i.test(s)?'landed':/est/i.test(s)?'est':/delay/i.test(s)?'delay':'';
+  return {s, kind, tm, sched, delay: tm!=null ? tm-sched : null, belt:fl.baggage, hall:fl.hall, age:Math.round((Date.now()-FLIGHT.at)/60e3)};
+}
+function flightHTML(){
+  const fi=flightInfo(), late=fi&&fi.delay!=null&&fi.delay>=10 ? ` (ช้า ${fi.delay} นาที)` : fi&&fi.delay!=null&&fi.delay<=-10 ? ` (เร็ว ${-fi.delay} นาที)` : '';
+  const txt = !fi ? 'สถานะสดจะขึ้นวันที่ 13–14 พ.ย. (ดึงจากสนามบินฮ่องกง)'
+    : fi.kind==='cancel' ? '❗ เที่ยวบินถูกยกเลิก ติดต่อ Emirates ทันที'
+    : fi.kind==='landed' ? `ลงแล้ว เข้าประตู ${hhmm(fi.tm)} น.${late}`
+    : fi.kind==='est' ? `คาดว่าลงฮ่องกง ${hhmm(fi.tm)} น.${late}`
+    : fi.kind==='delay' ? 'สนามบินแจ้งว่าล่าช้า ยังไม่มีเวลาใหม่' : 'ยังไม่ออกเดินทาง · ตามตารางลง 17:40 น.';
+  return `<div class="flt${fi&&(fi.kind==='cancel'||fi.delay>=30)?' late':''}"><b>✈️ ${FLIGHT_NO} · ${txt}</b>
+    ${fi&&fi.belt?`<small>สายพานรับกระเป๋า ${esc(fi.belt)}${fi.hall?' · Hall '+esc(fi.hall):''}</small>`:''}
+    ${fi?`<small>สนามบินฮ่องกง · อัปเดตเมื่อ ${fi.age} นาทีก่อน</small>`:''}
+    <div class="acts"><a class="btn-s" href="https://www.emirates.com/english/manage-booking/flight-status/" target="_blank" rel="noopener">สถานะบนเว็บ Emirates</a>
+      <a class="btn-s" href="https://www.flightstats.com/v2/flight-tracker/EK/384" target="_blank" rel="noopener">ติดตามเครื่องบิน</a></div></div>`;
+}
+// times of stops still in Thailand are kept in Hong Kong time inside the app, shown in Thai time
+const tShow = (t,it) => it && it.tz==='TH' ? hhmm(toMin(t)-60) : t;
+const tzTag = it => it && it.tz==='TH' ? ' (เวลาไทย)' : '';
+
 /* ---------- plan view ---------- */
 function legHTML(l){
   if(l.line==='WALK') return `<div class="leg"><span class="ln bus">เดินเชื่อม</span> ${esc(stName(l.from))} <span class="arrow">→</span> ${esc(stName(l.to))}</div>`;
@@ -1320,14 +1362,15 @@ function renderPlan(){
     return `<li class="it${done?' done':''}${cur===it.id?' now':''}" id="it-${it.id}">
       <button class="tick" type="button" data-arrive="${it.id}" aria-label="${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}: ${esc(it.h)}">${ic('check')}</button>
       <div class="card">
-        <div class="time num"><span${shift&&k>lastIdx&&!done?' style="text-decoration:line-through;opacity:.6"':''}>${esc(it.t)}${it.e?' – '+esc(it.e):''} น.</span>
-          ${done&&arrivedAt(it.id)?`<span class="nowtag" style="background:var(--mint)">ถึงจริง ${arrivedAt(it.id)}</span>`:''}
+        <div class="time num"><span${shift&&k>lastIdx&&!done?' style="text-decoration:line-through;opacity:.6"':''}>${esc(tShow(it.t,it))}${it.e?' – '+esc(tShow(it.e,it)):''} น.${tzTag(it)}</span>
+          ${done&&arrivedAt(it.id)?`<span class="nowtag" style="background:var(--mint)">ถึงจริง ${tShow(arrivedAt(it.id),it)}</span>`:''}
           ${shift&&k>lastIdx&&!done?`<span class="nowtag" style="background:var(--sun);color:var(--ink)">≈ ${hhmm(toMin(it.t)+delay)}</span>`:''}
           ${cur===it.id?'<span class="nowtag">ถัดไป</span>':''}</div>
         ${it.st&&NET?(()=>{ const x=exitFor(it); return `<div class="mini">MTR ${esc(codeName(it.st))}${x?` · ออก <span class="exit">Exit ${esc(x.ref)}</span>${x.name?' '+esc(x.name):''}${x.d!=null?` (~${x.d} ม.)`:''}`:''}
           ${x&&x.planRef?`<span class="tag" style="background:var(--sun-soft)">แผนเดิมเขียน Exit ${esc(x.planRef)} · ปรับตามข้อมูลจริงแล้ว</span>`:''}</div>` })():''}
         <h3>${esc(it.h)}</h3>
         ${it.p?`<p>${it.p}</p>`:''}
+        ${it.id==='1f'||(it.id==='1a'&&!done)?flightHTML():''}
         ${it.tip?`<div class="tip">${esc(it.tip)}</div>`:''}
         ${gh}
         <div class="acts">
@@ -1358,7 +1401,7 @@ function compactItem(it, done, cur, sel, delay){
   return `<li class="it${done?' done':''}${cur===it.id?' now':''}" id="it-${it.id}">
     <button class="tick" type="button" data-arrive="${it.id}" aria-label="${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}: ${esc(it.h)}">${ic('check')}</button>
     <button class="card cline" type="button" data-full="${it.id}">
-      <span class="time num">${delay!=null?`≈ ${hhmm(toMin(it.t)+delay)}`:esc(it.t)}${done&&arrivedAt(it.id)?` · ถึง ${arrivedAt(it.id)}`:''}${cur===it.id?' <span class="nowtag">ถัดไป</span>':''}</span>
+      <span class="time num">${delay!=null?`≈ ${hhmm(toMin(it.t)+delay)}`:esc(tShow(it.t,it))+tzTag(it)}${done&&arrivedAt(it.id)?` · ถึง ${arrivedAt(it.id)}`:''}${cur===it.id?' <span class="nowtag">ถัดไป</span>':''}</span>
       <span class="cn">${esc(it.h)}</span>
       ${how?`<span class="ch">${how}</span>`:''}</button></li>`;
 }
@@ -1760,7 +1803,7 @@ function nextStopHTML(){
   const td=tripDay(), n=hkNow();
   if(!td){
     if(n.date>DAYS[3].date) return '';
-    const first=dayItems(1)[0]; return first ? `<div class="nextc pre"><div class="nk">จุดแรกของทริป</div><b>${esc(first.h)}</b><small>ส. 14 พ.ย. · ${esc(first.t)} น.</small></div>` : '';
+    const first=dayItems(1)[0]; return first ? `<div class="nextc pre"><div class="nk">จุดแรกของทริป</div><b>${esc(first.h)}</b><small>ส. 14 พ.ย. · ${esc(tShow(first.t,first))} น.${tzTag(first)}</small></div>` : '';
   }
   const list=dayItems(td), id=nextItem(td), it=list.find(i=>i.id===id);
   if(!it) return `<div class="nextc"><div class="nk">วันนี้เที่ยวครบแล้ว</div><b>กลับไปพักผ่อนกัน</b><div class="acts"><button type="button" class="hbtn main" data-gohome="1">${ic('home',2.2)}พากลับที่พัก</button></div></div>`;
@@ -1768,12 +1811,12 @@ function nextStopHTML(){
   const {prev,opts}=optionsFor(td,it), sel=opts.length?chosen(td,it,opts):null, x=exitFor(it);
   const how = sel ? (sel.legs ? sel.legs.filter(l=>l.line!=='WALK').map(l=>`<span class="ln" style="background:${LINES[l.line].c}">${LINES[l.line].n.split(' ')[0]}</span>`).join(' → ')+` ลง ${esc(stName(sel.legs[sel.legs.length-1].to))}${x?' · Exit '+esc(x.ref):''}`
     : sel.bx ? `${esc(sel.n)} ลงป้าย ${esc(stopName(sel.bx.to))}` : esc(sel.n)) : '';
-  return `<div class="nextc"><div class="nk">ถัดไป · ${shiftOn?'≈ '+hhmm(toMin(it.t)+delay):esc(it.t)} น.</div>
+  return `<div class="nextc"><div class="nk">ถัดไป · ${shiftOn?'≈ '+hhmm(toMin(it.t)+delay):esc(tShow(it.t,it))} น.${tzTag(it)}</div>
     <b>${esc(it.h)}</b>${prev?`<small>จาก ${esc(prev.h)}${sel&&sel.fare!=null?' · '+(sel.fare?hk(sel.fare):'ฟรี'):''}${sel&&sel.mins?' · ~'+sel.mins+' นาที':''}</small>`:''}
     ${how?`<div class="nhow">${how}</div>`:''}
-    <div class="acts"><button type="button" class="hbtn main" data-nextnav="${it.id}">${ic('pin',2.2)}นำทาง</button>
+    <div class="acts">${it.flight||(prev&&prev.flight)?'':`<button type="button" class="hbtn main" data-nextnav="${it.id}">${ic('pin',2.2)}นำทาง</button>`}
       <button type="button" class="hbtn" data-arrive="${it.id}">${ic('check',2.4)}ถึงแล้ว</button>
-      <button type="button" class="hbtn" data-gotoday="${td}">ดูแผน</button></div></div>`;
+      <button type="button" class="hbtn" data-gotoday="${td}">ดูแผน</button></div>${['1s','1f','1a'].includes(it.id)?flightHTML():''}</div>`;
 }
 /* ---------- home: alerts (only when something needs attention) ---------- */
 function alertsHTML(){
@@ -2221,6 +2264,7 @@ async function saveExpense(){
     err.textContent = e&&e.code==='invalid_argument' ? 'บันทึกไม่ได้ เพราะบัญชีนี้ยังไม่มีสิทธิ์แก้ไข ให้เจ้าของลิงก์แชร์สิทธิ์ Contributor ให้ก่อน' : 'บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง' }
 }
 function fixHotel(items){ const defs=Object.fromEntries(DEFAULT_PLAN.flat().map(d=>[d.id,d]));
+  if(items && items.some(i=>i.id==='1a')) for(const id of ['1f','1s']) if(!items.some(i=>i.id===id)) items.unshift(clone(defs[id]));
   for(const it of items||[]){ const d=defs[it.id]; if(!d || it.custom) continue;
     for(const k of ['p','tip','map','ll']) if(d[k]!==undefined) it[k]=clone(d[k]); else delete it[k];
     if(!it.exitUser){ if(d.exit) it.exit=d.exit; else delete it.exit } }
@@ -2498,7 +2542,7 @@ try{ const g=JSON.parse(lsGet('hk-go','null')); if(g && NET && g.from in NET.byC
 let savedTab = lsGet('hk-tab','home'); if(savedTab==='set'){ savedTab='money'; S.moneySub='oct' }
 S.tab = ['home','plan','go','dz','money'].includes(savedTab) ? savedTab : 'home';
 setTab(S.tab);
-warnFetch(); setInterval(warnFetch, 10*60e3); gpsStart(false);
+warnFetch(); setInterval(warnFetch, 10*60e3); flightFetch(); setInterval(()=>flightFetch(), 5*60e3); gpsStart(false);
 setInterval(()=>{ if(S.tab==='dz') dzQueueFetch() }, 60e3);
 setInterval(()=>{ if(!S.sheet && S.tab==='home' && document.activeElement?.id!=='chk-new') renderHome(); if(!S.sheet && S.tab==='plan') renderPlan(); if(!S.sheet && S.tab==='dz' && !S.dzEdit) renderDisney(); renderHeader() }, 60000);
 
