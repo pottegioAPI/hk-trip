@@ -2516,6 +2516,8 @@ function weatherHTML(td){
 function renderHome(){
   const n=hkNow(), td=tripDay(), me=S.me;
   const days = Math.ceil((Date.parse(DAYS[0].date)-Date.parse(n.date))/864e5);
+  // the home page shows what matters at this point of the trip, nothing else
+  const phase = td ? 'trip' : n.date<DAYS[0].date ? 'pre' : 'post';
   const big = td ? `วันที่ ${td}` : days>0 ? `อีก ${days} วัน` : 'จบทริปแล้ว';
   const sub = td ? `${DAYS[td-1].title}` : days>0 ? 'ได้บินไปฮ่องกงแล้ว!' : 'กลับมาเล่าความทรงจำกัน';
   const spent = me==null ? 0 : allExp().reduce((s,e)=>s+share(e,me),0), B=Number(S.budget)||0, oc=me==null?{bal:null}:octoState();
@@ -2528,12 +2530,9 @@ function renderHome(){
     ${warnHTML()}
     ${alertsHTML()}
     ${nextStopHTML()}
-    ${gpsCardHTML()}
-    ${funCardHTML()}
-    ${daySummaryHTML()}
-    ${nowHTML()}
-    ${weatherHTML(td)}
-    ${checklistHTML()}
+    ${phase==='pre' ? `${checklistHTML()}${weatherHTML(td)}`            // before the trip: pack, then the forecast
+      : phase==='trip' ? `${gpsCardHTML()}${daySummaryHTML()}${nowHTML()}${weatherHTML(td)}${funCardHTML()}`   // on the road: where we are, today, weather, games
+      : funCardHTML()}
     <div class="hstats">
       <div><small>ที่เที่ยว</small><b class="num">${doneAll}/${stopsAll}</b><span>ไปแล้ว</span></div>
       <div><small>ใช้ไป</small><b class="num">${hk(spent)}</b><span>${B?`จากงบ ${hk(B)}`:'ยังไม่ตั้งงบ'}</span></div>
