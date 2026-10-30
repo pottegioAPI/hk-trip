@@ -1383,7 +1383,7 @@ function balance(){ // > 0: person 1 owes person 0
   let b=0;
   for(const e of S.expenses){
     const s = e.payer===0 ? 1 : -1;
-    if(e.kind==='settle') b -= s*e.amt;            // payer gives money back
+    if(e.kind==='settle') b += s*e.amt;            // payer hands money back, so what they owe goes down
     else if(e.type==='split') b += s*e.amt/2;
     else if(e.type==='adv') b += s*e.amt;
   }
@@ -1789,7 +1789,7 @@ function alertsHTML(){
   if(lh){ const left=lh.m-now;
     if(left<0) out.push(['warn',`รถไฟเที่ยวสุดท้ายกลับมงก๊กจาก ${stName(NET.byCode[lh.st])} ออกไปแล้ว (${hhmm(lh.m%1440)} น.) กด "พากลับที่พัก" ดูรถบัสกลางคืนหรือแท็กซี่`,'home']);
     else if(left<=60) out.push(['warn',`รถไฟเที่ยวสุดท้ายกลับที่พัก: ขึ้นที่ ${stName(NET.byCode[lh.st])} ก่อน ${hhmm(lh.m%1440)} น. (อีก ${left} นาที)`,'home']) }
-  else if(td && (n.min>=23*60 || n.min<60) && planSpot().src!=='hotel') out.push(['warn','ดึกแล้ว รถไฟ MTR เที่ยวสุดท้ายส่วนใหญ่ราวเที่ยงคืนถึงตีหนึ่ง กด "พากลับที่พัก" เพื่อดูทาง','home']);
+  else if(td && (n.min>=23*60 || n.min<60) && planSpot().src!=='hotel' && metres(planSpot().ll,HOTEL_LL)>300) out.push(['warn','ดึกแล้ว รถไฟ MTR เที่ยวสุดท้ายส่วนใหญ่ราวเที่ยงคืนถึงตีหนึ่ง กด "พากลับที่พัก" เพื่อดูทาง','home']);
   if(!td && daysTo>0 && daysTo<=7){
     const c=checkStats(); if(me!=null && c.mine<c.total) out.push(['info',`อีก ${daysTo} วันบิน เช็คลิสต์ของคุณยังเหลือ ${c.total-c.mine} อย่าง`,'check']);
     out.push(['info','เช็คเวลาเปิด Disneyland วันที่ 16 และกระเช้า Ngong Ping 360 วันที่ 17 (มีปิดซ่อมเป็นช่วงๆ)','dz']);
@@ -1912,7 +1912,19 @@ function navRoutes(a,b){
         fare:f, mins:Math.round(legMins(legs)+(w1+w2)*1.2/75), legs, inEx, outEx, w1:Math.round(w1), w2:Math.round(w2), from:a.st, to:b.st});
     }
   }
-  for(const o of busRoutes(a.ll, b.ll, {dow:dowOf(td?DAYS[td-1].date:n.date), min:n.min})) out.push({...busOpt(o), k:o.key});
+  const ctx={dow:dowOf(td?DAYS[td-1].date:n.date), min:n.min};
+  for(const o of busRoutes(a.ll, b.ll, ctx)) out.push({...busOpt(o), k:o.key});
+  // no train station nearby and no direct bus: bus to an MTR station, then the train
+  if(NET && b.st && d>=1500 && !out.some(o=>o.mode==='mtr'||o.mode==='bus'||o.mode==='ferry')){
+    const ib=NET.byCode[b.st], combos=[];
+    const near=Object.keys(NET.byCode).filter(c=>c!==b.st && stLL(c)).map(c=>({c, m:metres(a.ll,stLL(c))})).filter(x=>x.m<9000).sort((x,y)=>x.m-y.m).slice(0,10);
+    for(const {c} of near){ const bus=busRoutes(a.ll, stLL(c), ctx)[0]; if(!bus) continue;
+      const ia=NET.byCode[c], legs=mtrRoute(ia,ib), f=mtrFare(ia,ib); if(!legs||f==null||bus.fare==null) continue;
+      const w2 = b.isSt ? 0 : metres(b.ll, stLL(b.st)), outEx = b.isSt ? null : b.exit ? {ref:b.exit, name:b.exitName||'ตามแผนผัง MTR'} : nearestExit(b.st, b.ll);
+      combos.push({k:'bxm:'+bus.key+'>'+c, mode:'bus', n:`${busKind(BUS.routes[bus.ri])} ${BUS.routes[bus.ri][0]} + MTR`, d:`ไปสถานี ${stName(ia)} แล้วต่อ MTR`,
+        fare:Math.round((bus.fare+f)*10)/10, mins:Math.round(bus.mins+3+legMins(legs)+w2*1.2/75), bx:bus, legs, outEx, viaSt:c, w2:Math.round(w2)}) }
+    combos.sort((x,y)=>x.mins-y.mins).filter((o,i,arr)=>arr.findIndex(z=>z.n===o.n)===i).slice(0,2).forEach(o=>out.push(o));
+  }
   if(d>=700){ const road=d*1.35, fare=Math.round(29+Math.max(0,road-2000)/200*2.1); // HK urban taxi: HK$29 first 2 km, ~HK$2.1 per 200 m after
     out.push({k:'taxi', mode:'taxi', n:'แท็กซี่ (ประมาณ)', d:'ราคาประมาณสำหรับแท็กซี่สีแดง ยังไม่รวมค่าทางด่วน', fare, mins:Math.round(road/1000*3+5), shared:true}); }
   const paid=out.filter(o=>o.fare!=null && o.mode!=='walk' && o.mode!=='taxi');
@@ -1927,6 +1939,7 @@ function navStepsHTML(o, a, b){
     ${stepsHTML(o.legs, o.inEx?exitTxt(o.inEx).replace(/^Exit /,''):null, o.outEx?exitTxt(o.outEx).replace(/^Exit /,''):null, b&&!b.isSt?b.ll:null)}
     ${o.w2>60?`<div class="how">${ic('walk')} ออกสถานีแล้วเดินต่อ ~${o.w2} ม. ถึง ${esc(b.n)}</div>`:''}
     <a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}เวลารถไฟขบวนถัดไป</a>`;
+  if(o.bx && o.legs) return busSteps(o.bx)+`<div class="how" style="margin:8px 0">ลงป้ายใกล้สถานี <b>${esc(stName(NET.byCode[o.viaSt]))}</b> แล้วเดินเข้าสถานี</div>`+stepsHTML(o.legs, null, o.outEx?exitTxt(o.outEx).replace(/^Exit /,''):null, b&&!b.isSt?b.ll:null)+(o.w2>60?`<div class="how">${ic('walk')} ออกสถานีแล้วเดินต่อ ~${o.w2} ม. ถึง ${esc(b.n)}</div>`:'');
   if(o.bx) return busSteps(o.bx);
   if(o.mode==='taxi') return `<div class="how">โบกแท็กซี่สีแดง (ในเมือง) หรือสีเขียว/ฟ้าถ้าอยู่นอกเมือง แล้วโชว์ชื่อที่หมาย: <b>${esc(b.n)}</b></div>`;
   return `<div class="how">${ic('walk')} เดินตามแผนที่ไป ${esc(b.n)}</div>`;
@@ -2535,7 +2548,7 @@ function hkStore(key){
   const C = (()=>{ try{ return JSON.parse(lsGet('hk-cache','null'))||{} }catch(e){ return {} } })();
   const docs = new Map(Object.entries(C.docs||{}));      // path -> data (what this phone shows)
   const base = new Map(Object.entries(C.base||{}));      // path -> data as last seen on the server
-  let since = C.since||null, queue = C.queue||[], subs = new Set(), busy=false, timer=null;
+  let since = C.since||null, queue = C.queue||[], subs = new Set(), busy=false, timer=null, fullDone=false;
   const persist = () => lsSet('hk-cache', JSON.stringify({docs:Object.fromEntries(docs), base:Object.fromEntries(base), since, queue}));
   const notify = () => subs.forEach(f=>{ try{ f() }catch(e){ console.error(e) } });
   const status = s => { S.net=s; renderHeader() };
@@ -2555,9 +2568,13 @@ function hkStore(key){
     if(busy) return; busy=true;
     try{
       await flush();
-      // look back 15 s each time: a write saved a moment earlier on the other phone is never skipped
-      const rows = await sbRpc('hk_pull',{p_key:key,p_since:since?new Date(Date.parse(since)-15000).toISOString():null});
+      // first pull after opening the app reads everything, so anything removed on the server also leaves this phone;
+      // after that only changes, looking back 15 s so a write saved a moment earlier on the other phone is never skipped
+      const full=!fullDone, rows = await sbRpc('hk_pull',{p_key:key,p_since:full||!since?null:new Date(Date.parse(since)-15000).toISOString()});
       let changed=false;
+      if(full){ const live=new Set(rows.filter(r=>!r.deleted).map(r=>r.path));
+        for(const p of [...docs.keys()]) if(!live.has(p) && !queue.some(q=>q.path===p)){ docs.delete(p); base.delete(p); changed=true }
+        fullDone=true }
       for(const r of rows){
         since = r.updated_at;
         if(r.deleted){ base.delete(r.path); if(!queue.some(q=>q.path===r.path)){ if(docs.delete(r.path)) changed=true } }
