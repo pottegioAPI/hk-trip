@@ -57,6 +57,12 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .gearb.wait i{background:var(--sun)}
 .setsec{border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:12px}
 .setsec h4{margin:0 0 6px;font-size:15px}
+.pkinds{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.pkind{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;font:inherit;font-size:14px;color:var(--ink);text-align:left}
+.pkind i{flex:none;width:40px;height:24px;border-radius:99px;background:var(--line);position:relative;transition:background .15s}
+.pkind i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.pkind.on i{background:var(--mint)}
+.pkind.on i::after{left:19px}
 .save svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
 .pushc{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;border:2px dashed var(--sky)}
 .pushc small{grid-column:1;color:var(--muted);font-size:12.5px}
@@ -912,10 +918,18 @@ const pushInfo = () => {
   return {ios, standalone, ok, perm: ok ? Notification.permission : 'unsupported'};
 };
 const b64u = s => { const p='='.repeat((4-s.length%4)%4), r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(r, c=>c.charCodeAt(0)) };
+const PUSH_KINDS = [['weather','🌀 พายุ / ฝนหนัก (หอดูดาวฮ่องกง)'],['flight','✈️ เที่ยวบิน: ดีเลย์ ประตู ไปสนามบิน'],['mtr','🚇 MTR ขัดข้อง'],['morning','☀️ สรุปเช้าทุกวัน'],
+  ['meal','🍽️ มื้อ voucher ที่ Disney'],['fireworks','🎆 ไปจองที่ดูพลุ'],['dzwait','🎢 เครื่องห้ามพลาดคิวสั้น'],['dzstatus','🔧 เครื่องห้ามพลาดหยุด / กลับมาเปิด'],
+  ['night','🌙 ใกล้รถไฟเที่ยวสุดท้าย'],['depart','🧳 วันกลับ: เช็คเอาท์ รับกระเป๋า'],['budget','💰 วันนี้ใช้เกินงบ (ส่วนตัว)'],['pack','📋 คืนก่อนบิน: เช็คลิสต์']];
+async function pushKind(k){
+  const off=new Set(S.pushOff||[]); off.has(k)?off.delete(k):off.add(k); S.pushOff=[...off]; refreshSet();
+  try{ await sbRpc('hk_push_prefs_set',{p_key:lsGet('hk-key',''), p_off:S.pushOff}) }catch(e){ toast('บันทึกไม่สำเร็จ ลองใหม่') }
+}
 async function pushRefresh(){   // is this phone subscribed? (re-sent to the server each start, so a lost record heals itself)
   const p=pushInfo(); if(!p.ok || !S.web) return;
   try{ const reg=await navigator.serviceWorker.getRegistration(); const sub=reg && await reg.pushManager.getSubscription();
-    S.pushOn=!!sub; if(sub) sbRpc('hk_push_save',{p_key:lsGet('hk-key',''), p_sub:sub.toJSON()}).catch(()=>{}); renderAll() }catch(e){}
+    S.pushOn=!!sub; if(sub) sbRpc('hk_push_save',{p_key:lsGet('hk-key',''), p_sub:sub.toJSON()}).catch(()=>{});
+    sbRpc('hk_push_prefs_get',{p_key:lsGet('hk-key','')}).then(v=>{ S.pushOff=v||[]; refreshSet() }).catch(()=>{}); renderAll() }catch(e){}
 }
 async function pushOn(){
   const p=pushInfo();
@@ -951,7 +965,9 @@ function pushSetHTML(){
   const body = p.ios && !p.standalone ? 'ต้องเพิ่มแอปลงหน้าจอโฮมก่อน: ใน Safari กดปุ่มแชร์ → "เพิ่มไปยังหน้าจอโฮม" แล้วเปิดแอปจากไอคอน จึงจะเปิดแจ้งเตือนได้'
     : !p.ok ? 'เครื่องหรือเบราว์เซอร์นี้ไม่รองรับการแจ้งเตือน'
     : p.perm==='denied' ? 'ถูกปิดไว้ในเครื่อง เปิดได้ที่ ตั้งค่า > การแจ้งเตือน > ฮ่องกง'
-    : S.pushOn ? `เปิดอยู่ ✓ <div class="acts" style="margin-top:6px"><button type="button" class="btn-s pay" data-pushtest="1">ส่งแจ้งเตือนทดสอบ</button><button type="button" class="btn-s" data-pushoff="1">ปิด</button></div>`
+    : S.pushOn ? `เปิดอยู่ ✓ เลือกได้ว่าจะรับเรื่องไหน (ของคุณคนเดียว)
+      <div class="pkinds">${PUSH_KINDS.map(([k,t])=>{ const on=!(S.pushOff||[]).includes(k); return `<button type="button" class="pkind${on?' on':''}" data-pushkind="${k}" aria-pressed="${on}"><span>${t}</span><i></i></button>` }).join('')}</div>
+      <div class="acts" style="margin-top:8px"><button type="button" class="btn-s pay" data-pushtest="1">ส่งแจ้งเตือนทดสอบ</button><button type="button" class="btn-s" data-pushoff="1">ปิดแจ้งเตือนทั้งหมด</button></div>`
     : `ยังไม่ได้เปิด <div class="acts" style="margin-top:6px"><button type="button" class="btn-s pay" data-pushon="1">เปิดแจ้งเตือน</button></div>`;
   return `<div class="fl">🔔 แจ้งเตือน (เครื่องนี้)</div><div class="mini">${body}</div>`;
 }
@@ -3222,6 +3238,7 @@ document.addEventListener('click', e=>{
   if(ds.pushon) return pushOn();
   if(ds.pushtest) return pushTest();
   if(ds.pushoff) return pushOff();
+  if(ds.pushkind) return pushKind(ds.pushkind);
   if(ds.appupdate){ location.reload(); return }
   if(ds.setpin) return setPin();
   if(ds.setkey){ const v=(document.getElementById('keyin').value||'').trim().replace(/^.*#k=/,''); if(v.length<16){ toast('รหัสไม่ถูกต้อง'); return } lsSet('hk-key',v); location.reload(); return }
