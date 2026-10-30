@@ -1,0 +1,29 @@
+# Every morning (06:00 Hong Kong time) download the latest official MTR, bus, weather and
+# water-dispenser data, check it, rebuild the site and publish it. If anything fails the
+# old data stays online, nothing is overwritten.
+name: refresh-data
+on:
+  schedule:
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: refresh
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download and check new data
+        run: bash tools/refresh.sh
+      - name: Publish if something changed
+        run: |
+          git config user.name "hk-trip-bot"
+          git config user.email "hk-trip-bot@users.noreply.github.com"
+          git add -A index.html sw.js hk-trip.html bus.json places.json water.json weather.json data-cache/last-osm
+          git diff --cached --quiet || git commit -m "Daily data refresh $(date -u +%F)"
+          git push

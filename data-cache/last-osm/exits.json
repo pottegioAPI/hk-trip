@@ -1,0 +1,8465 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-10-29T10:12:11Z",
+    "timestamp_areas_base": "2026-10-29T05:59:47Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 253288941,
+  "lat": 22.2773860,
+  "lon": 114.1732833,
+  "tags": {
+    "name": "軒尼詩道 Hennessy Road",
+    "name:en": "Hennessy Road",
+    "name:zh": "軒尼詩道",
+    "name:zh-Hans": "轩尼诗道",
+    "name:zh-Hant": "軒尼詩道",
+    "railway": "subway_entrance",
+    "ref": "A4",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 253289096,
+  "lat": 22.2803598,
+  "lon": 114.1850696,
+  "tags": {
+    "check_date:wheelchair": "2024-09-22",
+    "name": "維多利亞公園 Victoria Park",
+    "name:en": "Victoria Park",
+    "name:zh": "維多利亞公園",
+    "name:zh-Hans": "维多利亚公园",
+    "name:zh-Hant": "維多利亞公園",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 253289239,
+  "lat": 22.2909529,
+  "lon": 114.2004094,
+  "tags": {
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 253289407,
+  "lat": 22.2822053,
+  "lon": 114.2223492,
+  "tags": {
+    "loc_ref": "A",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 253289508,
+  "lat": 22.2638697,
+  "lon": 114.2368875,
+  "tags": {
+    "name": "新翠花園 New Jade Gardens",
+    "name:en": "New Jade Gardens",
+    "name:zh": "新翠花園",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 288361301,
+  "lat": 22.2767999,
+  "lon": 114.1733505,
+  "tags": {
+    "check_date:wheelchair": "2024-09-27",
+    "name": "莊士敦道 Johnston Road",
+    "name:en": "Johnston Road",
+    "name:zh": "莊士敦道",
+    "name:zh-Hans": "庄士敦道",
+    "name:zh-Hant": "莊士敦道",
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 288361302,
+  "lat": 22.2774123,
+  "lon": 114.1726664,
+  "tags": {
+    "name": "修頓球場 Southorn Playground",
+    "name:en": "Southorn Playground",
+    "name:zh": "修頓球場",
+    "name:zh-Hans": "修顿球场",
+    "name:zh-Hant": "修頓球場",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 288361303,
+  "lat": 22.2780670,
+  "lon": 114.1728885,
+  "tags": {
+    "name": "駱克道 Lockhart Road",
+    "name:en": "Lockhart Road",
+    "name:zh": "駱克道",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 288382081,
+  "lat": 22.2818123,
+  "lon": 114.1572702,
+  "tags": {
+    "name": "畢打街 Pedder Street",
+    "name:en": "Pedder Street",
+    "name:zh": "畢打街",
+    "railway": "subway_entrance",
+    "ref": "D1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 288382082,
+  "lat": 22.2824897,
+  "lon": 114.1575643,
+  "tags": {
+    "name": "環球大廈 World-Wide House",
+    "name:en": "World-Wide House",
+    "name:zh": "環球大廈",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 333383083,
+  "lat": 22.3348737,
+  "lon": 114.1572049,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 474219840,
+  "lat": 22.3034734,
+  "lon": 114.1666990,
+  "tags": {
+    "entrance": "yes",
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "D2",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 489414265,
+  "lat": 22.3953565,
+  "lon": 113.9734402,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "V City",
+    "name:en": "V City",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 515688776,
+  "lat": 22.2942873,
+  "lon": 114.1726039,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "J3"
+  }
+},
+{
+  "type": "node",
+  "id": 515696992,
+  "lat": 22.2971488,
+  "lon": 114.1754008,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "P3"
+  }
+},
+{
+  "type": "node",
+  "id": 835004647,
+  "lat": 22.2850915,
+  "lon": 114.2152014,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 984409347,
+  "lat": 22.2910096,
+  "lon": 114.2004944,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 1012176477,
+  "lat": 22.2805978,
+  "lon": 114.1842425,
+  "tags": {
+    "building:entrance": "no",
+    "name": "崇光百貨 SOGO",
+    "name:en": "SOGO",
+    "name:zh": "崇光百貨",
+    "name:zh-Hans": "崇光百货",
+    "name:zh-Hant": "崇光百貨",
+    "railway": "subway_entrance",
+    "ref": "D1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1012176526,
+  "lat": 22.2798881,
+  "lon": 114.1844365,
+  "tags": {
+    "name": "渣甸坊 Jardine's Crescent",
+    "name:en": "Jardine's Crescent",
+    "name:zh": "渣甸坊",
+    "name:zh-Hans": "渣甸坊",
+    "name:zh-Hant": "渣甸坊",
+    "railway": "subway_entrance",
+    "ref": "F1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1023011812,
+  "lat": 22.3066677,
+  "lon": 114.2336348,
+  "tags": {
+    "name": "公共運輸交匯處 Public Transport Interchange",
+    "name:en": "Public Transport Interchange",
+    "name:zh": "公共運輸交匯處",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 1023011855,
+  "lat": 22.3060808,
+  "lon": 114.2336331,
+  "tags": {
+    "name": "鯉魚門道 Lei Yue Mun Road",
+    "name:en": "Lei Yue Mun Road",
+    "name:zh": "鯉魚門道",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1023011937,
+  "lat": 22.3080086,
+  "lon": 114.2343281,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "name": "啟田道 Kai Tin Road",
+    "name:en": "Kai Tin Road",
+    "name:zh": "啟田道",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 1023011993,
+  "lat": 22.3072166,
+  "lon": 114.2320816,
+  "tags": {
+    "name": "匯景花園 Sceneway Garden",
+    "name:en": "Sceneway Garden",
+    "name:zh": "匯景花園",
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 1179848571,
+  "lat": 22.2881280,
+  "lon": 114.2098504,
+  "tags": {
+    "noref": "yes",
+    "railway": "subway_entrance",
+    "was:ref": "B3",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1189559651,
+  "lat": 22.2973066,
+  "lon": 114.1762229,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "P2"
+  }
+},
+{
+  "type": "node",
+  "id": 1234054220,
+  "lat": 22.2785189,
+  "lon": 114.1647676,
+  "tags": {
+    "name": "金鐘廊 Queensway Plaza",
+    "name:en": "Queensway Plaza",
+    "name:zh": "金鐘廊",
+    "name:zh-Hans": "金钟廊",
+    "name:zh-Hant": "金鐘廊",
+    "railway": "subway_entrance",
+    "ref": "C1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1268358716,
+  "lat": 22.2962118,
+  "lon": 114.1703632,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "L5",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1268358723,
+  "lat": 22.2951015,
+  "lon": 114.1706378,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "L6"
+  }
+},
+{
+  "type": "node",
+  "id": 1276680606,
+  "lat": 22.3741051,
+  "lon": 114.1161059,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A3"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848661,
+  "lat": 22.3203941,
+  "lon": 114.1696731,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848665,
+  "lat": 22.3194348,
+  "lon": 114.1695494,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848668,
+  "lat": 22.3201894,
+  "lon": 114.1686505,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848672,
+  "lat": 22.3191447,
+  "lon": 114.1700803,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D3"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848674,
+  "lat": 22.3189982,
+  "lon": 114.1686758,
+  "tags": {
+    "level": "-1",
+    "railway": "subway_entrance",
+    "ref": "C3"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848676,
+  "lat": 22.3203356,
+  "lon": 114.1693592,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848677,
+  "lat": 22.3205221,
+  "lon": 114.1697125,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B3"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848678,
+  "lat": 22.3191127,
+  "lon": 114.1688279,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C4"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848683,
+  "lat": 22.3183600,
+  "lon": 114.1698389,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E2"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848689,
+  "lat": 22.3192900,
+  "lon": 114.1688610,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848691,
+  "lat": 22.3194812,
+  "lon": 114.1698266,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848692,
+  "lat": 22.3202353,
+  "lon": 114.1689752,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848700,
+  "lat": 22.3193442,
+  "lon": 114.1691704,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 1277848701,
+  "lat": 22.3182653,
+  "lon": 114.1693237,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E1"
+  }
+},
+{
+  "type": "node",
+  "id": 1279026536,
+  "lat": 22.3138159,
+  "lon": 114.1702379,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 1279026544,
+  "lat": 22.3130003,
+  "lon": 114.1701134,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 1279026546,
+  "lat": 22.3139072,
+  "lon": 114.1707603,
+  "tags": {
+    "name:zh": "A2出口",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1279026553,
+  "lat": 22.3130606,
+  "lon": 114.1704365,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 1279026559,
+  "lat": 22.3129306,
+  "lon": 114.1709220,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1279026568,
+  "lat": 22.3117934,
+  "lon": 114.1707101,
+  "tags": {
+    "name": "文明里 Man Ming Lane",
+    "name:en": "Man Ming Lane",
+    "name:zh": "文明里",
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 1295654877,
+  "lat": 22.2917000,
+  "lon": 114.2003300,
+  "tags": {
+    "layer": "-1",
+    "railway": "subway_entrance",
+    "ref": "A4"
+  }
+},
+{
+  "type": "node",
+  "id": 1295864438,
+  "lat": 22.3184881,
+  "lon": 114.1601228,
+  "tags": {
+    "name": "滙豐中心二及三座 HSBC Center Towers 2 & 3",
+    "name:en": "HSBC Center Towers 2 & 3",
+    "name:zh": "滙豐中心二及三座",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 1323956313,
+  "lat": 22.3226497,
+  "lon": 114.2141747,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 1387112133,
+  "lat": 22.2972731,
+  "lon": 114.1743430,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "N3"
+  }
+},
+{
+  "type": "node",
+  "id": 1387112134,
+  "lat": 22.2971701,
+  "lon": 114.1737076,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "N4"
+  }
+},
+{
+  "type": "node",
+  "id": 1442107002,
+  "lat": 22.2818243,
+  "lon": 114.1577864,
+  "tags": {
+    "name": "置地廣場 The Landmark",
+    "name:en": "The Landmark",
+    "name:zh": "置地廣場",
+    "railway": "subway_entrance",
+    "ref": "G",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1442107003,
+  "lat": 22.2819661,
+  "lon": 114.1570574,
+  "tags": {
+    "name": "畢打街 Pedder Street",
+    "name:en": "Pedder Street",
+    "name:zh": "畢打街",
+    "railway": "subway_entrance",
+    "ref": "D2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1442107005,
+  "lat": 22.2822161,
+  "lon": 114.1574634,
+  "tags": {
+    "name": "利源東街 Li Yuen Street East",
+    "name:en": "Li Yuen Street East",
+    "name:zh": "利源東街",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1442107006,
+  "lat": 22.2827140,
+  "lon": 114.1579391,
+  "tags": {
+    "name": "干諾道中 Connaught Road Central",
+    "name:en": "Connaught Road Central",
+    "name:zh": "干諾道中",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1465206059,
+  "lat": 22.3218213,
+  "lon": 114.2582024,
+  "tags": {
+    "name": "新都城商場一期 Metro City Plaza I",
+    "name:en": "Metro City Plaza I",
+    "name:zh": "新都城商場一期",
+    "name:zh-Hans": "新都城商场一期",
+    "name:zh-Hant": "新都城商場一期",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1465206102,
+  "lat": 22.3229134,
+  "lon": 114.2573934,
+  "tags": {
+    "name": "新都城商場三期 Metro City Plaza III",
+    "name:en": "Metro City Plaza III",
+    "name:zh": "新都城商場三期",
+    "name:zh-Hans": "新都城商场三期",
+    "name:zh-Hant": "新都城商場三期",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1490080694,
+  "lat": 22.3996735,
+  "lon": 114.2035406,
+  "tags": {
+    "name": "馬場看台（閘口1及2） Racecourse Grandstand (Gates 1 & 2)",
+    "name:en": "Racecourse Grandstand (Gates 1 & 2)",
+    "name:zh": "馬場看台（閘口1及2）",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 1490080723,
+  "lat": 22.4001296,
+  "lon": 114.2033472,
+  "tags": {
+    "name": "馬場看台（閘口3及4） Racecourse Grandstand (Gates 3 & 4)",
+    "name:en": "Racecourse Grandstand (Gates 3 & 4)",
+    "name:zh": "馬場看台（閘口3及4）",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 1490080736,
+  "lat": 22.4007925,
+  "lon": 114.2039171,
+  "tags": {
+    "name": "馬場看台（閘口5及6） Racecourse Grandstand (Gates 5 & 6)",
+    "name:en": "Racecourse Grandstand (Gates 5 & 6)",
+    "name:zh": "馬場看台（閘口5及6）",
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 1597620669,
+  "lat": 22.4442524,
+  "lon": 114.1708013,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1628446441,
+  "lat": 22.3723948,
+  "lon": 114.1771724,
+  "tags": {
+    "name": "積運街 Chik Wan Street",
+    "name:en": "Chik Wan Street",
+    "name:zh": "積運街",
+    "railway": "subway_entrance",
+    "ref": "G",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1640472762,
+  "lat": 22.3183829,
+  "lon": 114.1598281,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 1691725692,
+  "lat": 22.3117103,
+  "lon": 114.2260760,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B3",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1691725727,
+  "lat": 22.3122324,
+  "lon": 114.2269110,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1691725738,
+  "lat": 22.3123897,
+  "lon": 114.2268944,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1704465153,
+  "lat": 22.3571330,
+  "lon": 114.1278752,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 1709834365,
+  "lat": 22.3385739,
+  "lon": 114.1368489,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "F",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1737253258,
+  "lat": 22.3179216,
+  "lon": 114.1609513,
+  "tags": {
+    "name": "海桃灣 Florient Rise",
+    "name:en": "Florient Rise",
+    "name:zh": "海桃灣",
+    "railway": "subway_entrance",
+    "ref": "C5"
+  }
+},
+{
+  "type": "node",
+  "id": 1894143161,
+  "lat": 22.3364463,
+  "lon": 114.1551577,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1894143163,
+  "lat": 22.3357335,
+  "lon": 114.1553734,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1937862547,
+  "lat": 22.2906960,
+  "lon": 114.2006776,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B4"
+  }
+},
+{
+  "type": "node",
+  "id": 1937863198,
+  "lat": 22.2910383,
+  "lon": 114.2006342,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 1937863275,
+  "lat": 22.2911066,
+  "lon": 114.2009802,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B3"
+  }
+},
+{
+  "type": "node",
+  "id": 1942600954,
+  "lat": 22.2985307,
+  "lon": 114.2367112,
+  "tags": {
+    "name": "油麗邨 Yau Lai Estate",
+    "name:en": "Yau Lai Estate",
+    "name:zh": "油麗邨",
+    "name:zh-Hans": "油丽村",
+    "name:zh-Hant": "油麗邨",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1942600955,
+  "lat": 22.2984539,
+  "lon": 114.2365798,
+  "tags": {
+    "name": "茶果嶺道 Cha Kwo Ling Road",
+    "name:en": "Cha Kwo Ling Road",
+    "name:zh": "茶果嶺道",
+    "name:zh-Hans": "茶果岭道",
+    "name:zh-Hant": "茶果嶺道",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1942600956,
+  "lat": 22.2971312,
+  "lon": 114.2377680,
+  "tags": {
+    "name": "油塘邨 Yau Tong Estate",
+    "name:en": "Yau Tong Estate",
+    "name:zh": "油塘邨",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1942600957,
+  "lat": 22.2970443,
+  "lon": 114.2376312,
+  "tags": {
+    "name": "高輝道 Ko Fai Road",
+    "name:en": "Ko Fai Road",
+    "name:zh": "高輝道",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1947452672,
+  "lat": 22.3381945,
+  "lon": 114.1877115,
+  "tags": {
+    "entrance": "main",
+    "exit": "main",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 1952510747,
+  "lat": 22.2983158,
+  "lon": 114.1719412,
+  "tags": {
+    "name": "九龍公園 Kowloon Park",
+    "name:en": "Kowloon Park",
+    "name:zh": "九龍公園",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1956684701,
+  "lat": 22.3316724,
+  "lon": 114.1689901,
+  "tags": {
+    "addr:street": "窩仔街 Woh Chai Street",
+    "addr:street:en": "Woh Chai Street",
+    "addr:street:zh": "窩仔街",
+    "building": "subway_entrance",
+    "building:levels": "1",
+    "entrance": "yes",
+    "name": "南山邨 Nam Shan Estate",
+    "name:en": "Nam Shan Estate",
+    "name:zh": "南山邨",
+    "not:name": "B2",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1956684819,
+  "lat": 22.3316740,
+  "lon": 114.1685300,
+  "tags": {
+    "addr:street": "窩仔街 Woh Chai Street",
+    "addr:street:en": "Woh Chai Street",
+    "addr:street:zh": "窩仔街",
+    "conveying": "limited",
+    "entrance": "yes",
+    "name": "南昌街 Nam Cheong Street",
+    "name:en": "Nam Cheong Street",
+    "name:zh": "南昌街",
+    "not:name": "A",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1956684827,
+  "lat": 22.3327479,
+  "lon": 114.1688149,
+  "tags": {
+    "addr:street": "偉智街 Wai Chi Street",
+    "addr:street:en": "Wai Chi Street",
+    "addr:street:zh": "偉智街",
+    "building": "subway_entrance",
+    "building:levels": "1",
+    "entrance": "yes",
+    "name": "偉智街 Wai Chi Street",
+    "name:en": "Wai Chi Street",
+    "name:zh": "偉智街",
+    "not:name": "C",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1956684875,
+  "lat": 22.3314751,
+  "lon": 114.1691738,
+  "tags": {
+    "building": "subway_entrance",
+    "building:levels": "1",
+    "entrance": "yes",
+    "name": "窩仔街 Woh Chai Street",
+    "name:en": "Woh Chai Street",
+    "name:zh": "窩仔街",
+    "not:name": "B1",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1962793037,
+  "lat": 22.3070090,
+  "lon": 114.2590326,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 1962793082,
+  "lat": 22.3071034,
+  "lon": 114.2589954,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 1962793273,
+  "lat": 22.3076198,
+  "lon": 114.2608441,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 1962793277,
+  "lat": 22.3074614,
+  "lon": 114.2599109,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1962793390,
+  "lat": 22.3077187,
+  "lon": 114.2608051,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 1988098082,
+  "lat": 22.3730449,
+  "lon": 114.1780568,
+  "tags": {
+    "entrance": "yes",
+    "name": "富嘉花園 Grandway Garden",
+    "name:en": "Grandway Garden",
+    "name:zh": "富嘉花園",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1988098086,
+  "lat": 22.3723944,
+  "lon": 114.1777152,
+  "tags": {
+    "name": "美田路 Mei Tin Road",
+    "name:en": "Mei Tin Road",
+    "name:zh": "美田路",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1988098090,
+  "lat": 22.3726634,
+  "lon": 114.1780439,
+  "tags": {
+    "addr:street": "美田路 Mei Tin Road",
+    "addr:street:en": "Mei Tin Road",
+    "addr:street:zh": "美田路",
+    "entrance": "yes",
+    "name": "美田路 Mei Tin Road",
+    "name:en": "Mei Tin Road",
+    "name:zh": "美田路",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1988098091,
+  "lat": 22.3726206,
+  "lon": 114.1775485,
+  "tags": {
+    "addr:street": "美田路 Mei Tin Road",
+    "addr:street:en": "Mei Tin Road",
+    "addr:street:zh": "美田路",
+    "entrance": "yes",
+    "name": "海福花園 Holford Garden",
+    "name:en": "Holford Garden",
+    "name:zh": "海福花園",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1988098093,
+  "lat": 22.3729463,
+  "lon": 114.1793291,
+  "tags": {
+    "name": "公共運輸交匯處 Public Transport Interchange",
+    "name:en": "Public Transport Interchange",
+    "name:zh": "公共運輸交匯處",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1988101458,
+  "lat": 22.3881124,
+  "lon": 114.2086273,
+  "tags": {
+    "name": "達利廣場 Technology Park",
+    "name:en": "Technology Park",
+    "name:zh": "達利廣場",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1988101459,
+  "lat": 22.3874181,
+  "lon": 114.2082235,
+  "tags": {
+    "name": "香港浸會大學 Hong Kong Baptist University",
+    "name:en": "Hong Kong Baptist University",
+    "name:zh": "香港浸會大學",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1988101468,
+  "lat": 22.3875433,
+  "lon": 114.2080651,
+  "tags": {
+    "name": "永得利中心 Ever Gain Centre",
+    "name:en": "Ever Gain Centre",
+    "name:zh": "永得利中心",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1988101515,
+  "lat": 22.3879701,
+  "lon": 114.2087676,
+  "tags": {
+    "name": "建造業訓練場 CICTA Training Ground",
+    "name:en": "CICTA Training Ground",
+    "name:zh": "建造業訓練場",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1992279551,
+  "lat": 22.3957215,
+  "lon": 114.1986725,
+  "tags": {
+    "name": "御龍山 The Palazzo",
+    "name:en": "The Palazzo",
+    "name:zh": "御龍山",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1992279630,
+  "lat": 22.3947205,
+  "lon": 114.1980330,
+  "tags": {
+    "name": "火炭鐵路大樓 Fo Tan Railway House",
+    "name:en": "Fo Tan Railway House",
+    "name:zh": "火炭鐵路大樓",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1992279638,
+  "lat": 22.3959888,
+  "lon": 114.1981112,
+  "tags": {
+    "name": "㘭背灣街 Au Pui Wan Street",
+    "name:en": "Au Pui Wan Street",
+    "name:zh": "㘭背灣街",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 1992279664,
+  "lat": 22.3949228,
+  "lon": 114.1976498,
+  "tags": {
+    "name": "穗輝工業大廈 Sui Fai Factory Estate",
+    "name:en": "Sui Fai Factory Estate",
+    "name:zh": "穗輝工業大廈",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2028019506,
+  "lat": 22.4342941,
+  "lon": 114.0639191,
+  "tags": {
+    "name": "錦莆路 Kam Po Road",
+    "name:en": "Kam Po Road",
+    "name:zh": "錦莆路",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2028019587,
+  "lat": 22.4341732,
+  "lon": 114.0637156,
+  "tags": {
+    "name": "錦河路 Kam Ho Road",
+    "name:en": "Kam Ho Road",
+    "name:zh": "錦河路",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2028025892,
+  "lat": 22.4355136,
+  "lon": 114.0630537,
+  "tags": {
+    "name": "錦上路 Kam Sheung Road",
+    "name:en": "Kam Sheung Road",
+    "name:zh": "錦上路",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2028025893,
+  "lat": 22.4353897,
+  "lon": 114.0628534,
+  "tags": {
+    "name": "港鐵錦田大樓 MTR Kam Tin Building",
+    "name:en": "MTR Kam Tin Building",
+    "name:zh": "港鐵錦田大樓",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2029411541,
+  "lat": 22.4918273,
+  "lon": 114.1387823,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2042508937,
+  "lat": 22.3400670,
+  "lon": 114.2003280,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 2042509009,
+  "lat": 22.3409759,
+  "lon": 114.2009049,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 2046659659,
+  "lat": 22.3401757,
+  "lon": 114.2025474,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 2046659662,
+  "lat": 22.3392836,
+  "lon": 114.2021696,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 2078621332,
+  "lat": 22.3165635,
+  "lon": 113.9364765,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "G"
+  }
+},
+{
+  "type": "node",
+  "id": 2093151954,
+  "lat": 22.3573828,
+  "lon": 114.1280643,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 2093151958,
+  "lat": 22.3572648,
+  "lon": 114.1282665,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 2096110564,
+  "lat": 22.3486098,
+  "lon": 114.1256664,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 2096110594,
+  "lat": 22.3482531,
+  "lon": 114.1263049,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A3"
+  }
+},
+{
+  "type": "node",
+  "id": 2118748414,
+  "lat": 22.4137195,
+  "lon": 114.2098955,
+  "tags": {
+    "name": "香港中文大學 Chinese University of Hong Kong",
+    "name:en": "Chinese University of Hong Kong",
+    "name:zh": "香港中文大學",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2118748432,
+  "lat": 22.4151207,
+  "lon": 114.2106771,
+  "tags": {
+    "name": "綜合教學樓 Integrated Teaching Blocks",
+    "name:en": "Integrated Teaching Blocks",
+    "name:zh": "綜合教學樓",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2153312717,
+  "lat": 22.2767764,
+  "lon": 114.2399140,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 2213577057,
+  "lat": 22.3218065,
+  "lon": 114.2582995,
+  "tags": {
+    "name": "景林邨 King Lam Estate",
+    "name:en": "King Lam Estate",
+    "name:zh": "景林邨",
+    "name:zh-Hans": "景林村",
+    "name:zh-Hant": "景林邨",
+    "railway": "subway_entrance",
+    "ref": "B3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2251195619,
+  "lat": 22.3343071,
+  "lon": 114.1572266,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 2251195628,
+  "lat": 22.3349211,
+  "lon": 114.1578104,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 2251195633,
+  "lat": 22.3356151,
+  "lon": 114.1565083,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2251286250,
+  "lat": 22.3277990,
+  "lon": 114.1535930,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 2251292845,
+  "lat": 22.3262365,
+  "lon": 114.1526711,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2251292851,
+  "lat": 22.3256549,
+  "lon": 114.1552160,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 2251292856,
+  "lat": 22.3249965,
+  "lon": 114.1543017,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2294267334,
+  "lat": 22.3319892,
+  "lon": 114.0286230,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2298558134,
+  "lat": 22.4076764,
+  "lon": 114.2224323,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "name": "富安花園 Chevalier Garden",
+    "name:en": "Chevalier Garden",
+    "name:zh": "富安花園",
+    "public_transport": "yes",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "train": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2298558162,
+  "lat": 22.4077740,
+  "lon": 114.2222450,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "name": "錦泰苑 Kam Tai Court",
+    "name:en": "Kam Tai Court",
+    "name:zh": "錦泰苑",
+    "public_transport": "yes",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "train": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2303356543,
+  "lat": 22.2922475,
+  "lon": 114.2002722,
+  "tags": {
+    "name": "渣華道 Java Road",
+    "name:en": "Java Road",
+    "name:zh": "渣華道",
+    "name:zh-Hans": "渣华道",
+    "name:zh-Hant": "渣華道",
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 2315765554,
+  "lat": 22.5013549,
+  "lon": 114.1276038,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2315859109,
+  "lat": 22.4506191,
+  "lon": 114.1609177,
+  "tags": {
+    "layer": "2",
+    "level": "2",
+    "name": "太和廣場 Tai Wo Plaza",
+    "name:en": "Tai Wo Plaza",
+    "name:zh": "太和廣場",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2318534636,
+  "lat": 22.4442135,
+  "lon": 114.1700938,
+  "tags": {
+    "name": "新達廣場 Uptown Plaza",
+    "name:en": "Uptown Plaza",
+    "name:yue": "新達廣場",
+    "name:zh": "新達廣場",
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2321702079,
+  "lat": 22.3483266,
+  "lon": 114.1264211,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 2321702082,
+  "lat": 22.3479946,
+  "lon": 114.1265811,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 2368397761,
+  "lat": 22.3150707,
+  "lon": 114.2187248,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B5",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2368397777,
+  "lat": 22.3149852,
+  "lon": 114.2184925,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B6",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2373085251,
+  "lat": 22.2883628,
+  "lon": 114.2102822,
+  "tags": {
+    "noref": "yes",
+    "railway": "subway_entrance",
+    "was:ref": "B2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2373085256,
+  "lat": 22.2878025,
+  "lon": 114.2099511,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 2373085258,
+  "lat": 22.2884664,
+  "lon": 114.2104384,
+  "tags": {
+    "noref": "yes",
+    "railway": "subway_entrance",
+    "was:ref": "B1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2373085308,
+  "lat": 22.2884556,
+  "lon": 114.2099323,
+  "tags": {
+    "noref": "yes",
+    "railway": "subway_entrance",
+    "was:ref": "B4"
+  }
+},
+{
+  "type": "node",
+  "id": 2373122143,
+  "lat": 22.2905784,
+  "lon": 114.2079260,
+  "tags": {
+    "name": "模範里 Model Lane",
+    "name:en": "Model Lane",
+    "name:zh": "模範里",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406267,
+  "lat": 22.2788449,
+  "lon": 114.2296833,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406268,
+  "lat": 22.2795168,
+  "lon": 114.2282779,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B3"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406271,
+  "lat": 22.2797320,
+  "lon": 114.2288265,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406272,
+  "lat": 22.2787056,
+  "lon": 114.2286339,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406274,
+  "lat": 22.2798213,
+  "lon": 114.2298711,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406276,
+  "lat": 22.2786537,
+  "lon": 114.2281666,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A3"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406277,
+  "lat": 22.2789503,
+  "lon": 114.2286867,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406278,
+  "lat": 22.2804482,
+  "lon": 114.2298235,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 2387406279,
+  "lat": 22.2791652,
+  "lon": 114.2296884,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 2403562276,
+  "lat": 22.3961984,
+  "lon": 113.9736564,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "V City",
+    "name:en": "V City",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2409907559,
+  "lat": 22.4294168,
+  "lon": 114.2437838,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "西沙路 Sai Sha Road",
+    "name:en": "Sai Sha Road",
+    "name:zh": "西沙路",
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 2409907561,
+  "lat": 22.4290301,
+  "lon": 114.2438805,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "銀湖·天峰 Lake Silver",
+    "name:en": "Lake Silver",
+    "name:zh": "銀湖·天峰",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2409919310,
+  "lat": 22.4250450,
+  "lon": 114.2312418,
+  "tags": {
+    "name": "馬鞍山廣場 Ma On Shan Plaza",
+    "name:en": "Ma On Shan Plaza",
+    "name:zh": "馬鞍山廣場",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2409919311,
+  "lat": 22.4251689,
+  "lon": 114.2316834,
+  "tags": {
+    "name": "馬鞍山廣場 Ma On Shan Plaza",
+    "name:en": "Ma On Shan Plaza",
+    "name:zh": "馬鞍山廣場",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2409919312,
+  "lat": 22.4244930,
+  "lon": 114.2316438,
+  "tags": {
+    "entrance": "yes",
+    "name": "新港城中心 Sunshine City Plaza",
+    "name:en": "Sunshine City Plaza",
+    "name:zh": "新港城中心",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2409931194,
+  "lat": 22.4178817,
+  "lon": 114.2258039,
+  "tags": {
+    "name": "聽濤雅苑 Vista Paradiso",
+    "name:en": "Vista Paradiso",
+    "name:zh": "聽濤雅苑",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2409931195,
+  "lat": 22.4178287,
+  "lon": 114.2259672,
+  "tags": {
+    "name": "恒安邨 Heng On Estate",
+    "name:en": "Heng On Estate",
+    "name:zh": "恒安邨",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2409931196,
+  "lat": 22.4192729,
+  "lon": 114.2264295,
+  "tags": {
+    "name": "錦豐苑 Kam Fung Court",
+    "name:en": "Kam Fung Court",
+    "name:zh": "錦豐苑",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2410074738,
+  "lat": 22.3824231,
+  "lon": 114.2032013,
+  "tags": {
+    "name": "威爾斯親王醫院 Prince of Wales Hospital",
+    "name:en": "Prince of Wales Hospital",
+    "name:zh": "威爾斯親王醫院",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410074739,
+  "lat": 22.3825622,
+  "lon": 114.2030545,
+  "tags": {
+    "name": "愉田苑 Yue Tin Court",
+    "name:en": "Yue Tin Court",
+    "name:zh": "愉田苑",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410074740,
+  "lat": 22.3830363,
+  "lon": 114.2038394,
+  "tags": {
+    "name": "愉翠苑 Yu Chui Court",
+    "name:en": "Yu Chui Court",
+    "name:zh": "愉翠苑",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2410074741,
+  "lat": 22.3831719,
+  "lon": 114.2036999,
+  "tags": {
+    "name": "沙田第一城 City One Shatin",
+    "name:en": "City One Shatin",
+    "name:zh": "沙田第一城",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2410078031,
+  "lat": 22.3773444,
+  "lon": 114.1952575,
+  "tags": {
+    "name": "沙角邨 Sha Kok Estate",
+    "name:en": "Sha Kok Estate",
+    "name:zh": "沙角邨",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410078032,
+  "lat": 22.3771942,
+  "lon": 114.1953821,
+  "tags": {
+    "name": "沙田圍 Sha Tin Wai",
+    "name:en": "Sha Tin Wai",
+    "name:zh": "沙田圍",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410078033,
+  "lat": 22.3768740,
+  "lon": 114.1945897,
+  "tags": {
+    "name": "乙明邨 Jat Ming Estate",
+    "name:en": "Jat Ming Estate",
+    "name:zh": "乙明邨",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2410078034,
+  "lat": 22.3767145,
+  "lon": 114.1947060,
+  "tags": {
+    "name": "博康邨 Pok Hong Estate",
+    "name:en": "Pok Hong Estate",
+    "name:zh": "博康邨",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2410098346,
+  "lat": 22.3749091,
+  "lon": 114.1857738,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "香港文化博物館 Hong Kong Heritage Museum",
+    "name:en": "Hong Kong Heritage Museum",
+    "name:zh": "香港文化博物館",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410098347,
+  "lat": 22.3746394,
+  "lon": 114.1857574,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "車公廟 Che Kung Temple",
+    "name:en": "Che Kung Temple",
+    "name:zh": "車公廟",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410098348,
+  "lat": 22.3748836,
+  "lon": 114.1863407,
+  "tags": {
+    "name": "城門河 Shing Mun River",
+    "name:en": "Shing Mun River",
+    "name:zh": "城門河",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2410098353,
+  "lat": 22.3746142,
+  "lon": 114.1863250,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "沙田頭 Sha Tin Tau",
+    "name:en": "Sha Tin Tau",
+    "name:zh": "沙田頭",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2410098357,
+  "lat": 22.3748726,
+  "lon": 114.1865858,
+  "tags": {
+    "access": "private",
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "溱岸8號 The Riverpark",
+    "name:en": "The Riverpark",
+    "name:zh": "溱岸8號",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410149807,
+  "lat": 22.4918753,
+  "lon": 114.1391840,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410149810,
+  "lat": 22.4921754,
+  "lon": 114.1388841,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410149817,
+  "lat": 22.4926213,
+  "lon": 114.1383685,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2410171246,
+  "lat": 22.4442174,
+  "lon": 114.1698927,
+  "tags": {
+    "name": "新達廣場 Uptown Plaza",
+    "name:en": "Uptown Plaza",
+    "name:yue": "新達廣場",
+    "name:zh": "新達廣場",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2410171248,
+  "lat": 22.4443453,
+  "lon": 114.1697412,
+  "tags": {
+    "name": "新達廣場 Uptown Plaza",
+    "name:en": "Uptown Plaza",
+    "name:yue": "新達廣場",
+    "name:zh": "新達廣場",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2434934690,
+  "lat": 22.3823303,
+  "lon": 114.1879438,
+  "tags": {
+    "name": "新城市廣場 New Town Plaza",
+    "name:en": "New Town Plaza",
+    "name:zh": "新城市廣場",
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435280354,
+  "lat": 22.3941722,
+  "lon": 113.9736936,
+  "tags": {
+    "name": "公共運輸交匯處 Public Transport Interchange",
+    "name:en": "Public Transport Interchange",
+    "name:zh": "公共運輸交匯處",
+    "name:zh-Hans": "公共运输交汇处",
+    "name:zh-Hant": "公共運輸交匯處",
+    "railway": "subway_entrance",
+    "ref": "C1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435280355,
+  "lat": 22.3944454,
+  "lon": 113.9737665,
+  "tags": {
+    "name": "公共運輸交匯處 Public Transport Interchange",
+    "name:en": "Public Transport Interchange",
+    "name:zh": "公共運輸交匯處",
+    "railway": "subway_entrance",
+    "ref": "C2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435280356,
+  "lat": 22.3944114,
+  "lon": 113.9733722,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "公共運輸交匯處 Public Transport Interchange",
+    "name:en": "Public Transport Interchange",
+    "name:zh": "公共運輸交匯處",
+    "name:zh-Hans": "公共运输交汇处",
+    "name:zh-Hant": "公共運輸交匯處",
+    "railway": "subway_entrance",
+    "ref": "C3",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435280359,
+  "lat": 22.3965370,
+  "lon": 113.9734609,
+  "tags": {
+    "name": "的士站 Taxi Stand",
+    "name:en": "Taxi Stand",
+    "name:zh": "的士站",
+    "name:zh-Hans": "的士站",
+    "name:zh-Hant": "的士站",
+    "railway": "subway_entrance",
+    "ref": "F1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435280360,
+  "lat": 22.3962515,
+  "lon": 113.9734656,
+  "tags": {
+    "name": "輕鐵河田站 Light Rail Ho Tin Stop",
+    "name:en": "Light Rail Ho Tin Stop",
+    "name:zh": "輕鐵河田站",
+    "name:zh-Hans": "轻铁河田站",
+    "name:zh-Hant": "輕鐵河田站",
+    "railway": "subway_entrance",
+    "ref": "F2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303319,
+  "lat": 22.4109379,
+  "lon": 113.9785479,
+  "tags": {
+    "name": "彩暉花園 Brillant Garden",
+    "name:en": "Brillant Garden",
+    "name:zh": "彩暉花園",
+    "name:zh-Hans": "彩晖花园",
+    "name:zh-Hant": "彩暉花園",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303320,
+  "lat": 22.4118098,
+  "lon": 113.9790581,
+  "tags": {
+    "name": "嶺南大學 Lingnan University",
+    "name:en": "Lingnan University",
+    "name:zh": "嶺南大學",
+    "name:zh-Hans": "岭南大学",
+    "name:zh-Hant": "嶺南大學",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303321,
+  "lat": 22.4117924,
+  "lon": 113.9786487,
+  "tags": {
+    "name": "輕鐵兆康站 Light Rail Siu Hong Stop",
+    "name:en": "Light Rail Siu Hong Stop",
+    "name:zh": "輕鐵兆康站",
+    "name:zh-Hans": "轻铁兆康站",
+    "name:zh-Hant": "輕鐵兆康站",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303322,
+  "lat": 22.4119979,
+  "lon": 113.9787096,
+  "tags": {
+    "name": "輕鐵兆康站 Light Rail Siu Hong Stop",
+    "name:en": "Light Rail Siu Hong Stop",
+    "name:zh": "輕鐵兆康站",
+    "name:zh-Hans": "轻铁兆康站",
+    "name:zh-Hant": "輕鐵兆康站",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303323,
+  "lat": 22.4120548,
+  "lon": 113.9786575,
+  "tags": {
+    "name": "失物及學生乘車優惠計劃辦事處 Lost Property and Concessionary Travel Office",
+    "name:en": "Lost Property and Concessionary Travel Office",
+    "name:zh": "失物及學生乘車優惠計劃辦事處",
+    "name:zh-Hans": "失物及学生乘车优惠计划办事处",
+    "name:zh-Hant": "失物及學生乘車優惠計劃辦事處",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303324,
+  "lat": 22.4119996,
+  "lon": 113.9781976,
+  "tags": {
+    "name": "兆康苑 Siu Hong Court",
+    "name:en": "Siu Hong Court",
+    "name:zh": "兆康苑",
+    "name:zh-Hans": "兆康苑",
+    "name:zh-Hant": "兆康苑",
+    "railway": "subway_entrance",
+    "ref": "C1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303325,
+  "lat": 22.4120521,
+  "lon": 113.9781160,
+  "tags": {
+    "name": "兆康苑 Siu Hong Court",
+    "name:en": "Siu Hong Court",
+    "name:zh": "兆康苑",
+    "name:zh-Hans": "兆康苑",
+    "name:zh-Hant": "兆康苑",
+    "railway": "subway_entrance",
+    "ref": "C2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303326,
+  "lat": 22.4120526,
+  "lon": 113.9782132,
+  "tags": {
+    "name": "兆康苑 Siu Hong Court",
+    "name:en": "Siu Hong Court",
+    "name:zh": "兆康苑",
+    "name:zh-Hans": "兆康苑",
+    "name:zh-Hant": "兆康苑",
+    "railway": "subway_entrance",
+    "ref": "C3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435303327,
+  "lat": 22.4127815,
+  "lon": 113.9790955,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "新慶村 San Hing Tsuen",
+    "name:en": "San Hing Tsuen",
+    "name:zh": "新慶村",
+    "name:zh-Hans": "新庆村",
+    "name:zh-Hant": "新慶村",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "subway": "no",
+    "train": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435335624,
+  "lat": 22.4468725,
+  "lon": 114.0036088,
+  "tags": {
+    "name": "屏廈路 (南) Ping Ha Road (South)",
+    "name:en": "Ping Ha Road (South)",
+    "name:zh": "屏廈路 (南)",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435335625,
+  "lat": 22.4470589,
+  "lon": 114.0033561,
+  "tags": {
+    "name": "天盛苑 Tin Shing Court",
+    "name:en": "Tin Shing Court",
+    "name:zh": "天盛苑",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435335626,
+  "lat": 22.4481731,
+  "lon": 114.0044980,
+  "tags": {
+    "name": "天耀邨 Tin Yiu Estate",
+    "name:en": "Tin Yiu Estate",
+    "name:zh": "天耀邨",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435335627,
+  "lat": 22.4491298,
+  "lon": 114.0054366,
+  "tags": {
+    "name": "天祐苑 Tin Yau Court",
+    "name:en": "Tin Yau Court",
+    "name:zh": "天祐苑",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2435335628,
+  "lat": 22.4495469,
+  "lon": 114.0058728,
+  "tags": {
+    "name": "輕鐵天水圍站 Light Rail Tin Shui Wai Stop",
+    "name:en": "Light Rail Tin Shui Wai Stop",
+    "name:zh": "輕鐵天水圍站",
+    "railway": "subway_entrance",
+    "ref": "E1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435335629,
+  "lat": 22.4494756,
+  "lon": 114.0059690,
+  "tags": {
+    "name": "輕鐵天水圍站 Light Rail Tin Shui Wai Stop",
+    "name:en": "Light Rail Tin Shui Wai Stop",
+    "name:zh": "輕鐵天水圍站",
+    "railway": "subway_entrance",
+    "ref": "E2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2435335630,
+  "lat": 22.4493443,
+  "lon": 114.0061366,
+  "tags": {
+    "name": "聚星樓 Tsui Sing Lau",
+    "name:en": "Tsui Sing Lau",
+    "name:zh": "聚星樓",
+    "railway": "subway_entrance",
+    "ref": "E3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436054859,
+  "lat": 22.4475242,
+  "lon": 114.0247273,
+  "tags": {
+    "name": "朗屏邨 Long Ping Estate",
+    "name:en": "Long Ping Estate",
+    "name:zh": "朗屏邨",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436054864,
+  "lat": 22.4475217,
+  "lon": 114.0241856,
+  "tags": {
+    "name": "朗屏邨 Long Ping Estate",
+    "name:en": "Long Ping Estate",
+    "name:zh": "朗屏邨",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2436054870,
+  "lat": 22.4475613,
+  "lon": 114.0248937,
+  "tags": {
+    "name": "寶樂坊 Po Lok Square",
+    "name:en": "Po Lok Square",
+    "name:zh": "寶樂坊",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436054877,
+  "lat": 22.4475595,
+  "lon": 114.0259538,
+  "tags": {
+    "name": "保輝徑 Po Fai Path",
+    "name:en": "Po Fai Path",
+    "name:zh": "保輝徑",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436054883,
+  "lat": 22.4475584,
+  "lon": 114.0264814,
+  "tags": {
+    "name": "大橋村 Tai Kiu Tsuen",
+    "name:en": "Tai Kiu Tsuen",
+    "name:zh": "大橋村",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436054889,
+  "lat": 22.4477830,
+  "lon": 114.0265379,
+  "tags": {
+    "name": "東頭工業區 Tung Tau Industrial Area",
+    "name:en": "Tung Tau Industrial Area",
+    "name:zh": "東頭工業區",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2436311511,
+  "lat": 22.4462390,
+  "lon": 114.0337171,
+  "tags": {
+    "name": "朗日路 Long Yat Road",
+    "name:en": "Long Yat Road",
+    "name:zh": "朗日路",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436311514,
+  "lat": 22.4459464,
+  "lon": 114.0334056,
+  "tags": {
+    "name": "元朗舊墟 Yuen Long Kau Hui",
+    "name:en": "Yuen Long Kau Hui",
+    "name:zh": "元朗舊墟",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436311517,
+  "lat": 22.4459422,
+  "lon": 114.0346694,
+  "tags": {
+    "name": "輕鐵元朗站 Light Rail Yuen Long Stop",
+    "name:en": "Light Rail Yuen Long Stop",
+    "name:zh": "輕鐵元朗站",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2436311520,
+  "lat": 22.4459403,
+  "lon": 114.0352194,
+  "tags": {
+    "name": "新元朗中心 Sun Yuen Long Centre",
+    "name:en": "Sun Yuen Long Centre",
+    "name:zh": "新元朗中心",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2436311522,
+  "lat": 22.4462797,
+  "lon": 114.0351326,
+  "tags": {
+    "name": "輕鐵元朗站 Light Rail Yuen Long Stop",
+    "name:en": "Light Rail Yuen Long Stop",
+    "name:zh": "輕鐵元朗站",
+    "railway": "subway_entrance",
+    "ref": "G1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436311525,
+  "lat": 22.4464288,
+  "lon": 114.0353460,
+  "tags": {
+    "name": "輕鐵元朗站 Light Rail Yuen Long Stop",
+    "name:en": "Light Rail Yuen Long Stop",
+    "name:zh": "輕鐵元朗站",
+    "railway": "subway_entrance",
+    "ref": "G2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2436311528,
+  "lat": 22.4459353,
+  "lon": 114.0367204,
+  "tags": {
+    "name": "博愛醫院 Pok Oi Hospital",
+    "name:en": "Pok Oi Hospital",
+    "name:zh": "博愛醫院",
+    "railway": "subway_entrance",
+    "ref": "H",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2436311531,
+  "lat": 22.4462353,
+  "lon": 114.0364041,
+  "tags": {
+    "name": "英龍圍 Ying Lung Wai",
+    "name:en": "Ying Lung Wai",
+    "name:zh": "英龍圍",
+    "railway": "subway_entrance",
+    "ref": "J",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2441044910,
+  "lat": 22.2969652,
+  "lon": 114.1761727,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "P1"
+  }
+},
+{
+  "type": "node",
+  "id": 2484962281,
+  "lat": 22.5149060,
+  "lon": 114.0662608,
+  "tags": {
+    "entrance": "main",
+    "exit": "main",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 2555174996,
+  "lat": 22.2811785,
+  "lon": 114.1285401,
+  "tags": {
+    "name": "士美菲路 Smithfield",
+    "name:en": "Smithfield",
+    "name:zh": "士美菲路",
+    "name:zh-Hans": "士美菲路",
+    "name:zh-Hant": "士美菲路",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555174997,
+  "lat": 22.2812820,
+  "lon": 114.1280347,
+  "tags": {
+    "bicycle": "no",
+    "name": "科士街 Forbes Street",
+    "name:en": "Forbes Street",
+    "name:zh": "科士街",
+    "name:zh-Hans": "科士街",
+    "name:zh-Hant": "科士街",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555174998,
+  "lat": 22.2818121,
+  "lon": 114.1293531,
+  "tags": {
+    "name": "石山街 Rockhill Street",
+    "name:en": "Rock Hill Street",
+    "name:zh": "石山街",
+    "name:zh-Hans": "石山街",
+    "name:zh-Hant": "石山街",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555184303,
+  "lat": 22.2832689,
+  "lon": 114.1367440,
+  "tags": {
+    "name": "香港大學 The University of Hong Kong",
+    "name:en": "The University of Hong Kong",
+    "name:zh": "香港大學",
+    "operator": "香港鐵路有限公司 MTR Corporation",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "start_date": "2014-12-28",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555184304,
+  "lat": 22.2856593,
+  "lon": 114.1368203,
+  "tags": {
+    "name": "屈地街 Whitty Street",
+    "name:en": "Whitty Street",
+    "name:zh": "屈地街",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "start_date": "2014-12-28",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555184305,
+  "lat": 22.2856400,
+  "lon": 114.1351513,
+  "tags": {
+    "name": "山道 Hill Road",
+    "name:en": "Hill Road",
+    "name:zh": "山道",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "start_date": "2014-12-28",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555184306,
+  "lat": 22.2844548,
+  "lon": 114.1346392,
+  "tags": {
+    "name": "薄扶林道 Pok Fu Lam Road",
+    "name:en": "Pok Fu Lam Road",
+    "name:zh": "薄扶林道",
+    "operator": "香港鐵路有限公司 MTR Corporation",
+    "railway": "subway_entrance",
+    "ref": "C1",
+    "start_date": "2014-12-28",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555184307,
+  "lat": 22.2859012,
+  "lon": 114.1326439,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "name": "卑路乍街 Belcher's Street",
+    "name:en": "Belcher's Street",
+    "name:zh": "卑路乍街",
+    "railway": "subway_entrance",
+    "ref": "C2",
+    "start_date": "2014-12-28",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555265437,
+  "lat": 22.2864364,
+  "lon": 114.1418059,
+  "tags": {
+    "addr:street": "第一街 First Street",
+    "name": "第一街 First Street",
+    "name:en": "First Street",
+    "name:zh": "第一街",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "start_date": "2015-03",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555265438,
+  "lat": 22.2862083,
+  "lon": 114.1417987,
+  "tags": {
+    "addr:street": "第二街 Second Street",
+    "name": "第二街 Second Street",
+    "name:en": "Second Street",
+    "name:zh": "第二街",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "start_date": "2015-03",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555265440,
+  "lat": 22.2877584,
+  "lon": 114.1442223,
+  "tags": {
+    "addr:street": "德輔道西 Des Voeux Road West",
+    "name": "德輔道西 Des Voeux Road West",
+    "name:en": "Des Voeux Road West",
+    "name:zh": "德輔道西",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "start_date": "2015-03",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555265441,
+  "lat": 22.2870918,
+  "lon": 114.1444696,
+  "tags": {
+    "addr:street": "皇后大道西 Queen's Road West",
+    "name": "皇后大道西 Queen's Road West",
+    "name:en": "Queen's Road West",
+    "name:zh": "皇后大道西",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "start_date": "2015-03",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555281852,
+  "lat": 22.2866504,
+  "lon": 114.1536721,
+  "tags": {
+    "addr:street": "干諾道中 Connaught Road Central",
+    "addr:street:carriageway_ref:kmb": "W",
+    "addr:street:direction:kmb": "W",
+    "addr:street:en": "Connaught Road Central",
+    "addr:street:ref:kmb": "CO03",
+    "addr:street:wikidata": "Q16313103",
+    "addr:street:zh": "干諾道中",
+    "building:entrance": "no",
+    "name": "無限極廣場 Infinitus Plaza",
+    "name:en": "Infinitus Plaza",
+    "name:zh": "無限極廣場",
+    "railway": "subway_entrance",
+    "railway:entrance": "yes",
+    "ref": "E4",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299649,
+  "lat": 22.2863876,
+  "lon": 114.1522586,
+  "tags": {
+    "name": "永樂街 Wing Lok Street",
+    "name:en": "Wing Lok Street",
+    "name:zh": "永樂街",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299650,
+  "lat": 22.2861139,
+  "lon": 114.1522131,
+  "tags": {
+    "name": "永樂街 Wing Lok Street",
+    "name:en": "Wing Lok Street",
+    "name:zh": "永樂街",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299651,
+  "lat": 22.2866684,
+  "lon": 114.1520067,
+  "tags": {
+    "name": "禧利街 Hiller Street",
+    "name:en": "Hiller Street",
+    "name:zh": "禧利街",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299652,
+  "lat": 22.2870882,
+  "lon": 114.1521102,
+  "tags": {
+    "name": "干諾道中 Connaught Road Central",
+    "name:en": "Connaught Road Central",
+    "name:zh": "干諾道中",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299653,
+  "lat": 22.2876583,
+  "lon": 114.1522424,
+  "tags": {
+    "name": "港澳碼頭 HK-Macau Ferry Terminal",
+    "name:en": "HK-Macau Ferry Terminal",
+    "name:zh": "港澳碼頭",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299655,
+  "lat": 22.2860874,
+  "lon": 114.1533254,
+  "tags": {
+    "name": "無限極廣場 Infinitus Plaza",
+    "name:en": "Infinitus Plaza",
+    "name:zh": "無限極廣場",
+    "railway": "subway_entrance",
+    "ref": "E1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299656,
+  "lat": 22.2858939,
+  "lon": 114.1532690,
+  "tags": {
+    "name": "無限極廣場 Infinitus Plaza",
+    "name:en": "Infinitus Plaza",
+    "name:zh": "無限極廣場",
+    "railway": "subway_entrance",
+    "ref": "E2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299657,
+  "lat": 22.2861706,
+  "lon": 114.1536409,
+  "tags": {
+    "elevator": "only",
+    "footway:conveying": "no",
+    "name": "無限極廣場 Infinitus Plaza",
+    "name:en": "Infinitus Plaza",
+    "name:zh": "無限極廣場",
+    "railway": "subway_entrance",
+    "ref": "E3",
+    "steps": "no",
+    "steps:conveying": "no",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555299659,
+  "lat": 22.2866170,
+  "lon": 114.1536075,
+  "tags": {
+    "addr:housename": "無限極廣場 Infinitus Plaza",
+    "addr:housename:en": "Infinitus Plaza",
+    "addr:housename:wikidata": "Q7220843",
+    "addr:housename:zh": "無限極廣場",
+    "entrance": "yes",
+    "indoor": "yes",
+    "level": "0",
+    "name": "無限極廣場 Infinitus Plaza",
+    "name:en": "Infinitus Plaza",
+    "name:zh": "無限極廣場",
+    "railway": "subway_entrance",
+    "ref": "E5",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555337840,
+  "lat": 22.2810152,
+  "lon": 114.1609802,
+  "tags": {
+    "name": "遮打花園 Chater Garden",
+    "name:en": "Chater Garden",
+    "name:zh": "遮打花園",
+    "railway": "subway_entrance",
+    "ref": "J2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555348136,
+  "lat": 22.2816497,
+  "lon": 114.1587712,
+  "tags": {
+    "layer": "-1",
+    "level": "-1",
+    "name": "歷山大廈 Alexandra House",
+    "name:en": "Alexandra House",
+    "name:zh": "歷山大廈",
+    "name:zh-Hans": "历山大厦",
+    "name:zh-Hant": "歷山大廈",
+    "railway": "subway_entrance",
+    "ref": "H",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2555632176,
+  "lat": 22.2812628,
+  "lon": 114.1609732,
+  "tags": {
+    "entrance": "yes",
+    "name": "遮打花園 Chater Garden",
+    "name:en": "Chater Garden",
+    "name:zh": "遮打花園",
+    "railway": "subway_entrance",
+    "ref": "J3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555632177,
+  "lat": 22.2812671,
+  "lon": 114.1604814,
+  "tags": {
+    "entrance": "yes",
+    "name": "遮打花園 Chater Garden",
+    "name:en": "Chater Garden",
+    "name:zh": "遮打花園",
+    "railway": "subway_entrance",
+    "ref": "J1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555632178,
+  "lat": 22.2810983,
+  "lon": 114.1595412,
+  "tags": {
+    "entrance": "yes",
+    "loc_ref": "K",
+    "name": "皇后像廣場 Statue Square",
+    "name:en": "Statue Square",
+    "name:zh": "皇后像廣場",
+    "name:zh-Hans": "皇后像广场",
+    "name:zh-Hant": "皇后像廣場",
+    "railway": "subway_entrance",
+    "ref": "K",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555632179,
+  "lat": 22.2818589,
+  "lon": 114.1586996,
+  "tags": {
+    "name": "聖佐治大廈 St. George's Building",
+    "name:en": "St. George's Building",
+    "name:zh": "聖佐治大廈",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555632180,
+  "lat": 22.2819388,
+  "lon": 114.1583907,
+  "tags": {
+    "name": "遮打大廈 Chater House",
+    "name:en": "Chater House",
+    "name:zh": "遮打大廈",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555854344,
+  "lat": 22.2831241,
+  "lon": 114.1570888,
+  "tags": {
+    "name": "德忌利士街 Douglas Street",
+    "name:en": "Douglas Street",
+    "name:zh": "德忌利士街",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555854345,
+  "lat": 22.2843365,
+  "lon": 114.1584992,
+  "tags": {
+    "highway": "elevator",
+    "indoor": "yes",
+    "level": "1;0",
+    "level:ref": "L1;G",
+    "noref": "yes",
+    "railway": "subway_entrance",
+    "wheelchair": "designated"
+  }
+},
+{
+  "type": "node",
+  "id": 2555854346,
+  "lat": 22.2842075,
+  "lon": 114.1589258,
+  "tags": {
+    "elevator": "no",
+    "escalator": "only",
+    "level": "1",
+    "level:ref": "L1",
+    "name": "國際金融中心二期 Two International Finance Centre",
+    "name:en": "Two International Finance Centre",
+    "name:zh": "國際金融中心二期",
+    "railway": "subway_entrance",
+    "ramp": "no",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555854347,
+  "lat": 22.2841277,
+  "lon": 114.1590613,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "level": "0",
+    "name": "交易廣場一至二期 One and Two Exchange Square",
+    "name:en": "One and Two Exchange Square",
+    "name:zh": "交易廣場一至二期",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555854348,
+  "lat": 22.2841259,
+  "lon": 114.1586529,
+  "tags": {
+    "elevator": "no",
+    "entrance": "yes",
+    "exit": "yes",
+    "level": "0",
+    "name": "交易廣場一至二期 One and Two Exchange Square",
+    "name:en": "One and Two Exchange Square",
+    "name:zh": "交易廣場一至二期",
+    "railway": "subway_entrance",
+    "ramp": "no",
+    "ref": "B1",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555854350,
+  "lat": 22.2853571,
+  "lon": 114.1584653,
+  "tags": {
+    "level": "0",
+    "name": "國際金融中心商場 IFC Mall",
+    "name:en": "IFC Mall",
+    "name:zh": "國際金融中心商場",
+    "name:zh-Hans": "国际金融中心商场",
+    "name:zh-Hant": "國際金融中心商場",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555863739,
+  "lat": 22.2848674,
+  "lon": 114.1574190,
+  "tags": {
+    "level": "0",
+    "name": "交易廣場三期 Three Exchange Square",
+    "name:en": "Three Exchange Square",
+    "name:zh": "交易廣場三期",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2555863742,
+  "lat": 22.2850418,
+  "lon": 114.1572736,
+  "tags": {
+    "elevator": "no",
+    "escalator": "only",
+    "indoor": "yes",
+    "level": "1",
+    "name": "國際金融中心一期 One International Finance Centre",
+    "name:en": "One International Finance Centre",
+    "name:zh": "國際金融中心一期",
+    "name:zh-Hans": "国际金融中心一期",
+    "name:zh-Hant": "國際金融中心一期",
+    "railway": "subway_entrance",
+    "ramp": "no",
+    "ref": "E",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556667486,
+  "lat": 22.2793029,
+  "lon": 114.1650694,
+  "tags": {
+    "name": "海富中心 Admiralty Centre",
+    "name:en": "Admiralty Centre",
+    "name:zh": "海富中心",
+    "name:zh-Hans": "海富中心",
+    "name:zh-Hant": "海富中心",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2556667487,
+  "lat": 22.2793539,
+  "lon": 114.1641070,
+  "tags": {
+    "name": "德立街 Drake Street",
+    "name:en": "Drake Street",
+    "name:zh": "德立街",
+    "name:zh-Hans": "德立街",
+    "name:zh-Hant": "德立街",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556667489,
+  "lat": 22.2790194,
+  "lon": 114.1647669,
+  "tags": {
+    "name": "金鐘廊 Queensway Plaza",
+    "name:en": "Queensway Plaza",
+    "name:zh": "金鐘廊",
+    "name:zh-Hans": "金钟廊",
+    "name:zh-Hant": "金鐘廊",
+    "railway": "subway_entrance",
+    "ref": "C2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556667490,
+  "lat": 22.2787238,
+  "lon": 114.1655709,
+  "tags": {
+    "abutters": "railway",
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "name": "統一中心 United Centre",
+    "name:en": "United Centre",
+    "name:zh": "統一中心",
+    "name:zh-Hans": "统一中心",
+    "name:zh-Hant": "統一中心",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "subway": "yes",
+    "train": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2556672766,
+  "lat": 22.2788263,
+  "lon": 114.1658437,
+  "tags": {
+    "layer": "-2",
+    "level": "-2",
+    "name": "太古廣場 Pacific Place",
+    "name:en": "Pacific Place",
+    "name:zh": "太古廣場",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556736106,
+  "lat": 22.2772605,
+  "lon": 114.1726851,
+  "tags": {
+    "name": "修頓球場 Southorn Playground",
+    "name:en": "Southorn Playground",
+    "name:zh": "修頓球場",
+    "name:zh-Hans": "修顿球场",
+    "name:zh-Hant": "修頓球場",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556736117,
+  "lat": 22.2772036,
+  "lon": 114.1733047,
+  "tags": {
+    "level": "1",
+    "name": "香港會議展覽中心 Hong Kong Convention and Exhibition Center",
+    "name:en": "Hong Kong Convention and Exhibition Center",
+    "name:zh": "香港會議展覽中心",
+    "name:zh-Hans": "香港会议展览中心",
+    "name:zh-Hant": "香港會議展覽中心",
+    "railway": "subway_entrance",
+    "ref": "A5",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556760113,
+  "lat": 22.2780881,
+  "lon": 114.1732159,
+  "tags": {
+    "name": "駱克道 Lockhart Road",
+    "name:en": "Lockhart Road",
+    "name:zh": "駱克道",
+    "name:zh-Hans": "骆克道",
+    "name:zh-Hant": "駱克道",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556760114,
+  "lat": 22.2777689,
+  "lon": 114.1732529,
+  "tags": {
+    "name": "軒尼詩道 Hennessy Road",
+    "name:en": "Hennessy Road",
+    "name:zh": "軒尼詩道",
+    "name:zh-Hans": "轩尼诗道",
+    "name:zh-Hant": "軒尼詩道",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556799120,
+  "lat": 22.2783753,
+  "lon": 114.1824142,
+  "tags": {
+    "level": "-1",
+    "name": "時代廣場 Times Square",
+    "name:en": "Times Square",
+    "name:zh": "時代廣場",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556799121,
+  "lat": 22.2802036,
+  "lon": 114.1829982,
+  "tags": {
+    "name": "銅鑼灣廣場 Causeway Bay Plaza",
+    "name:en": "Causeway Bay Plaza",
+    "name:zh": "銅鑼灣廣場",
+    "name:zh-Hans": "铜锣湾广场",
+    "name:zh-Hant": "銅鑼灣廣場",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556799124,
+  "lat": 22.2806410,
+  "lon": 114.1844978,
+  "tags": {
+    "building": "elevator",
+    "building:levels": "1",
+    "elevator": "only",
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2556799125,
+  "lat": 22.2804356,
+  "lon": 114.1843136,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "level": "-1",
+    "name": "崇光百貨 SOGO",
+    "name:en": "SOGO",
+    "name:zh": "崇光百貨",
+    "name:zh-Hans": "崇光百货",
+    "name:zh-Hant": "崇光百貨",
+    "railway": "subway_entrance",
+    "ref": "D3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556799126,
+  "lat": 22.2804322,
+  "lon": 114.1841881,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "level": "-1",
+    "name": "崇光百貨 SOGO",
+    "name:en": "SOGO",
+    "name:zh": "崇光百貨",
+    "name:zh-Hans": "崇光百货",
+    "name:zh-Hant": "崇光百貨",
+    "railway": "subway_entrance",
+    "ref": "D4",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556829055,
+  "lat": 22.2829199,
+  "lon": 114.1921408,
+  "tags": {
+    "name": "維多利亞公園 Victoria Park",
+    "name:en": "Victoria Park",
+    "name:zh": "維多利亞公園",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2556829060,
+  "lat": 22.2829322,
+  "lon": 114.1918868,
+  "tags": {
+    "name": "維多利亞公園 Victoria Park",
+    "name:en": "Victoria Park",
+    "name:zh": "維多利亞公園",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2578042194,
+  "lat": 22.3152336,
+  "lon": 114.0454351,
+  "tags": {
+    "name": "香港迪士尼樂園 Hong Kong Disneyland",
+    "name:en": "Hong Kong Disneyland",
+    "name:zh": "香港迪士尼樂園",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2578067189,
+  "lat": 22.3151536,
+  "lon": 113.9364445,
+  "tags": {
+    "layer": "2",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 2578067190,
+  "lat": 22.3157819,
+  "lon": 113.9362190,
+  "tags": {
+    "layer": "2",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 2578067192,
+  "lat": 22.3153736,
+  "lon": 113.9369163,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "F"
+  }
+},
+{
+  "type": "node",
+  "id": 2578067196,
+  "lat": 22.3164244,
+  "lon": 113.9359829,
+  "tags": {
+    "layer": "2",
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 2589679005,
+  "lat": 22.3124269,
+  "lon": 114.2256210,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 2604586672,
+  "lat": 22.2981844,
+  "lon": 114.1724603,
+  "tags": {
+    "name": "堪富利士道 Humphreys Avenue",
+    "name:en": "Humphreys Avenue",
+    "name:zh": "堪富利士道",
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 2604586673,
+  "lat": 22.2987444,
+  "lon": 114.1722759,
+  "tags": {
+    "name": "金馬倫道 Cameron Road",
+    "name:en": "Cameron Road",
+    "name:zh": "金馬倫道",
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 2604586675,
+  "lat": 22.2976378,
+  "lon": 114.1723403,
+  "tags": {
+    "name": "加拿分道 Carnarvon Road",
+    "name:en": "Carnarvon Road",
+    "name:zh": "加拿分道",
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 2604586676,
+  "lat": 22.2976626,
+  "lon": 114.1727238,
+  "tags": {
+    "name": "加拿分道 Carnarvon Road",
+    "name:en": "Carnarvon Road",
+    "name:zh": "加拿分道",
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 2604586677,
+  "lat": 22.2970419,
+  "lon": 114.1725914,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "G"
+  }
+},
+{
+  "type": "node",
+  "id": 2604586687,
+  "lat": 22.2972881,
+  "lon": 114.1745217,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "N1"
+  }
+},
+{
+  "type": "node",
+  "id": 2604586688,
+  "lat": 22.2976794,
+  "lon": 114.1740651,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "N2"
+  }
+},
+{
+  "type": "node",
+  "id": 2604586689,
+  "lat": 22.2970617,
+  "lon": 114.1727035,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "N5"
+  }
+},
+{
+  "type": "node",
+  "id": 2609916590,
+  "lat": 22.5009494,
+  "lon": 114.1285089,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2609916951,
+  "lat": 22.5015570,
+  "lon": 114.1278100,
+  "tags": {
+    "name": "A4",
+    "railway": "subway_entrance",
+    "ref": "A4",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2609916984,
+  "lat": 22.5015540,
+  "lon": 114.1273755,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2616047477,
+  "lat": 22.3825516,
+  "lon": 114.1877565,
+  "tags": {
+    "name": "連城廣場 Citylink Plaza",
+    "name:en": "Citylink Plaza",
+    "name:zh": "連城廣場",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2616047479,
+  "lat": 22.3828804,
+  "lon": 114.1877322,
+  "tags": {
+    "name": "新城市中央廣場 Grand Central Plaza",
+    "name:en": "Grand Central Plaza",
+    "name:zh": "新城市中央廣場",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2616047484,
+  "lat": 22.3821550,
+  "lon": 114.1873398,
+  "tags": {
+    "name": "荔枝園 Lai Chi Yuen",
+    "name:en": "Lai Chi Yuen",
+    "name:zh": "荔枝園",
+    "railway": "subway_entrance",
+    "ref": "A4",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2674335450,
+  "lat": 22.3236164,
+  "lon": 114.2139662,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 2689359969,
+  "lat": 22.3378367,
+  "lon": 114.1877487,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 2702258420,
+  "lat": 22.3401353,
+  "lon": 114.2022361,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 2719226726,
+  "lat": 22.2823045,
+  "lon": 114.1917545,
+  "tags": {
+    "name": "香港中央圖書館 Hong Kong Central Library",
+    "name:en": "Hong Kong Central Library",
+    "name:zh": "香港中央圖書館",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 2754770536,
+  "lat": 22.3058984,
+  "lon": 114.1657878,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "B5"
+  }
+},
+{
+  "type": "node",
+  "id": 2977109015,
+  "lat": 22.2805041,
+  "lon": 114.1827740,
+  "tags": {
+    "name": "信和廣場 Sino Plaza",
+    "name:en": "Sino Plaza",
+    "name:zh": "信和廣場",
+    "name:zh-Hans": "信和广场",
+    "name:zh-Hant": "信和廣場",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3013850322,
+  "lat": 22.3117454,
+  "lon": 114.2275397,
+  "tags": {
+    "name": "鯉魚門道 Lei Yue Mun Road",
+    "name:en": "Lei Yue Mun Road",
+    "name:zh": "鯉魚門道",
+    "railway": "subway_entrance",
+    "ref": "D1",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3031760634,
+  "lat": 22.3154841,
+  "lon": 114.2194170,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 3035882934,
+  "lat": 22.3735958,
+  "lon": 114.1788311,
+  "tags": {
+    "addr:street": "村南道 Tsuen Nam Road",
+    "addr:street:en": "Tsuen Nam Road",
+    "addr:street:zh": "村南道",
+    "entrance": "yes",
+    "name": "村南道 Tsuen Nam Road",
+    "name:en": "Tsuen Nam Road",
+    "name:zh": "村南道",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3047962913,
+  "lat": 22.3706474,
+  "lon": 114.1243745,
+  "tags": {
+    "name": "青山公路 Castle Peak Road",
+    "name:en": "Castle Peak Road",
+    "name:zh": "青山公路",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 3047962917,
+  "lat": 22.3709928,
+  "lon": 114.1259577,
+  "tags": {
+    "name": "國瑞路 Kwok Shui Road",
+    "name:en": "Kwok Shui Road",
+    "name:zh": "國瑞路",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 3063935135,
+  "lat": 22.4479502,
+  "lon": 114.0247565,
+  "tags": {
+    "name": "宏樂街 Wang Lok Street",
+    "name:en": "Wang Lok Street",
+    "name:zh": "宏樂街",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3070117379,
+  "lat": 22.3223954,
+  "lon": 114.2577521,
+  "tags": {
+    "name": "貿業路 Mau Yip Road",
+    "name:en": "Mau Yip Road",
+    "name:zh": "貿業路",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3070117382,
+  "lat": 22.3220975,
+  "lon": 114.2584006,
+  "tags": {
+    "name": "新都城商場二期 Metro City Plaza II",
+    "name:en": "Metro City Plaza II",
+    "name:zh": "新都城商場二期",
+    "name:zh-Hans": "新都城商场二期",
+    "name:zh-Hant": "新都城商場二期",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3070117383,
+  "lat": 22.3230941,
+  "lon": 114.2576607,
+  "tags": {
+    "name": "新都城商場二期 Metro City Plaza II",
+    "name:en": "Metro City Plaza II",
+    "name:zh": "新都城商場二期",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3071501082,
+  "lat": 22.3940595,
+  "lon": 113.9730261,
+  "tags": {
+    "name": "輕鐵屯門站 Light Rail Tuen Mun Stop",
+    "name:en": "Light Rail Tuen Mun Stop",
+    "name:zh": "輕鐵屯門站",
+    "name:zh-Hans": "轻铁屯门站",
+    "name:zh-Hant": "輕鐵屯門站",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3071501083,
+  "lat": 22.3943477,
+  "lon": 113.9727265,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "杯渡路 Pui To Road",
+    "name:en": "Pui To Road",
+    "name:zh": "杯渡路",
+    "name:zh-Hans": "杯渡路",
+    "name:zh-Hant": "杯渡路",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3145326115,
+  "lat": 22.2811238,
+  "lon": 114.1613841,
+  "tags": {
+    "layer": "-1",
+    "location": "underground",
+    "name": "中國建設銀行大廈 CCB Tower",
+    "name:en": "CCB Tower",
+    "name:zh": "中國建設銀行大廈",
+    "name:zh-Hans": "中国建设银行大厦",
+    "name:zh-Hant": "中國建設銀行大廈",
+    "railway": "subway_entrance",
+    "ref": "L"
+  }
+},
+{
+  "type": "node",
+  "id": 3230266823,
+  "lat": 22.3171217,
+  "lon": 114.1613451,
+  "tags": {
+    "name": "櫻桃街 Cherry Street",
+    "name:en": "Cherry Street",
+    "name:zh": "櫻桃街",
+    "railway": "subway_entrance",
+    "ref": "D1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3230266824,
+  "lat": 22.3180412,
+  "lon": 114.1610245,
+  "tags": {
+    "name": "櫻桃街 Cherry Street",
+    "name:en": "Cherry Street",
+    "name:zh": "櫻桃街",
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 3230266841,
+  "lat": 22.3181890,
+  "lon": 114.1610319,
+  "tags": {
+    "entrance": "yes",
+    "name": "滙豐中心一座 HSBC Center Tower 1",
+    "name:en": "HSBC Center Tower 1",
+    "name:zh": "滙豐中心一座",
+    "note": "office entrance",
+    "railway": "subway_entrance",
+    "ref": "C4"
+  }
+},
+{
+  "type": "node",
+  "id": 3230266842,
+  "lat": 22.3183909,
+  "lon": 114.1606939,
+  "tags": {
+    "name": "滙豐中心二及三座 HSBC Center Towers 2 & 3",
+    "name:en": "HSBC Center Towers 2 & 3",
+    "name:zh": "滙豐中心二及三座",
+    "railway": "subway_entrance",
+    "ref": "C3"
+  }
+},
+{
+  "type": "node",
+  "id": 3230266847,
+  "lat": 22.3166901,
+  "lon": 114.1611467,
+  "tags": {
+    "name": "連翔道 Lin Cheung Road",
+    "name:en": "Lin Cheung Road",
+    "name:zh": "連翔道",
+    "railway": "subway_entrance",
+    "ref": "D2",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 3230273785,
+  "lat": 22.3169601,
+  "lon": 114.1610689,
+  "tags": {
+    "name": "奧海城2、3期 Olympic City 2 & 3",
+    "name:en": "Olympic City 2 & 3",
+    "name:zh": "奧海城2、3期",
+    "railway": "subway_entrance",
+    "ref": "D3",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3230273804,
+  "lat": 22.3183775,
+  "lon": 114.1606786,
+  "tags": {
+    "name": "深旺道 Sham Mong Road",
+    "name:en": "Sham Mong Road",
+    "name:zh": "深旺道",
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 3230273821,
+  "lat": 22.3031620,
+  "lon": 114.1676324,
+  "tags": {
+    "level": "-1",
+    "railway": "subway_entrance",
+    "ref": "F"
+  }
+},
+{
+  "type": "node",
+  "id": 3389134667,
+  "lat": 22.3370879,
+  "lon": 114.1762546,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "F",
+    "toilets:wheelchair": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3413857798,
+  "lat": 22.2918584,
+  "lon": 114.2003087,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 3606334545,
+  "lat": 22.3366682,
+  "lon": 114.1402795,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "百老匯街 Broadway",
+    "name:en": "Broadway",
+    "name:zh": "百老匯街",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3606334546,
+  "lat": 22.3376997,
+  "lon": 114.1398055,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 3606334547,
+  "lat": 22.3383891,
+  "lon": 114.1382857,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 3606334548,
+  "lat": 22.3382305,
+  "lon": 114.1385889,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 3606334550,
+  "lat": 22.3382151,
+  "lon": 114.1387391,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 3606334552,
+  "lat": 22.3380487,
+  "lon": 114.1377471,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3606657744,
+  "lat": 22.3308089,
+  "lon": 114.1631189,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 3606657756,
+  "lat": 22.3311522,
+  "lon": 114.1620258,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 3606657761,
+  "lat": 22.3309587,
+  "lon": 114.1617696,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 3606657766,
+  "lat": 22.3306497,
+  "lon": 114.1615549,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 3606657772,
+  "lat": 22.3302897,
+  "lon": 114.1626521,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 3606657776,
+  "lat": 22.3299777,
+  "lon": 114.1624362,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 3606666223,
+  "lat": 22.3304800,
+  "lon": 114.1628839,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 3606666224,
+  "lat": 22.3314755,
+  "lon": 114.1622502,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 3607107694,
+  "lat": 22.3240356,
+  "lon": 114.1679901,
+  "tags": {
+    "conveying": "no",
+    "elevator": "no",
+    "highway": "steps",
+    "railway": "subway_entrance",
+    "ramp": "no",
+    "ref": "C2",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3607107706,
+  "lat": 22.3250731,
+  "lon": 114.1676565,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3607107707,
+  "lat": 22.3251375,
+  "lon": 114.1680012,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3607107708,
+  "lat": 22.3250576,
+  "lon": 114.1683454,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3607107709,
+  "lat": 22.3240834,
+  "lon": 114.1682361,
+  "tags": {
+    "conveying": "no",
+    "elevator": "no",
+    "highway": "steps",
+    "railway": "subway_entrance",
+    "ramp": "no",
+    "ref": "C1",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3607107711,
+  "lat": 22.3241543,
+  "lon": 114.1685840,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3607107712,
+  "lat": 22.3238531,
+  "lon": 114.1690286,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3646949234,
+  "lat": 22.3684913,
+  "lon": 114.1088460,
+  "tags": {
+    "conveying": "yes",
+    "elevator": "no",
+    "highway": "steps",
+    "name": "麗城花園 Belvedere Garden",
+    "name:en": "Belvedere Garden",
+    "name:zh": "麗城花園",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3689794629,
+  "lat": 22.4294052,
+  "lon": 114.2437331,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "西沙路 Sai Sha Road",
+    "name:en": "Sai Sha Road",
+    "name:zh": "西沙路",
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 3906009472,
+  "lat": 22.3369966,
+  "lon": 114.1468073,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3906009488,
+  "lat": 22.3373307,
+  "lon": 114.1488828,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 3906009490,
+  "lat": 22.3355470,
+  "lon": 114.1489732,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D3"
+  }
+},
+{
+  "type": "node",
+  "id": 3906009491,
+  "lat": 22.3355095,
+  "lon": 114.1493312,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D4"
+  }
+},
+{
+  "type": "node",
+  "id": 3906009492,
+  "lat": 22.3363458,
+  "lon": 114.1481806,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 3906009493,
+  "lat": 22.3361861,
+  "lon": 114.1482316,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716007,
+  "lat": 22.3057169,
+  "lon": 114.1722798,
+  "tags": {
+    "addr:street": "佐敦道 Jordan Road",
+    "addr:street:en": "Jordan Road",
+    "addr:street:zh": "佐敦道",
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "伊利沙伯醫院 Queen Elizabeth Hospital",
+    "name:en": "Queen Elizabeth Hospital",
+    "name:zh": "伊利沙伯醫院",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716008,
+  "lat": 22.3043298,
+  "lon": 114.1719032,
+  "tags": {
+    "addr:housename": "恆豐中心 Prudential Centre",
+    "addr:housename:en": "Prudential Centre",
+    "addr:housename:zh": "恆豐中心",
+    "entrance": "yes",
+    "exit": "yes",
+    "layer": "-1",
+    "level:forward": "-4",
+    "level:ref:backward": "C",
+    "level:ref:forward": "2B",
+    "location": "underground",
+    "name": "恆豐中心 Prudential Centre",
+    "name:en": "Prudential Centre",
+    "name:zh": "恆豐中心",
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716010,
+  "lat": 22.3042792,
+  "lon": 114.1712090,
+  "tags": {
+    "addr:street": "庇利金街 Pilkem Street",
+    "addr:street:en": "Pilkem Street",
+    "addr:street:zh": "庇利金街",
+    "name": "寶靈街 Bowring Street",
+    "name:en": "Bowring Street",
+    "name:zh": "寶靈街",
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716011,
+  "lat": 22.3038862,
+  "lon": 114.1719493,
+  "tags": {
+    "addr:street": "彌敦道 Nathan Road",
+    "addr:street:en": "Nathan Road",
+    "addr:street:zh": "彌敦道",
+    "name": "四海大廈 Fourseas Building",
+    "name:en": "Fourseas Building",
+    "name:zh": "四海大廈",
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716012,
+  "lat": 22.3370233,
+  "lon": 114.1756454,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "H"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716013,
+  "lat": 22.3369609,
+  "lon": 114.1755307,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716014,
+  "lat": 22.3366796,
+  "lon": 114.1754928,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716015,
+  "lat": 22.3371286,
+  "lon": 114.1759267,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "G2"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716016,
+  "lat": 22.3370297,
+  "lon": 114.1759802,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "G1"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716017,
+  "lat": 22.3369681,
+  "lon": 114.1765532,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716018,
+  "lat": 22.3364815,
+  "lon": 114.1765237,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716019,
+  "lat": 22.3366639,
+  "lon": 114.1775564,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716020,
+  "lat": 22.3368954,
+  "lon": 114.1777640,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 3924716021,
+  "lat": 22.3368890,
+  "lon": 114.1779842,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731857,
+  "lat": 22.3415413,
+  "lon": 114.1929708,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731858,
+  "lat": 22.3413665,
+  "lon": 114.1931971,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731859,
+  "lat": 22.3418030,
+  "lon": 114.1934536,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731860,
+  "lat": 22.3417909,
+  "lon": 114.1928623,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731862,
+  "lat": 22.3418991,
+  "lon": 114.1944788,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731863,
+  "lat": 22.3418974,
+  "lon": 114.1946376,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731864,
+  "lat": 22.3412997,
+  "lon": 114.1946575,
+  "tags": {
+    "entrance": "yes",
+    "indoor": "door",
+    "level": "-1",
+    "railway": "subway_entrance",
+    "ref": "D3"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731865,
+  "lat": 22.3412307,
+  "lon": 114.1946803,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 3924731866,
+  "lat": 22.3415663,
+  "lon": 114.1950579,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 3933280549,
+  "lat": 22.3115999,
+  "lon": 114.2270784,
+  "tags": {
+    "name": "鯉魚門道 Lei Yue Mun Road",
+    "name:en": "Lei Yue Mun Road",
+    "name:zh": "鯉魚門道",
+    "railway": "subway_entrance",
+    "ref": "D3",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3933280556,
+  "lat": 22.3114307,
+  "lon": 114.2273230,
+  "tags": {
+    "name": "鯉魚門道 Lei Yue Mun Road",
+    "name:en": "Lei Yue Mun Road",
+    "name:zh": "鯉魚門道",
+    "railway": "subway_entrance",
+    "ref": "D4",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4099072622,
+  "lat": 22.2834236,
+  "lon": 114.1366559,
+  "tags": {
+    "name": "薄扶林道 Pok Fu Lam Road",
+    "name:en": "Pok Fu Lam Road",
+    "name:zh": "薄扶林道",
+    "operator": "香港鐵路有限公司 MTR Corporation",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "start_date": "2014-12-28",
+    "toilets:wheelchair": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4102394732,
+  "lat": 22.3217312,
+  "lon": 114.1725686,
+  "tags": {
+    "name": "政府合署停車場 Government Offices Car Park",
+    "name:en": "Government Offices Car Park",
+    "name:zh": "政府合署停車場",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 4102394733,
+  "lat": 22.3225649,
+  "lon": 114.1724953,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 4102394734,
+  "lat": 22.3232827,
+  "lon": 114.1726344,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 4102394735,
+  "lat": 22.3217556,
+  "lon": 114.1724851,
+  "tags": {
+    "name": "旺角政府合署 Mong Kok Government Offices",
+    "name:en": "Mong Kok Government Offices",
+    "name:zh": "旺角政府合署",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 4128161006,
+  "lat": 22.2876065,
+  "lon": 114.1415061,
+  "tags": {
+    "building": "train_station",
+    "conveying": "yes",
+    "elevator": "yes",
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "奇靈里 Ki Ling Lane",
+    "name:en": "Ki Ling Lane",
+    "name:zh": "奇靈里",
+    "railway": "subway_entrance",
+    "ref": "B3",
+    "start_date": "2015-03-29",
+    "steps": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4159230886,
+  "lat": 22.2962034,
+  "lon": 114.1721625,
+  "tags": {
+    "name": "半島酒店 The Peninsula",
+    "name:en": "The Peninsula",
+    "name:zh": "半島酒店",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4276009216,
+  "lat": 22.3054144,
+  "lon": 114.1713153,
+  "tags": {
+    "addr:street": "佐敦道 Jordan Road",
+    "addr:street:en": "Jordan Road",
+    "addr:street:zh": "佐敦道",
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "裕華國貨 Yue Wha Emporium",
+    "name:en": "Yue Wha Emporium",
+    "name:zh": "裕華國貨",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 4276009223,
+  "lat": 22.3055666,
+  "lon": 114.1719658,
+  "tags": {
+    "addr:street": "佐敦道 Jordan Road",
+    "addr:street:en": "Jordan Road",
+    "addr:street:zh": "佐敦道",
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "香港逸東酒店 Eaton, Hong Kong",
+    "name:en": "Eaton, Hong Kong",
+    "name:zh": "香港逸東酒店",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4276009224,
+  "lat": 22.3055446,
+  "lon": 114.1719440,
+  "tags": {
+    "access:conditional": "designated @ (wheelchair)",
+    "addr:street": "佐敦道 Jordan Road",
+    "addr:street:en": "Jordan Road",
+    "addr:street:zh": "佐敦道",
+    "elevator": "only",
+    "entrance": "yes",
+    "exit": "yes",
+    "highway": "elevator",
+    "name": "香港逸東酒店 Eaton, Hong Kong",
+    "name:en": "Eaton, Hong Kong",
+    "name:zh": "香港逸東酒店",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "designated"
+  }
+},
+{
+  "type": "node",
+  "id": 4276009233,
+  "lat": 22.3042917,
+  "lon": 114.1714978,
+  "tags": {
+    "addr:street": "寶靈街 Bowring Street",
+    "addr:street:en": "Bowring Street",
+    "addr:street:zh": "寶靈街",
+    "name": "莊士倫敦廣場 Chuang's London Plaza",
+    "name:en": "Chuang's London Plaza",
+    "name:zh": "莊士倫敦廣場",
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 4402756982,
+  "lat": 22.2946721,
+  "lon": 114.1739278,
+  "tags": {
+    "barrier": "kerb",
+    "railway": "subway_entrance",
+    "ref": "J2",
+    "tactile_paving": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4423210028,
+  "lat": 22.3102693,
+  "lon": 114.1834589,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4423210030,
+  "lat": 22.3089754,
+  "lon": 114.1822884,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4423210031,
+  "lat": 22.3092898,
+  "lon": 114.1828588,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4459362791,
+  "lat": 22.3058121,
+  "lon": 114.1887229,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4459399532,
+  "lat": 22.3052274,
+  "lon": 114.1883747,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 4459551604,
+  "lat": 22.3045400,
+  "lon": 114.1898786,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 4459551605,
+  "lat": 22.3044486,
+  "lon": 114.1897472,
+  "tags": {
+    "level": "-1",
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 4459551606,
+  "lat": 22.3040584,
+  "lon": 114.1908456,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 4459551607,
+  "lat": 22.3041181,
+  "lon": 114.1906479,
+  "tags": {
+    "level": "-1",
+    "opening_hours": "08:30-22:30",
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 4462785948,
+  "lat": 22.3103752,
+  "lon": 114.1821070,
+  "tags": {
+    "door": "no",
+    "elevator": "only",
+    "entrance": "yes",
+    "layer": "1",
+    "location": "overhead",
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "steps": "partial"
+  }
+},
+{
+  "type": "node",
+  "id": 4506726719,
+  "lat": 22.2480707,
+  "lon": 114.1745306,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 4506726720,
+  "lat": 22.2483354,
+  "lon": 114.1738402,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 4506726721,
+  "lat": 22.2489110,
+  "lon": 114.1749711,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 4506834409,
+  "lat": 22.2477339,
+  "lon": 114.1669095,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 4506834410,
+  "lat": 22.2481012,
+  "lon": 114.1676575,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 4507531598,
+  "lat": 22.2436512,
+  "lon": 114.1553329,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 4507531599,
+  "lat": 22.2435951,
+  "lon": 114.1554259,
+  "tags": {
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 4507531602,
+  "lat": 22.2409991,
+  "lon": 114.1562399,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 4507655919,
+  "lat": 22.2435269,
+  "lon": 114.1489437,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 4507655920,
+  "lat": 22.2429495,
+  "lon": 114.1481572,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 4507655921,
+  "lat": 22.2427753,
+  "lon": 114.1490496,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 4576615774,
+  "lat": 22.2482035,
+  "lon": 114.1680915,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 4793044337,
+  "lat": 22.4510239,
+  "lon": 114.1613482,
+  "tags": {
+    "layer": "3",
+    "level": "4",
+    "name": "太和邨 Tai Wo Estate",
+    "name:en": "Tai Wo Estate",
+    "name:zh": "太和邨",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4832806901,
+  "lat": 22.3681037,
+  "lon": 114.1106612,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E2"
+  }
+},
+{
+  "type": "node",
+  "id": 4832881038,
+  "lat": 22.3688176,
+  "lon": 114.1098817,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 5093611286,
+  "lat": 22.2894025,
+  "lon": 113.9418428,
+  "tags": {
+    "name": "富東街 Fu Tung Street",
+    "name:en": "Fu Tung Street",
+    "name:zh": "富東街",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5093611287,
+  "lat": 22.2895782,
+  "lon": 113.9416617,
+  "tags": {
+    "name": "東薈城名店倉 Citygate Outlets",
+    "name:en": "Citygate Outlets",
+    "name:zh": "東薈城名店倉",
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 5093611288,
+  "lat": 22.2891486,
+  "lon": 113.9409809,
+  "tags": {
+    "name": "昂坪360 Ngong Ping 360",
+    "name:en": "Ngong Ping 360",
+    "name:zh": "昂坪360",
+    "name:zh-Hans": "昂坪360",
+    "name:zh-Hant": "昂坪360",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 5093611289,
+  "lat": 22.2888783,
+  "lon": 113.9412041,
+  "tags": {
+    "name": "東堤灣畔 (1至3座) Tung Chung Crescent (Block 1 to 3)",
+    "name:en": "Tung Chung Crescent (Block 1 to 3)",
+    "name:zh": "東堤灣畔 (1至3座)",
+    "name:zh-Hans": "东堤湾畔 (1至3座)",
+    "name:zh-Hant": "東堤灣畔 (1至3座)",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 5220743103,
+  "lat": 22.3128356,
+  "lon": 114.2256305,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 5220743109,
+  "lat": 22.3127310,
+  "lon": 114.2260346,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C3",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 5226330530,
+  "lat": 22.5016658,
+  "lon": 114.1276483,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 5274674609,
+  "lat": 22.4140914,
+  "lon": 114.2100208,
+  "tags": {
+    "name": "香港中文大學 Chinese University of Hong Kong",
+    "name:en": "Chinese University of Hong Kong",
+    "name:zh": "香港中文大學",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 5276887508,
+  "lat": 22.3038193,
+  "lon": 114.1660935,
+  "tags": {
+    "door": "yes",
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "J",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5276887509,
+  "lat": 22.3043402,
+  "lon": 114.1659776,
+  "tags": {
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "-1",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5276888138,
+  "lat": 22.3054273,
+  "lon": 114.1658333,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "B4"
+  }
+},
+{
+  "type": "node",
+  "id": 5276888139,
+  "lat": 22.3038401,
+  "lon": 114.1666749,
+  "tags": {
+    "entrance": "yes",
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "D4",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5276888141,
+  "lat": 22.3039758,
+  "lon": 114.1660664,
+  "tags": {
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "1",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "N",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5447058900,
+  "lat": 22.2764167,
+  "lon": 114.1724445,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "layer": "-1",
+    "level": "-1",
+    "level:ref:backward": "B1",
+    "level:ref:forward": "C",
+    "name": "利東街 Lee Tung Avenue",
+    "name:en": "Lee Tung Avenue",
+    "name:zh": "利東街",
+    "name:zh-Hans": "利东街",
+    "name:zh-Hant": "利東街",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5602771872,
+  "lat": 22.2788731,
+  "lon": 114.1661202,
+  "tags": {
+    "highway": "elevator",
+    "level": "1;0;-1",
+    "name": "樂禮街 Rodney Street",
+    "name:en": "Rodney Street",
+    "name:zh": "樂禮街",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5640765554,
+  "lat": 22.2639621,
+  "lon": 114.2367060,
+  "tags": {
+    "name": "興華邨 Hing Wah Estate",
+    "name:en": "Hing Wah Estate",
+    "name:zh": "興華邨",
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 5640765555,
+  "lat": 22.2640822,
+  "lon": 114.2367677,
+  "tags": {
+    "name": "吉勝街 Kut Shing Street",
+    "name:en": "Kut Shing Street",
+    "name:zh": "吉勝街",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 5640765556,
+  "lat": 22.2649302,
+  "lon": 114.2372032,
+  "tags": {
+    "name": "利眾街 Lee Chung Street",
+    "name:en": "Lee Chung Street",
+    "name:zh": "利眾街",
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 5640765557,
+  "lat": 22.2653959,
+  "lon": 114.2374361,
+  "tags": {
+    "name": "怡翠苑 Yee Tsui Court",
+    "name:en": "Yee Tsui Court",
+    "name:zh": "怡翠苑",
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 5757793926,
+  "lat": 22.2961756,
+  "lon": 114.2696631,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5757793927,
+  "lat": 22.2962364,
+  "lon": 114.2697420,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 5870086827,
+  "lat": 22.3049443,
+  "lon": 114.1656867,
+  "tags": {
+    "door": "yes",
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5889966299,
+  "lat": 22.3034371,
+  "lon": 114.1642242,
+  "tags": {
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "1",
+    "level:ref": "L1",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "M",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5890242541,
+  "lat": 22.3053812,
+  "lon": 114.1654837,
+  "tags": {
+    "entrance": "yes",
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "K2",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5890242542,
+  "lat": 22.3053544,
+  "lon": 114.1655382,
+  "tags": {
+    "entrance": "yes",
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "K1",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5890242543,
+  "lat": 22.3032870,
+  "lon": 114.1659558,
+  "tags": {
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "H",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5890242544,
+  "lat": 22.3036400,
+  "lon": 114.1647361,
+  "tags": {
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5890242545,
+  "lat": 22.3033697,
+  "lon": 114.1642821,
+  "tags": {
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5890284960,
+  "lat": 22.3037636,
+  "lon": 114.1666820,
+  "tags": {
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 5890284961,
+  "lat": 22.3052203,
+  "lon": 114.1663429,
+  "tags": {
+    "access": "private",
+    "entrance": "yes",
+    "exit": "yes",
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "B3"
+  }
+},
+{
+  "type": "node",
+  "id": 5890284962,
+  "lat": 22.3050281,
+  "lon": 114.1660464,
+  "tags": {
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 5890284963,
+  "lat": 22.3054742,
+  "lon": 114.1658083,
+  "tags": {
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 5917702058,
+  "lat": 22.3044712,
+  "lon": 114.1663362,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5917702060,
+  "lat": 22.3039238,
+  "lon": 114.1635567,
+  "tags": {
+    "entrance": "yes",
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5921970333,
+  "lat": 22.2843756,
+  "lon": 114.2168139,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 5921970334,
+  "lat": 22.2845400,
+  "lon": 114.2150388,
+  "tags": {
+    "elevator": "no",
+    "entrance": "yes",
+    "escalator": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "steps": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 5921970335,
+  "lat": 22.2853719,
+  "lon": 114.2168708,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "E3"
+  }
+},
+{
+  "type": "node",
+  "id": 5921970336,
+  "lat": 22.2858712,
+  "lon": 114.2166234,
+  "tags": {
+    "abutters": "railway",
+    "elevator": "yes",
+    "entrance": "yes",
+    "entrance:use": "station",
+    "escalator": "limited",
+    "exit": "yes",
+    "level": "0",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "D1",
+    "services": "station",
+    "steps": "yes",
+    "wheelchair": "designated"
+  }
+},
+{
+  "type": "node",
+  "id": 5921970337,
+  "lat": 22.2848078,
+  "lon": 114.2155041,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 5921970338,
+  "lat": 22.2853321,
+  "lon": 114.2169263,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "E2"
+  }
+},
+{
+  "type": "node",
+  "id": 5921970339,
+  "lat": 22.2855492,
+  "lon": 114.2171999,
+  "tags": {
+    "abutters": "retail;railway",
+    "entrance": "main",
+    "exit": "main",
+    "level": "2",
+    "level:ref": "2",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "E1",
+    "services": "building;station",
+    "subway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5921970340,
+  "lat": 22.2858278,
+  "lon": 114.2171117,
+  "tags": {
+    "entrance": "yes",
+    "escalator": "separate",
+    "exit": "yes",
+    "indoor": "yes",
+    "level": "-1",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "D2",
+    "subway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5922657228,
+  "lat": 22.3049890,
+  "lon": 114.1653299,
+  "tags": {
+    "entrance": "yes",
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "K4",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6132030464,
+  "lat": 22.3285982,
+  "lon": 114.1898643,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B3"
+  }
+},
+{
+  "type": "node",
+  "id": 6132030465,
+  "lat": 22.3280178,
+  "lon": 114.1898417,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 6132030466,
+  "lat": 22.3279082,
+  "lon": 114.1898374,
+  "tags": {
+    "elevator": "yes",
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6132030479,
+  "lat": 22.3179311,
+  "lon": 114.1870821,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 6132030484,
+  "lat": 22.3162812,
+  "lon": 114.1871164,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 6155837516,
+  "lat": 22.3706400,
+  "lon": 114.1247336,
+  "tags": {
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6283089243,
+  "lat": 22.3036501,
+  "lon": 114.1670778,
+  "tags": {
+    "access": "private",
+    "entrance": "yes",
+    "exit": "yes",
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "D3"
+  }
+},
+{
+  "type": "node",
+  "id": 6309071633,
+  "lat": 22.2967793,
+  "lon": 114.1720724,
+  "tags": {
+    "access": "yes",
+    "barrier": "gate",
+    "door": "no",
+    "entrance": "yes",
+    "gate:material": "metal",
+    "gate:type": "sliding",
+    "layer": "-1",
+    "location": "underground",
+    "name": "iSquare",
+    "railway": "subway_entrance",
+    "ref": "H"
+  }
+},
+{
+  "type": "node",
+  "id": 6309071634,
+  "lat": 22.2973076,
+  "lon": 114.1720366,
+  "tags": {
+    "addr:housename": "國際廣場 iSQUARE",
+    "addr:housename:en": "iSQUARE",
+    "addr:housename:zh": "國際廣場",
+    "addr:housenumber": "63",
+    "addr:street": "彌敦道 Nathan Road",
+    "addr:street:en": "Nathan Road",
+    "addr:street:wikidata": "Q2188138",
+    "addr:street:zh": "彌敦道",
+    "entrance": "yes",
+    "indoor": "yes",
+    "level": "-2",
+    "level:ref": "MTR",
+    "loc_name": "iSQUARE",
+    "loc_name:en": "iSQUARE",
+    "name": "iSQUARE",
+    "name:en": "iSQUARE",
+    "name:ko": "아이스퀘어",
+    "name:zh": "國際廣場",
+    "official_name": "國際廣場 iSQUARE",
+    "railway": "subway_entrance",
+    "ref": "R"
+  }
+},
+{
+  "type": "node",
+  "id": 6309071635,
+  "lat": 22.2977299,
+  "lon": 114.1730943,
+  "tags": {
+    "name": "K11 Art Mall",
+    "railway": "subway_entrance",
+    "ref": "D3"
+  }
+},
+{
+  "type": "node",
+  "id": 6534842280,
+  "lat": 22.3115418,
+  "lon": 114.2261649,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "steps": "only",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 6579966180,
+  "lat": 22.3314618,
+  "lon": 114.1686991,
+  "tags": {
+    "access:conditional": "designated @ (wheelchair)",
+    "addr:street": "窩仔街 Woh Chai Street",
+    "addr:street:en": "Woh Chai Street",
+    "addr:street:zh": "窩仔街",
+    "elevator": "only",
+    "entrance": "yes",
+    "name": "南昌街 Nam Cheong Street",
+    "name:en": "Nam Cheong Street",
+    "name:zh": "南昌街",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "designated"
+  }
+},
+{
+  "type": "node",
+  "id": 6629900550,
+  "lat": 22.3375557,
+  "lon": 114.1483446,
+  "tags": {
+    "conveying": "yes",
+    "elevator": "yes",
+    "entrance": "yes",
+    "highway": "steps",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "steps": "yes",
+    "steps:conveying": "yes",
+    "subway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6769203044,
+  "lat": 22.4133351,
+  "lon": 114.2103441,
+  "tags": {
+    "addr:street": "澤祥街 Chak Cheung Street",
+    "addr:street:en": "Chak Cheung Street",
+    "addr:street:zh": "澤祥街",
+    "entrance": "yes",
+    "name": "澤祥街 Chak Cheung Street",
+    "name:en": "Chak Cheung Street",
+    "name:zh": "澤祥街",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6825575400,
+  "lat": 22.2804322,
+  "lon": 114.1842454,
+  "tags": {
+    "name": "崇光百貨 SOGO",
+    "name:en": "SOGO",
+    "name:zh": "崇光百貨",
+    "name:zh-Hans": "崇光百货",
+    "name:zh-Hant": "崇光百貨",
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 6843965291,
+  "lat": 22.3828238,
+  "lon": 114.1878231,
+  "tags": {
+    "name": "巴士總站 Bus Terminus",
+    "name:en": "Bus Terminus",
+    "name:zh": "巴士總站",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6844920874,
+  "lat": 22.3419530,
+  "lon": 114.1931700,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B3"
+  }
+},
+{
+  "type": "node",
+  "id": 6863890287,
+  "lat": 22.3305415,
+  "lon": 114.1628176,
+  "tags": {
+    "elevator": "only",
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "designated"
+  }
+},
+{
+  "type": "node",
+  "id": 6876936124,
+  "lat": 22.2919214,
+  "lon": 114.2003317,
+  "tags": {
+    "layer": "-1",
+    "railway": "subway_entrance",
+    "ref": "A3"
+  }
+},
+{
+  "type": "node",
+  "id": 6876936125,
+  "lat": 22.2883911,
+  "lon": 114.1939883,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
+    "subway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6908992954,
+  "lat": 22.3123693,
+  "lon": 114.2265219,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6914766732,
+  "lat": 22.3070387,
+  "lon": 114.2318447,
+  "tags": {
+    "name": "匯景花園 Sceneway Garden",
+    "name:en": "Sceneway Garden",
+    "name:zh": "匯景花園",
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 6918454182,
+  "lat": 22.2816925,
+  "lon": 114.2226498,
+  "tags": {
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6948560579,
+  "lat": 22.3160129,
+  "lon": 114.2642111,
+  "tags": {
+    "name": "蔚藍灣畔 Residence Oasis",
+    "name:en": "Residence Oasis",
+    "name:zh": "蔚藍灣畔",
+    "name:zh-Hans": "蔚蓝湾畔",
+    "name:zh-Hant": "蔚藍灣畔",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6948560580,
+  "lat": 22.3159698,
+  "lon": 114.2641245,
+  "tags": {
+    "name": "安寧花園 On Ning Garden",
+    "name:en": "On Ning Garden",
+    "name:zh": "安寧花園",
+    "name:zh-Hans": "安宁花园",
+    "name:zh-Hant": "安寧花園",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 6948560581,
+  "lat": 22.3152554,
+  "lon": 114.2647167,
+  "tags": {
+    "name": "連理街商場 The Lane",
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 6948560582,
+  "lat": 22.3152115,
+  "lon": 114.2646393,
+  "tags": {
+    "name": "將軍澳運動場 Tseung Kwan O Sport Ground",
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 6992554251,
+  "lat": 22.3048101,
+  "lon": 114.1901728,
+  "tags": {
+    "access": "yes",
+    "building": "transportation",
+    "level": "-2;0",
+    "railway": "subway_entrance",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7015935406,
+  "lat": 22.3020574,
+  "lon": 114.1809481,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 7016481520,
+  "lat": 22.3562572,
+  "lon": 114.1275101,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 7016481521,
+  "lat": 22.3563831,
+  "lon": 114.1273138,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 7018858862,
+  "lat": 22.3731474,
+  "lon": 114.1182573,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 7018858863,
+  "lat": 22.3730245,
+  "lon": 114.1185393,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 7060166412,
+  "lat": 22.2802725,
+  "lon": 114.1842570,
+  "tags": {
+    "building:entrance": "no",
+    "name": "崇光百貨 SOGO",
+    "name:en": "SOGO",
+    "name:zh": "崇光百貨",
+    "name:zh-Hans": "崇光百货",
+    "name:zh-Hant": "崇光百貨",
+    "railway": "subway_entrance",
+    "ref": "D2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 7060182527,
+  "lat": 22.2799718,
+  "lon": 114.1840897,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "level": "-1",
+    "name": "渣甸坊 Jardine's Crescent",
+    "name:en": "Jardine's Crescent",
+    "name:zh": "渣甸坊",
+    "name:zh-Hans": "渣甸坊",
+    "name:zh-Hant": "渣甸坊",
+    "railway": "subway_entrance",
+    "ref": "F2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 7077478907,
+  "lat": 22.2968510,
+  "lon": 114.1721233,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "gate": "yes",
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 7077478908,
+  "lat": 22.2972239,
+  "lon": 114.1720981,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "gate": "yes",
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 7083795022,
+  "lat": 22.3103895,
+  "lon": 114.1822236,
+  "tags": {
+    "door": "no",
+    "elevator": "only",
+    "entrance": "yes",
+    "layer": "0",
+    "location": "surface",
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "steps": "partial"
+  }
+},
+{
+  "type": "node",
+  "id": 7083795026,
+  "lat": 22.3113200,
+  "lon": 114.1835322,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "layer": "0",
+    "location": "surface",
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 7098776740,
+  "lat": 22.3115030,
+  "lon": 114.2261509,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 7098776769,
+  "lat": 22.3116643,
+  "lon": 114.2272649,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7098776791,
+  "lat": 22.3125954,
+  "lon": 114.2257481,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7144509951,
+  "lat": 22.3315518,
+  "lon": 114.1998352,
+  "tags": {
+    "elevator": "no",
+    "entrance:use": "station",
+    "escalator": "yes",
+    "level": "0",
+    "location": "surface",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "steps": "yes",
+    "subway": "train",
+    "train": "subway"
+  }
+},
+{
+  "type": "node",
+  "id": 7144509953,
+  "lat": 22.3308838,
+  "lon": 114.2005830,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7151049508,
+  "lat": 22.3377924,
+  "lon": 114.1491005,
+  "tags": {
+    "elevator": "no",
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "steps": "only",
+    "steps:conveying": "no",
+    "subway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7151183303,
+  "lat": 22.5014085,
+  "lon": 114.1275156,
+  "tags": {
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 7208625806,
+  "lat": 22.3636399,
+  "lon": 114.1709419,
+  "tags": {
+    "access": "yes",
+    "door": "no",
+    "entrance": "yes",
+    "level": "0",
+    "level:ref": "C",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 7208625807,
+  "lat": 22.3297878,
+  "lon": 114.1988085,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7244230139,
+  "lat": 22.3308763,
+  "lon": 114.2003777,
+  "tags": {
+    "elevator": "only",
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7265335520,
+  "lat": 22.3120012,
+  "lon": 114.2262962,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 7328255984,
+  "lat": 22.5288896,
+  "lon": 114.1136712,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "station": "train",
+    "subway": "no",
+    "train": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 7328319691,
+  "lat": 22.5289560,
+  "lon": 114.1128051,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "station": "train",
+    "subway": "no",
+    "train": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 7328319693,
+  "lat": 22.5290978,
+  "lon": 114.1133671,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "station": "train",
+    "subway": "no",
+    "train": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 7509598989,
+  "lat": 22.5007507,
+  "lon": 114.1283086,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7509598990,
+  "lat": 22.5010115,
+  "lon": 114.1284517,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7509598995,
+  "lat": 22.5015160,
+  "lon": 114.1279353,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 7559804954,
+  "lat": 22.3058909,
+  "lon": 114.1662981,
+  "tags": {
+    "level": "-1",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 7600830759,
+  "lat": 22.2819393,
+  "lon": 114.2222144,
+  "tags": {
+    "loc_ref": "B",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 7617293457,
+  "lat": 22.2845364,
+  "lon": 114.1433534,
+  "tags": {
+    "elevator": "only",
+    "highway": "elevator",
+    "name": "般咸道 Bonham Road",
+    "name:en": "Bonham Road",
+    "name:zh": "般咸道",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "start_date": "2015-03",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8424412470,
+  "lat": 22.2846412,
+  "lon": 114.1584882,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "noref": "yes",
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 8424412473,
+  "lat": 22.2849189,
+  "lon": 114.1580087,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "noref": "yes",
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 8562160628,
+  "lat": 22.2880508,
+  "lon": 114.1936641,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 8631066789,
+  "lat": 22.3177994,
+  "lon": 114.1879291,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8631066790,
+  "lat": 22.3153221,
+  "lon": 114.1878357,
+  "tags": {
+    "elevator": "yes",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "subway": "no",
+    "train": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8711408515,
+  "lat": 22.2956385,
+  "lon": 114.1721170,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "gate": "yes",
+    "railway": "subway_entrance",
+    "ref": "L3"
+  }
+},
+{
+  "type": "node",
+  "id": 8821676012,
+  "lat": 22.3261319,
+  "lon": 114.1919482,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8821676013,
+  "lat": 22.3256657,
+  "lon": 114.1912817,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8869631404,
+  "lat": 22.3270288,
+  "lon": 114.1896061,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 8873824707,
+  "lat": 22.3153219,
+  "lon": 114.1879936,
+  "tags": {
+    "elevator": "yes",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "subway": "no",
+    "train": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8893847489,
+  "lat": 22.3041226,
+  "lon": 114.1814923,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 8893847505,
+  "lat": 22.3035573,
+  "lon": 114.1822040,
+  "tags": {
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 8895250772,
+  "lat": 22.3038258,
+  "lon": 114.1814892,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 8943344494,
+  "lat": 22.3343679,
+  "lon": 114.2092963,
+  "tags": {
+    "name": "牛池灣街市 Ngau Chi Wan Market",
+    "name:en": "Ngau Chi Wan Market",
+    "name:yue-Hant": "牛池灣街市",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 8946269271,
+  "lat": 22.3671702,
+  "lon": 114.1108994,
+  "tags": {
+    "conveying": "yes",
+    "elevator": "yes",
+    "highway": "steps",
+    "name": "荃灣碼頭 Tsuen Wan Pier",
+    "name:en": "Tsuen Wan Pier",
+    "name:zh": "荃灣碼頭",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 8974729471,
+  "lat": 22.2957139,
+  "lon": 114.1717716,
+  "tags": {
+    "level": "-2",
+    "level:ref": "B2",
+    "railway": "subway_entrance",
+    "ref": "L4"
+  }
+},
+{
+  "type": "node",
+  "id": 8974745435,
+  "lat": 22.2957514,
+  "lon": 114.1731635,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "L1"
+  }
+},
+{
+  "type": "node",
+  "id": 8974745438,
+  "lat": 22.2949088,
+  "lon": 114.1725900,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "J4"
+  }
+},
+{
+  "type": "node",
+  "id": 9000013652,
+  "lat": 22.5149813,
+  "lon": 114.0656550,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 9160033155,
+  "lat": 22.4459451,
+  "lon": 114.0337768,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9273513565,
+  "lat": 22.3356035,
+  "lon": 114.2079047,
+  "tags": {
+    "name": "牛池灣村 Ngau Chi Wan Village",
+    "name:en": "Ngau Chi Wan Village",
+    "name:yue-Hant": "牛池灣村",
+    "name:zh": "牛池灣村",
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 9350653717,
+  "lat": 22.3023550,
+  "lon": 114.1661062,
+  "tags": {
+    "elevator": "only",
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "ref": "G"
+  }
+},
+{
+  "type": "node",
+  "id": 9609113919,
+  "lat": 22.2987628,
+  "lon": 114.1725613,
+  "tags": {
+    "name": "金馬倫道 Cameron Road",
+    "name:en": "Cameron Road",
+    "name:zh": "金馬倫道",
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 9643550182,
+  "lat": 22.3340859,
+  "lon": 114.2097260,
+  "tags": {
+    "name": "坪石邨 Ping Shek Estate",
+    "name:en": "Ping Shek Estate",
+    "name:zh": "坪石邨",
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 9643550183,
+  "lat": 22.3339944,
+  "lon": 114.2093413,
+  "tags": {
+    "name": "坪石邨 Ping Shek Estate",
+    "name:en": "Ping Shek Estate",
+    "name:zh": "坪石邨",
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 9659973855,
+  "lat": 22.2814999,
+  "lon": 114.1748895,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "B1",
+    "start_date": "2022-05-15",
+    "subway": "yes",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9659973859,
+  "lat": 22.2816117,
+  "lon": 114.1748957,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "start_date": "2022-05-15",
+    "subway": "yes",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9659973861,
+  "lat": 22.2813183,
+  "lon": 114.1758679,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "start_date": "2022-05-15",
+    "subway": "yes",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9660468950,
+  "lat": 22.3737707,
+  "lon": 114.1172885,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 9660468952,
+  "lat": 22.3733088,
+  "lon": 114.1182946,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 9660912774,
+  "lat": 22.2816210,
+  "lon": 114.1761723,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "start_date": "2022-05-15",
+    "subway": "yes",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9672056463,
+  "lat": 22.3748549,
+  "lon": 114.1869810,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "name": "溱岸8號 The Riverpark",
+    "name:en": "The Riverpark",
+    "name:zh": "溱岸8號",
+    "railway": "subway_entrance",
+    "ref": "F",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9684737753,
+  "lat": 22.3044760,
+  "lon": 114.2529502,
+  "tags": {
+    "name": "香港知專設計學院 Hong Kong Design Institute",
+    "name:en": "Hong Kong Design Institute",
+    "name:yue-Hant": "香港知專設計學院",
+    "name:zh": "香港知專設計學院",
+    "name:zh-Hans": "香港知专设计学院",
+    "name:zh-Hant": "香港知專設計學院",
+    "railway": "subway_entrance",
+    "ref": "A2",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9684737754,
+  "lat": 22.3045935,
+  "lon": 114.2528322,
+  "tags": {
+    "name": "公共運輸交匯處 Public Transport Interchange",
+    "name:en": "Public Transport Interchange",
+    "name:yue": "公共運輸交匯處",
+    "name:zh": "公共運輸交匯處",
+    "name:zh-Hans": "公共运输交汇处",
+    "name:zh-Hant": "公共運輸交匯處",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9684737755,
+  "lat": 22.3042244,
+  "lon": 114.2522171,
+  "tags": {
+    "name": "都會駅／城中駅 Metro Town and LePoint",
+    "name:en": "Metro Town and LePoint",
+    "name:yue": "都會駅／城中駅",
+    "name:zh": "都會駅／城中駅",
+    "name:zh-Hans": "都会駅／城中駅",
+    "name:zh-Hant": "都會駅／城中駅",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9705067986,
+  "lat": 22.3181959,
+  "lon": 114.1591785,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 9711005592,
+  "lat": 22.2813684,
+  "lon": 114.1761385,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "start_date": "2022-05-15",
+    "subway": "yes",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9730739285,
+  "lat": 22.2812483,
+  "lon": 114.1745746,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B3",
+    "start_date": "2022-05-15",
+    "subway": "yes",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9769723651,
+  "lat": 22.2955174,
+  "lon": 114.2685190,
+  "tags": {
+    "name": "The LOHAS 康城",
+    "name:en": "The LOHAS",
+    "name:zh": "康城",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 9848516498,
+  "lat": 22.3686222,
+  "lon": 114.1098648,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 9848516506,
+  "lat": 22.3679044,
+  "lon": 114.1106635,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E1",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 10005931530,
+  "lat": 22.4459361,
+  "lon": 114.0364796,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "K",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 10018328749,
+  "lat": 22.3674745,
+  "lon": 114.1102116,
+  "tags": {
+    "conveying": "yes",
+    "elevator": "no",
+    "highway": "steps",
+    "name": "海濱走廊 Waterfront Walkway",
+    "name:en": "Waterfront Walkway",
+    "name:zh": "海濱走廊",
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 10072617359,
+  "lat": 22.3340686,
+  "lon": 114.2097387,
+  "tags": {
+    "level": "-1",
+    "railway": "subway_entrance",
+    "ref": "A3",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 10091243583,
+  "lat": 22.3013941,
+  "lon": 114.1810501,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D3"
+  }
+},
+{
+  "type": "node",
+  "id": 10110489374,
+  "lat": 22.3021592,
+  "lon": 114.1813403,
+  "tags": {
+    "level": "2",
+    "railway": "subway_entrance",
+    "ref": "D6",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 10110489377,
+  "lat": 22.3019068,
+  "lon": 114.1821256,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 10117786612,
+  "lat": 22.3007428,
+  "lon": 114.1809251,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D5"
+  }
+},
+{
+  "type": "node",
+  "id": 10117786613,
+  "lat": 22.3007910,
+  "lon": 114.1809739,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D4"
+  }
+},
+{
+  "type": "node",
+  "id": 10125880851,
+  "lat": 22.2954873,
+  "lon": 114.1736748,
+  "tags": {
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "K"
+  }
+},
+{
+  "type": "node",
+  "id": 10164505894,
+  "lat": 22.3047485,
+  "lon": 114.1620627,
+  "tags": {
+    "indoor": "yes",
+    "level": "1",
+    "level:ref": "U3",
+    "railway": "subway_entrance",
+    "ref": "C1"
+  }
+},
+{
+  "type": "node",
+  "id": 10181827452,
+  "lat": 22.3733295,
+  "lon": 114.1185108,
+  "tags": {
+    "entrance": "yes",
+    "exit": "yes",
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 10211064227,
+  "lat": 22.3676953,
+  "lon": 114.1104722,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C3"
+  }
+},
+{
+  "type": "node",
+  "id": 10211064237,
+  "lat": 22.3678446,
+  "lon": 114.1100472,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 10211064240,
+  "lat": 22.3675723,
+  "lon": 114.1103447,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "C4"
+  }
+},
+{
+  "type": "node",
+  "id": 10211113075,
+  "lat": 22.5016865,
+  "lon": 114.1276699,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 10213765479,
+  "lat": 22.3277181,
+  "lon": 114.1536256,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 10213765480,
+  "lat": 22.3263815,
+  "lon": 114.1543502,
+  "tags": {
+    "level": "2",
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 10301092070,
+  "lat": 22.3160193,
+  "lon": 114.2187397,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B3"
+  }
+},
+{
+  "type": "node",
+  "id": 10301092071,
+  "lat": 22.3158799,
+  "lon": 114.2185960,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B4"
+  }
+},
+{
+  "type": "node",
+  "id": 10301092072,
+  "lat": 22.3159471,
+  "lon": 114.2191631,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B2"
+  }
+},
+{
+  "type": "node",
+  "id": 10301092073,
+  "lat": 22.3157562,
+  "lon": 114.2194424,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B1"
+  }
+},
+{
+  "type": "node",
+  "id": 10608449266,
+  "lat": 22.3242867,
+  "lon": 114.2140011,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 10703682000,
+  "lat": 22.3048867,
+  "lon": 114.1610913,
+  "tags": {
+    "automated": "yes",
+    "automatic_door": "yes",
+    "door": "sliding",
+    "entrance": "yes",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "railway": "subway_entrance",
+    "ref": "E4",
+    "tunnel": "building_passage"
+  }
+},
+{
+  "type": "node",
+  "id": 10740506419,
+  "lat": 22.2951854,
+  "lon": 114.1736970,
+  "tags": {
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "J1"
+  }
+},
+{
+  "type": "node",
+  "id": 10758674303,
+  "lat": 22.5016608,
+  "lon": 114.1277664,
+  "tags": {
+    "name": "D3",
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 10758683505,
+  "lat": 22.5008668,
+  "lon": 114.1283873,
+  "tags": {
+    "name": "B",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 10789714336,
+  "lat": 22.3675768,
+  "lon": 114.1104198,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "C5"
+  }
+},
+{
+  "type": "node",
+  "id": 10841608424,
+  "lat": 22.5149797,
+  "lon": 114.0656373,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 10842157477,
+  "lat": 22.3381481,
+  "lon": 114.1877292,
+  "tags": {
+    "entrance": "main",
+    "exit": "main",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 10842157478,
+  "lat": 22.3382621,
+  "lon": 114.1876907,
+  "tags": {
+    "entrance": "main",
+    "exit": "main",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 11264962675,
+  "lat": 22.2951919,
+  "lon": 114.1722357,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "J5"
+  }
+},
+{
+  "type": "node",
+  "id": 11335379996,
+  "lat": 22.3733700,
+  "lon": 114.1795271,
+  "tags": {
+    "level": "4",
+    "name": "圍方 The Wai",
+    "name:en": "The Wai",
+    "name:yue-Hant": "圍方",
+    "railway": "subway_entrance",
+    "ref": "H",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 11372395047,
+  "lat": 22.3307115,
+  "lon": 114.1991433,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "-1",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "C",
+    "subway": "train",
+    "train": "subway"
+  }
+},
+{
+  "type": "node",
+  "id": 11384842235,
+  "lat": 22.3028399,
+  "lon": 114.1673793,
+  "tags": {
+    "level": "-1",
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 11516591167,
+  "lat": 22.3351968,
+  "lon": 114.1569528,
+  "tags": {
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 11516591168,
+  "lat": 22.3351795,
+  "lon": 114.1569751,
+  "tags": {
+    "highway": "elevator",
+    "railway": "subway_entrance",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 11875948362,
+  "lat": 22.3397029,
+  "lon": 114.1365129,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "G"
+  }
+},
+{
+  "type": "node",
+  "id": 12046189249,
+  "lat": 22.3204081,
+  "lon": 114.1695071,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B4"
+  }
+},
+{
+  "type": "node",
+  "id": 12179383321,
+  "lat": 22.3312913,
+  "lon": 114.1994397,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "level": "-1",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "B2",
+    "subway": "train",
+    "train": "subway"
+  }
+},
+{
+  "type": "node",
+  "id": 12233929079,
+  "lat": 22.3216322,
+  "lon": 113.9407700,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 12234009402,
+  "lat": 22.3222581,
+  "lon": 113.9437313,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 12304286656,
+  "lat": 22.2479090,
+  "lon": 114.1680534,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 12466920421,
+  "lat": 22.4442836,
+  "lon": 114.1701423,
+  "tags": {
+    "name": "新達廣場 Uptown Plaza",
+    "name:en": "Uptown Plaza",
+    "name:yue": "新達廣場",
+    "name:zh": "新達廣場",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12589966854,
+  "lat": 22.3485854,
+  "lon": 114.1260965,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 12595506494,
+  "lat": 22.3373307,
+  "lon": 114.1488828,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 12730532635,
+  "lat": 22.2849480,
+  "lon": 114.1573919,
+  "tags": {
+    "highway": "elevator",
+    "indoor": "yes",
+    "level": "1;0",
+    "level:ref": "L1;G",
+    "noref": "yes",
+    "railway": "subway_entrance",
+    "wheelchair": "designated"
+  }
+},
+{
+  "type": "node",
+  "id": 12946984639,
+  "lat": 22.3049007,
+  "lon": 114.1616540,
+  "tags": {
+    "covered": "yes",
+    "entrance": "yes",
+    "exit": "yes",
+    "level:ref": "U5",
+    "location": "podium",
+    "podium": "bulk",
+    "railway": "subway_entrance",
+    "ref": "C2"
+  }
+},
+{
+  "type": "node",
+  "id": 12946984676,
+  "lat": 22.3053050,
+  "lon": 114.1612739,
+  "tags": {
+    "automated": "yes",
+    "automatic_door": "yes",
+    "door": "sliding",
+    "entrance": "yes",
+    "exit": "yes",
+    "level": "0",
+    "level:ref": "G",
+    "railway": "subway_entrance",
+    "ref": "E5",
+    "tunnel": "building_passage"
+  }
+},
+{
+  "type": "node",
+  "id": 12946984698,
+  "lat": 22.3049502,
+  "lon": 114.1614970,
+  "tags": {
+    "covered": "yes",
+    "entrance": "yes",
+    "exit": "yes",
+    "level:ref": "U5",
+    "location": "podium",
+    "podium": "bulk",
+    "railway": "subway_entrance",
+    "ref": "D2"
+  }
+},
+{
+  "type": "node",
+  "id": 12946994706,
+  "lat": 22.3050687,
+  "lon": 114.1611346,
+  "tags": {
+    "indoor": "yes",
+    "level": "1",
+    "level:ref": "U3",
+    "railway": "subway_entrance",
+    "ref": "D1"
+  }
+},
+{
+  "type": "node",
+  "id": 13138017360,
+  "lat": 22.2880764,
+  "lon": 114.2098603,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "limited"
+  }
+},
+{
+  "type": "node",
+  "id": 13138042138,
+  "lat": 22.3093771,
+  "lon": 114.1828012,
+  "tags": {
+    "entrance": "yes",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13442537598,
+  "lat": 22.3156071,
+  "lon": 114.2190886,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 13587375421,
+  "lat": 22.3941052,
+  "lon": 113.9728177,
+  "tags": {
+    "name": "輕鐵屯門站 Light Rail Tuen Mun Stop",
+    "name:en": "Light Rail Tuen Mun Stop",
+    "name:zh": "輕鐵屯門站",
+    "name:zh-Hans": "轻铁屯门站",
+    "name:zh-Hant": "輕鐵屯門站",
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13620585266,
+  "lat": 22.3220187,
+  "lon": 114.2582128,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 13620585268,
+  "lat": 22.3229332,
+  "lon": 114.2574845,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 13626435742,
+  "lat": 22.4077456,
+  "lon": 114.2223671,
+  "tags": {
+    "door": "no",
+    "entrance": "yes",
+    "noname": "yes",
+    "noref": "yes",
+    "public_transport": "yes",
+    "railway": "subway_entrance",
+    "train": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13662713593,
+  "lat": 22.4443812,
+  "lon": 114.1700076,
+  "tags": {
+    "name": "新達廣場 Uptown Plaza",
+    "name:en": "Uptown Plaza",
+    "name:yue": "新達廣場",
+    "name:zh": "新達廣場",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 13665029390,
+  "lat": 22.4920076,
+  "lon": 114.1389545,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13666351816,
+  "lat": 22.5013904,
+  "lon": 114.1277656,
+  "tags": {
+    "level": "1",
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13666351817,
+  "lat": 22.5015020,
+  "lon": 114.1278409,
+  "tags": {
+    "level": "0",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13745638786,
+  "lat": 22.3637096,
+  "lon": 114.1313252,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 13745638795,
+  "lat": 22.3626898,
+  "lon": 114.1312663,
+  "tags": {
+    "level": "2",
+    "railway": "subway_entrance",
+    "ref": "E",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13745638798,
+  "lat": 22.3627684,
+  "lon": 114.1312903,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 13745797026,
+  "lat": 22.3625914,
+  "lon": 114.1310736,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13745797036,
+  "lat": 22.3635854,
+  "lon": 114.1311082,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 13905228792,
+  "lat": 22.3581141,
+  "lon": 114.1063760,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 13905228800,
+  "lat": 22.3580081,
+  "lon": 114.1069967,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 13905248203,
+  "lat": 22.3583988,
+  "lon": 114.1069198,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 13905248205,
+  "lat": 22.3590098,
+  "lon": 114.1071068,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 13905248223,
+  "lat": 22.3586695,
+  "lon": 114.1072002,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "F"
+  }
+},
+{
+  "type": "node",
+  "id": 13905248224,
+  "lat": 22.3586522,
+  "lon": 114.1071953,
+  "tags": {
+    "access": "permissive",
+    "note": "Marks & Spencer",
+    "railway": "subway_entrance",
+    "ref": "G"
+  }
+},
+{
+  "type": "node",
+  "id": 13905248225,
+  "lat": 22.3591139,
+  "lon": 114.1069765,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A1"
+  }
+},
+{
+  "type": "node",
+  "id": 13905248229,
+  "lat": 22.3589419,
+  "lon": 114.1069346,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 13905248232,
+  "lat": 22.3582067,
+  "lon": 114.1067118,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 13909377256,
+  "lat": 22.3151980,
+  "lon": 113.9364290,
+  "tags": {
+    "layer": "1",
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 13909377260,
+  "lat": 22.3163632,
+  "lon": 113.9360056,
+  "tags": {
+    "layer": "1",
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 13910356528,
+  "lat": 22.3159443,
+  "lon": 113.9367385,
+  "tags": {
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 13914065029,
+  "lat": 22.3165860,
+  "lon": 113.9364680,
+  "tags": {
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 13914065032,
+  "lat": 22.3153489,
+  "lon": 113.9369257,
+  "tags": {
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 13953869543,
+  "lat": 22.3965055,
+  "lon": 113.9736061,
+  "tags": {
+    "name": "的士站 Taxi Stand",
+    "name:en": "Taxi Stand",
+    "name:zh": "的士站",
+    "name:zh-Hans": "的士站",
+    "name:zh-Hant": "的士站",
+    "railway": "subway_entrance",
+    "ref": "F1",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 14022100401,
+  "lat": 22.3391157,
+  "lon": 114.2016043,
+  "tags": {
+    "entrance": "yes",
+    "entrance:use": "station",
+    "exit": "yes",
+    "location": "underground",
+    "opening_hours": "06:00-00:00",
+    "proposed:opening_hours": "24/7",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "start_date": "2026-07-17",
+    "station": "train",
+    "subway": "yes",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 14029097703,
+  "lat": 22.3172091,
+  "lon": 114.1606910,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C"
+  }
+},
+{
+  "type": "node",
+  "id": 14029097704,
+  "lat": 22.3171478,
+  "lon": 114.1607165,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 14029097707,
+  "lat": 22.3171977,
+  "lon": 114.1604937,
+  "tags": {
+    "noname": "yes",
+    "noref": "yes",
+    "railway": "subway_entrance",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 14030999390,
+  "lat": 22.3170826,
+  "lon": 114.1603474,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "E"
+  }
+},
+{
+  "type": "node",
+  "id": 14041077225,
+  "lat": 22.3183692,
+  "lon": 114.1599990,
+  "tags": {
+    "noname": "yes",
+    "noref": "yes",
+    "railway": "subway_entrance"
+  }
+},
+{
+  "type": "node",
+  "id": 14041077227,
+  "lat": 22.3181307,
+  "lon": 114.1591036,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A2"
+  }
+},
+{
+  "type": "node",
+  "id": 14077001999,
+  "lat": 22.3037420,
+  "lon": 114.1645239,
+  "tags": {
+    "abutters": "railway;retail",
+    "access": "yes",
+    "entrance": "main",
+    "entrance:use": "station;retail",
+    "exit": "main",
+    "indoor": "yes",
+    "level": "1;1",
+    "level:ref": "L1;1",
+    "name": "環球匯 International Gateway Centre",
+    "name:en": "International Gateway Centre",
+    "name:zh": "環球匯",
+    "public_transport": "entrance",
+    "railway": "subway_entrance",
+    "ref": "L",
+    "subway": "no",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 14079931908,
+  "lat": 22.2796868,
+  "lon": 114.2292980,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D"
+  }
+},
+{
+  "type": "node",
+  "id": 14079932000,
+  "lat": 22.2792458,
+  "lon": 114.2294051,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 14115380417,
+  "lat": 22.3739137,
+  "lon": 114.1169800,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "A"
+  }
+},
+{
+  "type": "node",
+  "id": 14115380421,
+  "lat": 22.3733239,
+  "lon": 114.1182620,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B"
+  }
+}
+
+  ]
+}
