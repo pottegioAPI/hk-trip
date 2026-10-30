@@ -413,6 +413,7 @@ nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding-
 .wxd span{font-size:11px;line-height:1.25}
 .dsum{padding:12px 14px}
 .wbtn.hbtn2{background:var(--sun-soft);color:var(--sun)}
+.wbtn.sosb{background:#E5383B;color:#fff;font:800 11px/1 system-ui,sans-serif;letter-spacing:.3px;box-shadow:0 2px 6px rgba(229,56,59,.35)}
 header.top .wrap{gap:8px}
 button.sync{border:none;font-weight:600;color:var(--ink);background:var(--pink-soft);padding:6px 12px;font-size:12.5px}
 
@@ -507,6 +508,7 @@ input[type=time].txt{appearance:none;min-height:46px}
   <div class="wrap">
     <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18M5 18V9l4-3v12M9 18V4l5 3v11M14 18v-8l5-2v10"/></svg></div>
     <div class="ttl"><h1>ทริปฮ่องกง</h1><p id="countdown">14–17 พ.ย. 2569</p></div>
+    <button class="wbtn sosb" type="button" data-sos="1" aria-label="บัตรฉุกเฉิน โทร 999 และสถานกงสุลไทย">SOS</button>
     <button class="wbtn hbtn2" id="hotelbtn" type="button" aria-label="ที่พักของเรา และพากลับที่พัก"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" fill="currentColor"/></svg></button>
     <button class="wbtn" id="waterbtn" type="button" aria-label="จุดกดน้ำฟรีใกล้ฉัน"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z" fill="currentColor"/><path d="M9.5 15.5q2.5 2 5 0" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></button>
     <button class="sync" id="sync" type="button" aria-label="สลับว่าใครใช้เครื่องนี้"><i></i><span>…</span></button>
@@ -2460,7 +2462,6 @@ function renderHome(){
     ${nextStopHTML()}
     ${gpsCardHTML()}
     ${funCardHTML()}
-    <button type="button" class="sosbtn" data-sos="1">🆘 บัตรฉุกเฉิน · 999 · สถานกงสุลไทย</button>
     ${daySummaryHTML()}
     ${nowHTML()}
     ${weatherHTML(td)}
