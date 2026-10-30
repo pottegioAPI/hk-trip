@@ -67,7 +67,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .dzmini{margin-top:10px;background:var(--grape-soft);border-radius:16px;padding:10px 12px}.dzmh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}.dzmh small{font-size:11.5px;color:var(--muted)}.dzmr{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px dashed var(--line)}.dzmr .rk{width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}.dzmr span b{display:block;font-size:13.5px}.dzmr small{font-size:11.5px;color:var(--muted)}.dzmini .dzmeal{margin-bottom:6px}.dzday{background:var(--mint-soft);border-radius:16px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:2px}.dzday b{font-size:15px}.dzday small{font-size:12.5px;color:var(--muted)}
 .wxnow{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:center;background:var(--sky-soft);border-radius:16px;padding:10px 14px;margin-bottom:10px}.wxnow b{grid-row:span 2;font-family:var(--display);font-size:30px;color:var(--sky)}.wxnow span{font-size:13.5px}.wxnow small{font-size:11.5px;color:var(--muted)}
 .fwedit{margin-top:6px;font-size:12.5px}.fwedit summary{cursor:pointer;opacity:.9;list-style:none}.fwedit summary::-webkit-details-marker{display:none}.fwedit p{margin:6px 0;opacity:.9}.fwrow{display:flex;align-items:center;gap:10px;margin:4px 0}.fwrow label{min-width:64px;color:#fff}.fwrow input{flex:1;max-width:160px;border:none;border-radius:10px;padding:6px 10px;font-size:16px;color:var(--ink);background:#fff}
-.dzvch summary{list-style:none;cursor:pointer}.dzvch summary::-webkit-details-marker{display:none}.dzvch h3{margin:0}.dzvi{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;padding:6px 0;text-align:left;font-size:14px;color:var(--ink)}.dzvi.on{opacity:.55;text-decoration:line-through}
+.dzvch summary{list-style:none;cursor:pointer}.dzvch summary::-webkit-details-marker{display:none}.dzvch h3{margin:0}.dzvi{display:flex;align-items:flex-start;gap:10px;line-height:1.4;width:100%;border:none;background:none;padding:6px 0;text-align:left;font-size:14px;color:var(--ink)}.dzvi.on{opacity:.55;text-decoration:line-through}
 .dzalt{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px;margin:-4px 0 10px;display:flex;flex-direction:column;gap:4px}.dzalt>b{font-size:14px}.dzalt>small{font-size:11.5px;color:var(--muted)}.dzaltr{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}.dzaltr span{display:flex;flex-direction:column}.dzaltr small{font-size:11.5px;color:var(--muted)}.dzaltr .num{text-align:right;flex:none}
 .dzshows summary{list-style:none;cursor:pointer}.dzshows summary::-webkit-details-marker{display:none}.dzshows h3{margin:0}.dzsh{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px dashed var(--line);font-size:13.5px}.dzsh b{display:block;font-weight:600}.dzsh small{color:var(--muted);font-size:11.5px}.dzsh .num{text-align:right}.dzsh i{font-style:normal;display:inline-block;padding:1px 6px;border-radius:8px;background:var(--surface2);margin:1px}.dzsh i.nx{background:var(--pink);color:#fff}.dzsh i.past{opacity:.4;text-decoration:line-through}.dzsh.fw b{color:#6B3FA0}
 .dzpk{min-width:70px;border-radius:16px;background:var(--pink-soft);padding:8px 8px;text-align:center;display:flex;flex-direction:column;line-height:1.15}.dzpk b{font-family:var(--display);font-weight:600;font-size:26px;color:var(--pink)}.dzpk small{font-size:11px;color:var(--muted)}.dzpk.open{background:var(--mint-soft)}.dzpk.open b{color:var(--mint)}.dzpk.off{background:var(--surface2)}.dzpk.off b{font-size:16px;color:var(--muted)}
@@ -1166,7 +1166,7 @@ function sosSheetHTML(){
 let DZQ=null;
 const dzNorm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
 async function dzQueueFetch(force){
-  if(window.claude || (!force && DZQ && Date.now()-DZQ.at<4*60e3)) return;
+  if(window.claude || hkNow().date!=='2026-11-16' || (!force && DZQ && Date.now()-DZQ.at<4*60e3)) return;   // today's queues/closures say nothing about 16 Nov
   try{ const j=await liveJSON(SB.url+'/functions/v1/hk-queue'), m={};
     for(const r of j.rides||[]){ if(/single rider/i.test(r.name)) continue; const k=Object.keys(DZ_RIDES).find(k=>dzNorm(r.name).startsWith(dzNorm(DZ_RIDES[k].n))); if(k) m[k]={open:r.open, w:r.wait, at:Date.parse(r.updated)} }
     const rb=(j.rides||[]).find(r=>dzNorm(r.name)==='royalbanquethall');
@@ -1989,15 +1989,16 @@ function dzRecommend(any){
 // must-do rides (the user's own list): planned first, never left to chance
 const DZ_MUST = new Set(['frozen','rc','hyper','grizzly','ironman']);
 const dzCurve = m => { const h=m/60, a=Math.floor(h), f0=DZ_HOUR[a] ?? (a<9?.5:.4), f1=DZ_HOUR[a+1] ?? f0; return f0+(f1-f0)*(h-a) };
+const dzClosedNow = k => { const n=dzNowMin(), w=dzWait(k,n); return !!w.closed };
 function dzPredWait(k, at, now){
-  const w=dzWait(k, now); if(w.closed) return null;
+  const w=dzWait(k, now); if(w.closed) return Math.round(DZ_RIDES[k].avg * Math.pow(dzCurve(at), DZ_RIDES[k].avg>=25 ? 1.8 : 1));
   const c = m => Math.pow(dzCurve(m), DZ_RIDES[k].avg>=25 ? 1.8 : 1);              // headline rides swing harder: short at opening, long midday
   if(w.live) return Math.max(0, Math.round(w.w * c(at)/c(now)));                  // what the board says now, along the day's shape
   return Math.round(DZ_RIDES[k].avg * c(at));
 }
 function dzTasks(){
   const now=dzNowMin(), t=[];
-  for(const k of Object.keys(DZ_RIDES)) if(!S.done['dz:'+k] && dzPredWait(k,now,now)!=null) t.push({k, land:DZ_LAND_OF[k], dur:5});
+  for(const k of Object.keys(DZ_RIDES)) if(!S.done['dz:'+k]) t.push({k, land:DZ_LAND_OF[k], dur:5});
   for(const [k,m] of Object.entries(DZ_MEALS)) if(!dzMealDone(k) && now<=m.to) t.push({meal:k, land:'FL', dur:35, from:m.from, to:m.to});
   return t;
 }
@@ -2010,6 +2011,7 @@ function dzSim(seq, start, here){
     if(s.meal){ if(t<s.from){ pen+=(s.from-t)*0.5; t=s.from } wait=rbh; if(t>s.to) pen+=3000;   // a free meal missed costs real money   // eat inside the voucher hours
       const pref=s.meal==='lunch'?13*60+30:18*60; if(t>pref) pen+=(t-pref)*0.4 }                    // and not too late to be hungry
     else { wait=dzPredWait(s.k,t,now); const lt=(S.dzLater||{})[s.k]; if(lt && t<lt) pen+=(lt-t)*4;
+      if(dzClosedNow(s.k) && t<now+45) pen+=(now+45-t)*5;   // down right now: come back later
       // leaving a headline ride for late is a gamble (queues and breakdowns stack up): do the big ones while there's slack
       if(DZ_RIDES[s.k].avg>=25) pen+=Math.max(0,t-16*60)*0.35 }
     steps.push({...s, at:t, walk, wait}); t+=wait+s.dur; waitSum+=wait; land=s.land;
@@ -2056,7 +2058,7 @@ function dzRouteHTML(full){
     // the queue is what decides "go now or skip", so it is the biggest thing on the row
     const live=!s.meal && i===0 && dzWait(s.k,now).live, wc=s.wait>=40?'var(--danger)':s.wait>=25?'#E58A00':'var(--mint)';
     const wb=`<span class="dzwb" style="--wc:${wc}"><b class="num">${s.wait}</b><small>${s.meal?'คิวร้าน':'นาที'}${live?' · สด':''}</small></span>`;
-    const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&DZ_RIDES[s.k].single?' · มีแถว Single Rider':''}`;
+    const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&DZ_RIDES[s.k].single?' · มีแถว Single Rider':''}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
     return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>ไปต่อเลย · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small></div><div class="dzbtns">${btn}${later}</div></div>`
       : `<div class="dzstep${late?' late':''}">${wb}<span><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small></span><div class="dzbtns">${btn}${later}</div></div>`;
   };
@@ -2152,7 +2154,7 @@ function dzShowsHTML(){
     ${DZCAL.closed&&DZCAL.closed.length?`<p class="mini" style="margin:8px 0 0">ปิดปรับปรุงวันนั้น: ${DZCAL.closed.map(esc).join(', ')}</p>`:''}
     <p class="mini" style="margin:6px 0 0">สวนเปิด ${DZCAL.open}–${DZCAL.close} น. · ข้อมูลจาก hongkongdisneyland.com อัปเดตทุกเช้า · ตารางอาจเปลี่ยนได้ เช็คในแอป Disney อีกครั้ง</p></details>`;
 }
-const DZ_VOUCHER = [['lunch','มื้อเที่ยง (ก่อน 16:00)'],['dinner','มื้อเย็น (ตั้งแต่ 16:30)'],['snack','Frozen Lollipop หรือ Popcorn 1 ชิ้น ที่รถเข็น'],['cart20','ลด HK$20 เมื่อซื้อครบ HK$100 ที่รถเข็น']];
+const DZ_VOUCHER = [['lunch','มื้อเที่ยง · แลกได้ตั้งแต่ร้านเปิด (Royal Banquet Hall 11:30) ถึง 16:00 · ชุดไม่เกิน HK$170'],['dinner','มื้อเย็น · แลกได้ 16:30 ถึง 30 นาทีก่อนร้านปิด (Royal Banquet Hall ถึง 20:00) · ชุดไม่เกิน HK$170 · ควรกินเสร็จก่อน 19:20 เพื่อไปจองที่ดูพลุ'],['snack','Frozen Lollipop หรือ Popcorn 1 ชิ้น · ที่รถเข็นที่ร่วมรายการ เวลาไหนก็ได้ · ฟรี'],['cart20','ส่วนลด HK$20 · เมื่อซื้อครบ HK$100 ขึ้นไป ที่รถเข็นที่ร่วมรายการ · ใช้ได้ 1 ครั้ง']];
 function dzVoucherHTML(){
   const vd=k=>k==='lunch'||k==='dinner'?dzMealDone(k):!!S.done['dz:'+k], left=DZ_VOUCHER.filter(([k])=>!vd(k)).length;
   return `<details class="panel dzvch"><summary><h3>🎟️ Meal Voucher <small>เหลือ ${left}/4 ▾</small></h3></summary>
