@@ -43,6 +43,8 @@ mkdir -p "$N/water"
 if curl -fsSL --retry 3 -o "$N/water/lcsd.csv" https://www.lcsd.gov.hk/datagovhk/fac-wd/lcsd_wd_en.csv \
    && curl -fsSL --retry 3 -o "$N/water/fehd.csv" https://www.fehd.gov.hk/datagovhk/water_dispenser/english/waterdispenser.csv \
    && node "$T/build-water.js" "$N/water" "$N/water.json"; then cp "$N/water.json" "$ROOT/water.json"; else echo "water data unavailable - keeping previous"; fi
+# MTR last trains (official first/last train pages); keep the previous copy if it fails
+if node "$T/build-lasttrain.js" "$N/mtr-data.js" "$N/lasttrain.json"; then cp "$N/lasttrain.json" "$ROOT/lasttrain.json"; else echo "last trains unavailable - keeping previous"; fi
 # all checks passed: swap in
 cp "$N/bus.json" "$ROOT/bus.json"
 cp "$N/places.json" "$ROOT/places.json"

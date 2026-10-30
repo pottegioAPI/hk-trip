@@ -58,6 +58,9 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.gpsc{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;background:var(--sky-soft);border-radius:16px;padding:10px 12px;margin-bottom:8px}.gpsc b{display:block;font-size:14px}.gpsc small{display:block;font-size:12px;color:var(--muted)}.gpsc svg{width:22px;height:22px;color:var(--sky)}.gpsc .dot{width:14px;height:14px;border-radius:50%;background:#3FB2E6;box-shadow:0 0 0 5px rgba(63,178,230,.3);margin-left:6px}.gpsc.off{background:var(--surface);border:1px dashed var(--sky)}
+.wn{display:block;text-decoration:none;color:var(--ink);border-radius:14px;padding:10px 12px;margin-bottom:8px;background:var(--sky-soft)}.wn.warn{background:var(--sun-soft)}.wn.danger{background:var(--danger);color:#fff}.wn b{display:block;font-size:14.5px}.wn small{display:block;font-size:11.5px;opacity:.85}
+.sosbtn{width:100%;border:none;border-radius:14px;background:#FFE3E3;color:#B4232A;font-weight:700;padding:10px;margin-bottom:12px;font-size:14px}.sos.big{display:flex;align-items:center;gap:12px;background:var(--danger);color:#fff;border-radius:18px;padding:14px 16px;text-decoration:none;margin-bottom:12px}.sos.big b{font-family:var(--display);font-size:34px}.sos.big span{font-size:14px}.sosp{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;border:none;background:var(--bg);border-radius:12px;padding:9px 12px;margin-top:6px;text-align:left;color:var(--ink)}.sosp b{font-size:20px;font-family:"PingFang TC","Noto Sans TC",sans-serif}.sosp span{font-size:13px;color:var(--muted)}
 
 main .wrap{padding-block:4px calc(130px + env(safe-area-inset-bottom,0px))}
 section.view[hidden]{display:none}
@@ -1001,13 +1004,141 @@ async function liveShow(id){
     + `<button type="button" class="btn-s live-b" data-live="${id}">${ic('swap')}อัปเดต (${t} น.)</button>`;
 }
 
+
+/* ---------- GPS: where am I (own website only; asks permission once) ---------- */
+S.gps=null; let gpsWatch=null, gpsTrail=[];
+const gpsFresh = () => S.gps && Date.now()-S.gps.at < 3*60e3 && S.gps.acc < 250;
+function gpsStart(ask){
+  if(window.claude || !navigator.geolocation || gpsWatch!=null) return;
+  if(!ask && lsGet('hk-gps','')!=='on') return;
+  gpsWatch = navigator.geolocation.watchPosition(p=>{
+    const first=!S.gps; S.gps={ll:[p.coords.latitude,p.coords.longitude], acc:p.coords.accuracy, at:Date.now()}; lsSet('hk-gps','on');
+    gpsTrail.push({ll:S.gps.ll, at:S.gps.at}); gpsTrail=gpsTrail.filter(x=>S.gps.at-x.at<6*60e3);
+    gpsCheck(); if(first || S.tab==='home') rerender();
+  }, e=>{ gpsWatch=null; if(e.code===1){ lsSet('hk-gps','off'); toast('ไม่ได้รับอนุญาตใช้ตำแหน่ง เปิดได้ที่ ตั้งค่า > Safari > ตำแหน่ง') } else toast('หาตำแหน่งไม่ได้ ลองออกไปที่โล่ง') },
+  {enableHighAccuracy:true, maximumAge:15000, timeout:30000});
+}
+function gpsStop(){ if(gpsWatch!=null) navigator.geolocation.clearWatch(gpsWatch); gpsWatch=null; S.gps=null; lsSet('hk-gps','off'); rerender() }
+// the place the next stop is about: its own coordinates, otherwise its station
+const targetLL = it => it && (locOf(it) || (it.st ? stLL(it.st) : null));
+function gpsNext(){ const td=tripDay(); if(!td) return null; const id=nextItem(td); return dayItems(td).find(i=>i.id===id)||null }
+// arrived? walking the wrong way? (checked on every position update)
+function gpsCheck(){
+  if(!gpsFresh()) return; const it=gpsNext(), ll=targetLL(it); if(!ll) return;
+  const d=metres(S.gps.ll,ll);
+  if(d < Math.max(150, S.gps.acc) && !S.done[it.id] && S.askedArrive!==it.id){ S.askedArrive=it.id; toast('ดูเหมือนถึง '+it.h+' แล้ว กด "ถึงแล้ว" ได้เลย') }
+  const old=gpsTrail.find(x=>S.gps.at-x.at>=3*60e3);
+  if(old && d<2500){ const d0=metres(old.ll,ll); S.walkAway = d-d0>200 ? {id:it.id, d:Math.round(d)} : null } else S.walkAway=null;
+}
+function gpsCardHTML(){
+  if(window.claude || !navigator.geolocation) return '';
+  if(!gpsFresh()) return `<div class="gpsc off"><span>${ic('pin',2)}</span><div><b>ให้แอปรู้ว่าตอนนี้อยู่ตรงไหน</b><small>ใช้ GPS บอกสถานีใกล้สุด เตือนเมื่อถึงที่หมายหรือเดินผิดทาง</small></div>
+    <button type="button" class="btn-s pay" data-gps="on">${gpsWatch!=null?'กำลังหา…':'เปิด'}</button></div>`;
+  const near=nearestStation(S.gps.ll), it=gpsNext(), ll=targetLL(it), d=ll?metres(S.gps.ll,ll):null;
+  return `<div class="gpsc"><span class="dot"></span><div><b>${near?`ใกล้สถานี ${esc(stName(NET.byCode[near.c]))} (${wDist(near.m)})`:'ตำแหน่งของคุณ'}</b>
+    <small>${it&&d!=null?`ห่างจาก ${esc(it.h)} ${wDist(d)}`:'แม่นยำ ±'+Math.round(S.gps.acc)+' ม.'}</small></div>
+    <button type="button" class="btn-s" data-gps="off">ปิด</button></div>
+    ${S.walkAway&&it&&S.walkAway.id===it.id?`<button type="button" class="al warn" data-nextnav="${it.id}">${ic('info')}<span>ดูเหมือนกำลังเดินห่างจาก ${esc(it.h)} ออกไป (ตอนนี้ ${wDist(S.walkAway.d)}) แตะเพื่อดูทาง</span></button>`:''}
+    ${it&&d!=null&&d<Math.max(150,S.gps.acc)&&!S.done[it.id]?`<button type="button" class="al info" data-arrive="${it.id}">${ic('check')}<span>ถึง ${esc(it.h)} แล้วใช่ไหม? แตะเพื่อบันทึกว่าถึงแล้ว</span></button>`:''}`;
+}
+
+/* ---------- walking from the exit to the place (Google Maps, walking) ---------- */
+function exitLL(st, ref){ const e=BUS && BUS.ex[st] && BUS.ex[st].find(x=>x[0]===ref); return e ? [e[2]/1e5, e[3]/1e5] : null }
+function exitWalkBtn(st, ref, dest){
+  const a=ref&&exitLL(st,ref); if(!a||!dest||metres(a,dest)<60) return '';
+  return `<a class="btn-s" href="https://www.google.com/maps/dir/?api=1&origin=${a[0].toFixed(5)},${a[1].toFixed(5)}&destination=${dest[0].toFixed(5)},${dest[1].toFixed(5)}&travelmode=walking" target="_blank" rel="noopener">${ic('walk')}เดินจาก Exit ${esc(ref)} ไปที่หมาย (${wDist(metres(a,dest))})</a>`;
+}
+
+/* ---------- real last trains (MTR's published first/last train times) ---------- */
+let LAST=null;
+fetch('lasttrain.json').then(r=>r.ok?r.json():null).then(j=>{ if(j){ LAST=j; rerender() } }).catch(()=>{});
+const lastMin = s => { const m=+s.slice(0,2)*60+ +s.slice(2); return m<4*60 ? m+1440 : m };   // after midnight counts as the same night
+// latest train from station index a towards b on one line (a train that goes at least as far as b)
+function lastTrain(line, a, b){
+  const rows=LAST && LAST.st[MTR.ids[a]]; if(!rows) return null; let best=null;
+  for(const [ln,toId,hm] of rows){ if(ln!==line) continue;
+    for(const q of MTR.lines[line]){ const pa=q.indexOf(MTR.ids[a]), pb=q.indexOf(MTR.ids[b]), pd=q.indexOf(toId); if(pa<0||pb<0||pd<0) continue;
+      if(Math.sign(pb-pa)===Math.sign(pd-pa) && Math.abs(pd-pa)>=Math.abs(pb-pa)){ const m=lastMin(hm); if(best==null||m>best) best=m } } }
+  return best;
+}
+// latest time to board at the start so every change still has a train (2 min a stop, 5 min a change)
+function lastBoard(legs){
+  let off=0, latest=Infinity;
+  for(const L of legs){ if(L.line==='WALK'){ off+=8; continue }
+    const m=lastTrain(L.line, L.from, L.to); if(m==null) return null; latest=Math.min(latest, m-off); off+=L.stops*2+5 }
+  return latest===Infinity?null:latest;
+}
+function lastHome(){
+  const here=planSpot(); if(here.src==='hotel' || metres(here.ll,HOTEL_LL)<300) return null;
+  const st = here.st || (nearestStation(here.ll)||{}).c; if(!st || st==='MOK' || !NET) return null;
+  const legs=mtrRoute(NET.byCode[st], NET.byCode.MOK); if(!legs) return null;
+  const m=lastBoard(legs); return m==null?null:{st, m, legs};
+}
+
+/* ---------- Hong Kong Observatory warnings (typhoon, rain, heat …) ---------- */
+let WARN=null;
+const WARN_TH = {
+  TC1:['info','สัญญาณไต้ฝุ่น T1 มีพายุอยู่ห่างออกไป ยังเที่ยวได้ตามปกติ คอยดูประกาศ'],
+  TC3:['warn','สัญญาณไต้ฝุ่น T3 ลมแรง ระวังของหล่นจากที่สูง กิจกรรมกลางแจ้งและริมทะเลอาจปิด (กระเช้า Ngong Ping 360 มักหยุด)'],
+  TC8NE:['danger','สัญญาณไต้ฝุ่น T8 กลับที่พักโดยเร็ว ร้านค้าและสถานที่ท่องเที่ยวส่วนใหญ่ปิด รถบัสและเรือหยุดทีละสาย MTR ใต้ดินมักวิ่งต่อแต่ช่วงบนดินอาจหยุด'],
+  TC9:['danger','สัญญาณไต้ฝุ่น T9 อยู่ในที่พัก ห้ามออกไปข้างนอก'], TC10:['danger','สัญญาณไต้ฝุ่น T10 อันตรายสูงสุด อยู่ในที่พัก ห่างหน้าต่าง'],
+  WRAINA:['warn','ฝนตกหนัก (สีเหลือง/อำพัน) ระวังน้ำท่วมขัง พกร่ม'], WRAINR:['danger','ฝนตกหนักมาก (สีแดง) หลบในอาคาร'], WRAINB:['danger','พายุฝนรุนแรง (สีดำ) อยู่ในอาคาร ห้ามออกไปข้างนอก'],
+  WTS:['warn','เตือนพายุฝนฟ้าคะนอง หลบในอาคารเมื่อมีฟ้าผ่า'], WHOT:['warn','อากาศร้อนจัด ดื่มน้ำบ่อยๆ (กดน้ำฟรีได้จากปุ่มหยดน้ำด้านบน)'],
+  WCOLD:['info','อากาศหนาว ใส่เสื้อกันหนาว'], WMSGNL:['info','มรสุมแรง ลมแรงริมทะเล'], WL:['warn','เตือนดินถล่ม เลี่ยงทางเดินบนเขา'],
+  WTMW:['danger','เตือนสึนามิ อยู่ห่างชายฝั่ง'], WFIRE:['info','เสี่ยงไฟป่า งดก่อไฟบนเขา'], WFNTSA:['info','น้ำท่วมทางตอนเหนือ (ไม่กระทบย่านท่องเที่ยว)'], WFROST:['info','น้ำค้างแข็งบนยอดเขา']
+};
+['TC8NW','TC8SE','TC8SW'].forEach(k=>WARN_TH[k]=WARN_TH.TC8NE);
+async function warnFetch(){
+  if(window.claude) return;
+  try{ const j=await liveJSON('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=en');
+    WARN={at:Date.now(), list:Object.values(j||{}).filter(w=>w && w.actionCode!=='CANCEL' && WARN_TH[w.code]).map(w=>({code:w.code, lv:WARN_TH[w.code][0], th:WARN_TH[w.code][1], en:w.name}))};
+    lsSet('hk-warn', JSON.stringify(WARN)); rerender() }catch(e){}
+}
+try{ WARN=JSON.parse(lsGet('hk-warn','null')) }catch(e){}
+function warnHTML(){
+  if(!WARN || !WARN.list.length || Date.now()-WARN.at>3*3600e3) return '';
+  const order={danger:0,warn:1,info:2};
+  return WARN.list.slice().sort((a,b)=>order[a.lv]-order[b.lv]).map(w=>`<a class="wn ${w.lv}" href="https://www.hko.gov.hk/en/wxinfo/dailywx/wxwarntoday.htm" target="_blank" rel="noopener">
+    <b>${w.lv==='danger'?'⚠️ ':''}${esc(w.th)}</b><small>${esc(w.en)} · หอดูดาวฮ่องกง · อัปเดต ${new Date(WARN.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.</small></a>`).join('');
+}
+
+/* ---------- emergency card (works offline) ---------- */
+const SOS_PHRASES = [['請幫幫我','ช่วยด้วย'],['我迷路了','ฉันหลงทาง'],['請叫救護車','ช่วยเรียกรถพยาบาล'],['我要去醫院','ฉันต้องไปโรงพยาบาล'],['請報警','ช่วยแจ้งตำรวจ'],['我係泰國人，唔識講中文','ฉันเป็นคนไทย พูดภาษาจีนไม่ได้']];
+function speakHK(s){ try{ const u=new SpeechSynthesisUtterance(s); u.lang='zh-HK'; u.rate=.85; speechSynthesis.cancel(); speechSynthesis.speak(u) }catch(e){ toast('เครื่องนี้พูดภาษาจีนไม่ได้ ให้คนอื่นอ่านจากจอแทน') } }
+function sosSheetHTML(){
+  const ph=(S.settings.phones||['','']);
+  return `<div class="wrap"><div class="grab"></div><h2 id="sheet-title">บัตรฉุกเฉิน <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
+    <a class="sos big" href="tel:999"><b>999</b><span>ตำรวจ · รถพยาบาล · ดับเพลิง (โทรฟรี)</span></a>
+    <div class="panel"><h3>สถานกงสุลใหญ่ ณ ฮ่องกง</h3>
+      <p class="mini" style="margin:0 0 6px">8/F, Fairmont House, 8 Cotton Tree Drive, Central (ใกล้ MTR Admiralty)</p>
+      <div class="acts"><a class="btn-s pay" href="tel:+85268211545">เบอร์ฉุกเฉิน 6821 1545</a><a class="btn-s" href="tel:+85268211546">6821 1546</a><a class="btn-s" href="tel:+85225216481">สำนักงาน 2521 6481</a></div>
+      <div class="src">สำนักงานเปิด จ.–ศ. 09:00–17:00 · เบอร์ฉุกเฉินจากเว็บสถานกงสุล hongkong.thaiembassy.org</div></div>
+    <div class="panel"><h3>เบอร์ของเรา</h3>
+      ${[0,1].map(p=>`<div class="fin"><label for="ph${p}" style="min-width:42px">${nm(p)}</label><input id="ph${p}" type="tel" inputmode="tel" value="${esc(ph[p]||'')}" placeholder="+66 …" style="flex:1;width:auto">${ph[p]?`<a class="btn-s pay" href="tel:${esc(ph[p].replace(/[^\d+]/g,''))}">โทร</a>`:''}</div>`).join('')}
+      <button type="button" class="btn-s" data-savephones="1" style="margin-top:8px">บันทึกเบอร์</button>
+      <div class="mini" style="margin-top:6px">ที่พัก: ${esc(HOTEL.n)} ${esc(HOTEL.b)} · ${esc(HOTEL.addr)} · ${esc(HOTEL.zh)}</div></div>
+    <div class="panel"><h3>ประโยคขอความช่วยเหลือ <small>แตะเพื่อให้โทรศัพท์พูด</small></h3>
+      ${SOS_PHRASES.map(([zh,th])=>`<button type="button" class="sosp" data-say="${esc(zh)}"><b>${zh}</b><span>${th} 🔊</span></button>`).join('')}</div>
+    <div class="note">${ic('info')}หน้านี้เปิดได้แม้ไม่มีเน็ต</div></div>`;
+}
+
+/* ---------- live Disneyland waits (Queue-Times.com via our Supabase function) ---------- */
+let DZQ=null;
+const dzNorm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
+async function dzQueueFetch(force){
+  if(window.claude || (!force && DZQ && Date.now()-DZQ.at<4*60e3)) return;
+  try{ const j=await liveJSON(SB.url+'/functions/v1/hk-queue'), m={};
+    for(const r of j.rides||[]){ if(/single rider/i.test(r.name)) continue; const k=Object.keys(DZ_RIDES).find(k=>dzNorm(r.name).startsWith(dzNorm(DZ_RIDES[k].n))); if(k) m[k]={open:r.open, w:r.wait, at:Date.parse(r.updated)} }
+    DZQ={at:Date.now(), m, anyOpen:Object.values(m).some(x=>x.open)}; if(S.tab==='dz' && !S.dzEdit) renderDisney() }catch(e){}
+}
+
 /* ---------- plan view ---------- */
 function legHTML(l){
   if(l.line==='WALK') return `<div class="leg"><span class="ln bus">เดินเชื่อม</span> ${esc(stName(l.from))} <span class="arrow">→</span> ${esc(stName(l.to))}</div>`;
   return `<div class="leg">${esc(stName(l.from))} <span class="arrow">→</span> <span class="ln" style="background:${LINES[l.line].c}">${LINES[l.line].n}</span> <span class="arrow">→</span> <b>${esc(stName(l.to))}</b><span class="fare">ทาง ${esc(l.toward)} · ${l.stops} ป้าย</span></div>`;
 }
 // entrance → platform direction → change → exit, as a vertical line diagram
-function stepsHTML(legs, inEx, outEx){
+function stepsHTML(legs, inEx, outEx, dest){
   const endSt=legs[legs.length-1].to;
   return `<ol class="legs">` + legs.map((L,k)=>{
     const walk=L.line==='WALK', c=walk?'var(--muted)':LINES[L.line].c;
@@ -1017,7 +1148,7 @@ function stepsHTML(legs, inEx, outEx){
       <div class="how">${walk?`เดินเชื่อมสถานีไป ${esc(stName(L.to))} (ประมาณ 5–10 นาที)`
         :`${enter} ขึ้นชานชาลา <span class="ln" style="background:${c}">${LINES[L.line].n}</span> มุ่งหน้า <b>${esc(L.toward)}</b> · ${L.stops} ป้าย`}</div>${walk?'':liveBtn({mtr:[L.line,L.from,L.to]})}</div></li>`;
   }).join('') + `<li class="lg end" style="--c:var(--pink)"><span class="nd"></span><div><div class="stn">${esc(stName(endSt))}</div>
-    <div class="how">${outEx?`ลงสถานีนี้ ออกทาง <span class="exit">Exit ${esc(outEx)}</span>`:'ลงสถานีนี้ ดูป้าย Exit ในสถานีให้ใกล้ที่หมาย'}</div></div></li></ol>`;
+    <div class="how">${outEx?`ลงสถานีนี้ ออกทาง <span class="exit">Exit ${esc(outEx)}</span>`:'ลงสถานีนี้ ดูป้าย Exit ในสถานีให้ใกล้ที่หมาย'}</div>${outEx?`<div class="how">${exitWalkBtn(MTR.st[endSt][0], outEx, dest)}</div>`:''}</div></li></ol>`;
 }
 function autoIds(id){ return [`auto-${id}-0`,`auto-${id}-1`,`auto-${id}-t`] }
 function renderPlan(){
@@ -1032,7 +1163,7 @@ function renderPlan(){
     const gh = opts.length ? `<div class="gh"><div class="lab">วิธีไปจาก ${esc(prev.h)}${done?' (ถึงแล้ว)':''}</div>
       <div class="opts">${done||!open ? optHTML(it,sel,true) : opts.map(o=>optHTML(it,o,o.key===sel.key)).join('')}</div>
       ${!done ? `<button class="more" type="button" data-gh="${it.id}">${open?'ย่อ ▴':`เปลี่ยนวิธี / ดูเส้นทาง (${opts.length} แบบ) ▾`}</button>` : ''}
-      ${open && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''))}
+      ${open && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it))}
         <a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}ดูเวลารถไฟขบวนถัดไป (MTR)</a></div>` : ''}
       ${open && sel.bx ? `<div class="route">${busSteps(sel.bx)}</div>` : ''}
       ${!done && sel.manual ? `<div class="fin">${sel.key==='bus:c'?`<input type="text" id="no-${it.id}" placeholder="เลขสาย" value="${esc(it.go&&it.go.no||'')}" style="width:80px">`:''}
@@ -1216,7 +1347,7 @@ function plannerHTML(){
         <div class="sum"><div><small>ค่ารถ/คน</small><b>${fare!=null?hk(fare):'–'}</b><small class="num">${fare!=null?thb(fare):''}</small></div>
           <div><small>เปลี่ยนสาย</small><b>${changes}</b><small>ครั้ง</small></div>
           <div><small>เวลาโดยประมาณ</small><b>~${legMins(legs)}</b><small>นาที</small></div></div>
-        ${stepsHTML(legs, null, place&&place.ll&&nearestExit(g.to,place.ll) ? exitTxt(nearestExit(g.to,place.ll)).replace(/^Exit /,'') : place?place.ex:null)}
+        ${stepsHTML(legs, null, place&&place.ll&&nearestExit(g.to,place.ll) ? exitTxt(nearestExit(g.to,place.ll)).replace(/^Exit /,'') : place?place.ex:null, place&&place.ll)}
         ${place&&place.x?`<div class="xnote">${esc(place.x)}</div>`:''}
         <div class="acts">
           <button class="btn-s pay" type="button" id="go-add">${ic('plus')}เพิ่มลงแผน</button>
@@ -1330,7 +1461,9 @@ const DZ_PLAN = [
   {t:'19:45', e:'21:00', zone:'โชว์ Momentous', why:'จองที่หน้าปราสาทก่อนเริ่ม 20:30 ตามแผน', rides:[]}
 ];
 const DZ_LV = ['','เบา','กลาง','หวาดเสียว'];
-function waitTag(r,k){ const lv=k&&dzLive()[k], fresh=lv&&Date.now()-lv.at<40*60e3, w=fresh?lv.w:r.avg, c = w>=30?'var(--pink)':w>=20?'var(--sun)':'var(--mint)';
+function waitTag(r,k){ const lv=k&&dzLive()[k], q=k&&DZQ&&DZQ.anyOpen&&DZQ.m[k]&&Date.now()-DZQ.m[k].at<20*60e3?DZQ.m[k]:null;
+  if(!(lv&&Date.now()-lv.at<40*60e3) && q && !q.open) return `<span class="wt" style="--wc:var(--muted)" data-dzedit="${k}" role="button">ปิดอยู่</span>`;
+  const fresh=(lv&&Date.now()-lv.at<40*60e3)||!!q, w=lv&&Date.now()-lv.at<40*60e3?lv.w:q?q.w:r.avg, c = w>=30?'var(--pink)':w>=20?'var(--sun)':'var(--mint)';
   return `<span class="wt" style="--wc:${c}" data-dzedit="${k}" role="button">${fresh?`ตอนนี้รอ ${w} นาที`:`เฉลี่ย ~${r.avg} นาที`} ✎</span>` }
 
 // lands around the castle (rough layout from park maps; 1 unit ≈ 4 min walk)
@@ -1342,12 +1475,13 @@ const dzWalk = (a,b) => { const A=DZ_LANDS[a], B=DZ_LANDS[b]; return Math.round(
 function dzLive(){ try{ return JSON.parse(lsGet('hk-dzlive','{}')) }catch(e){ return {} } }
 function dzWait(k, min){
   const live=dzLive()[k]; if(live && Date.now()-live.at < 40*60e3) return {w:live.w, live:true, ago:Math.round((Date.now()-live.at)/60e3)};
+  const q=DZQ&&DZQ.anyOpen&&DZQ.m[k]; if(q && Date.now()-q.at<20*60e3) return q.open ? {w:q.w, live:true, qt:true, ago:Math.max(0,Math.round((Date.now()-q.at)/60e3))} : {w:999, closed:true};
   const h=Math.floor(min/60), f=DZ_HOUR[h] ?? (h<9?.5:.4); return {w:Math.round(DZ_RIDES[k].avg*f/5)*5, live:false};
 }
 function dzRecommend(){
   const n=hkNow(), min = n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 600), here=S.dzLand||'MS';
   return Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]).map(k=>{ const w=dzWait(k,min), walk=dzWalk(here,DZ_LAND_OF[k]);
-    return {k, w, walk, score:w.w + walk + (DZ_RIDES[k].avg>=25 && min<11*60 ? -10 : 0)} }).sort((a,b)=>a.score-b.score).slice(0,3);
+    return w.closed ? null : {k, w, walk, score:w.w + walk + (DZ_RIDES[k].avg>=25 && min<11*60 ? -10 : 0)} }).filter(Boolean).sort((a,b)=>a.score-b.score).slice(0,3);
 }
 function dzSmartHTML(){
   const recs=dzRecommend(), n=hkNow(), today=n.date==='2026-11-16';
@@ -1356,9 +1490,9 @@ function dzSmartHTML(){
     <div class="places" style="margin:0 -14px 8px">${Object.entries(DZ_LANDS).map(([k,l])=>`<button class="chip" type="button" data-dzland="${k}" aria-pressed="${(S.dzLand||'MS')===k}">${l[0]}</button>`).join('')}</div>
     ${today?'':`<div class="mini" style="margin-bottom:6px">ยังไม่ถึงวันที่ 16 ลองดูคำแนะนำตามเวลา: ${[10,12,14,17,19].map(h=>`<button type="button" class="chip num" data-dzsim="${h*60}" aria-pressed="${(S.dzSimMin??600)===h*60}" style="padding:2px 8px;font-size:12px">${h}:00</button>`).join(' ')}</div>`}
     ${recs.length ? recs.map((r,i)=>{ const R=DZ_RIDES[r.k]; return `<div class="dzrec${i===0?' top':''}"><span class="rk">${i+1}</span>
-      <span class="rn"><b>${esc(R.n)}</b><small>${DZ_LANDS[DZ_LAND_OF[r.k]][0]} · เดิน ~${r.walk} นาที · ${r.w.live?`รอ ${r.w.w} นาที (ข้อมูลจริงที่กรอกเมื่อ ${r.w.ago} นาทีก่อน)`:`คาดว่ารอ ~${r.w.w} นาที`}</small></span>
+      <span class="rn"><b>${esc(R.n)}</b><small>${DZ_LANDS[DZ_LAND_OF[r.k]][0]} · เดิน ~${r.walk} นาที · ${r.w.qt?`รอ ${r.w.w} นาที (สดเมื่อ ${r.w.ago} นาทีก่อน)`:r.w.live?`รอ ${r.w.w} นาที (ข้อมูลจริงที่กรอกเมื่อ ${r.w.ago} นาทีก่อน)`:`คาดว่ารอ ~${r.w.w} นาที`}</small></span>
       <b class="num tot">~${r.w.w+r.walk}<small>นาที</small></b></div>` }).join('') : '<p class="mini">เล่นครบทุกเครื่องแล้ว!</p>'}
-    <div class="note">${ic('info')}เวลารอคาดจากสถิติย้อนหลังตามช่วงเวลา ถ้าเห็นเวลารอจริงที่ป้ายหน้าเครื่องเล่นหรือในแอป Disney แตะป้ายเวลารอของเครื่องนั้นด้านล่างแล้วกรอก แอปจะใช้ตัวเลขจริงแทนเป็นเวลา 40 นาที</div>
+    <div class="note">${ic('info')}${DZQ&&DZQ.anyOpen?`เวลารอสดทุก 5 นาที Powered by Queue-Times.com (อัปเดต ${new Date(DZQ.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.) · `:''}เวลารอคาดจากสถิติย้อนหลังตามช่วงเวลา ถ้าเห็นเวลารอจริงที่ป้ายหน้าเครื่องเล่นหรือในแอป Disney แตะป้ายเวลารอของเครื่องนั้นด้านล่างแล้วกรอก แอปจะใช้ตัวเลขจริงแทนเป็นเวลา 40 นาที</div>
     <div class="acts"><a class="btn-s" href="https://queue-times.com/parks/31/queue_times" target="_blank" rel="noopener">${ic('info')}ดูเวลารอสด</a>
       <button type="button" class="btn-s" data-dzreset="1">${S.dzResetSure?'แตะอีกครั้งเพื่อล้าง':'ล้างที่เล่นแล้วทั้งหมด'}</button></div></div>`;
 }
@@ -1468,7 +1602,8 @@ function tripMapSVG(){
       <rect x="-7" y="-1" width="14" height="12" rx="1.5" fill="var(--sun)" stroke="#e7a52a" stroke-width="1.5"/>
       <rect x="-2" y="4" width="4" height="7" rx="1" fill="#fff"/><path d="M-1 -5 A1.2 1.2 0 0 1 1 -5 Q0 -3 0 -3 Q0 -3 -1 -5Z" fill="#fff"/>
       <text y="22" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--ink)" stroke="var(--surface)" stroke-width="2.6" paint-order="stroke">ที่พัก</text></g>
-    ${icons}</g>
+    ${icons}
+    ${gpsFresh()?(()=>{ const p=px(S.gps.ll); return p[0]>0&&p[0]<MAP.w&&p[1]>0&&p[1]<MAP.h ? `<g transform="translate(${p[0].toFixed(1)},${p[1].toFixed(1)})"><circle r="9" fill="#3FB2E6" opacity=".25"><animate attributeName="r" values="5;12;5" dur="2s" repeatCount="indefinite"/></circle><circle r="4.5" fill="#3FB2E6" stroke="#fff" stroke-width="1.8"/><text y="-8" text-anchor="middle" font-size="7.5" font-weight="800" fill="#1d7fb0" stroke="#fff" stroke-width="2.4" paint-order="stroke">ฉัน</text></g>` : '' })():''}</g>
   </svg>`;
 }
 
@@ -1502,7 +1637,11 @@ function alertsHTML(){
     if(spent>per) out.push(['warn',`วันนี้ใช้ไป ${hk(spent)} เกินงบเฉลี่ยต่อวัน (${hk(per)})`,'money']);
   }
   if(td){ const {delay}=dayDelay(dayItems(td)); if(delay!=null && delay>=30) out.push(['info',`ช้ากว่าแผน ${delay} นาที ลองตัดหรือเลื่อนบางจุดในแผนวันนี้`,'plan']) }
-  if(td && (n.min>=23*60 || n.min<60) && planSpot().src!=='hotel') out.push(['warn','ดึกแล้ว รถไฟ MTR เที่ยวสุดท้ายส่วนใหญ่ราวเที่ยงคืนถึงตีหนึ่ง กด "พากลับที่พัก" เพื่อดูทาง','home']);
+  const now=n.min<4*60?n.min+1440:n.min, lh=(td||n.date==='2026-11-18') && now>=21*60 ? lastHome() : null;
+  if(lh){ const left=lh.m-now;
+    if(left<0) out.push(['warn',`รถไฟเที่ยวสุดท้ายกลับมงก๊กจาก ${stName(NET.byCode[lh.st])} ออกไปแล้ว (${hhmm(lh.m%1440)} น.) กด "พากลับที่พัก" ดูรถบัสกลางคืนหรือแท็กซี่`,'home']);
+    else if(left<=60) out.push(['warn',`รถไฟเที่ยวสุดท้ายกลับที่พัก: ขึ้นที่ ${stName(NET.byCode[lh.st])} ก่อน ${hhmm(lh.m%1440)} น. (อีก ${left} นาที)`,'home']) }
+  else if(td && (n.min>=23*60 || n.min<60) && planSpot().src!=='hotel') out.push(['warn','ดึกแล้ว รถไฟ MTR เที่ยวสุดท้ายส่วนใหญ่ราวเที่ยงคืนถึงตีหนึ่ง กด "พากลับที่พัก" เพื่อดูทาง','home']);
   if(!td && daysTo>0 && daysTo<=7){
     const c=checkStats(); if(me!=null && c.mine<c.total) out.push(['info',`อีก ${daysTo} วันบิน เช็คลิสต์ของคุณยังเหลือ ${c.total-c.mine} อย่าง`,'check']);
     out.push(['info','เช็คเวลาเปิด Disneyland วันที่ 16 และกระเช้า Ngong Ping 360 วันที่ 17 (มีปิดซ่อมเป็นช่วงๆ)','dz']);
@@ -1575,8 +1714,11 @@ function renderHome(){
       <div class="hsub">${esc(sub)}</div>
       <div class="hdate">ส. 14 – อ. 17 พ.ย. 2569 · ${nm(0)} & ${nm(1)}</div>
     </div>
+    ${warnHTML()}
     ${alertsHTML()}
     ${nextStopHTML()}
+    ${gpsCardHTML()}
+    <button type="button" class="sosbtn" data-sos="1">🆘 บัตรฉุกเฉิน · 999 · สถานกงสุลไทย</button>
     ${daySummaryHTML()}
     ${weatherHTML(td)}
     ${checklistHTML()}
@@ -1603,6 +1745,7 @@ function navSpot(n, ll, extra={}){ const ns = ll ? nearestStation(ll) : null; re
 const stationSpot = code => { const i=NET.byCode[code]; return navSpot(stName(i)+' (MTR)', stLL(code), {st:code, isSt:true}) };
 // "where am I": the last stop marked arrived today, otherwise the guesthouse
 function planSpot(){
+  if(gpsFresh()){ const n=nearestStation(S.gps.ll); return navSpot('ตำแหน่งปัจจุบัน (GPS)', S.gps.ll, {st:n&&n.m<700?n.c:undefined, src:'gps'}) }
   const td=tripDay(); const list = td ? dayItems(td).filter(i=>S.done[i.id]) : [];
   const it = list.length ? list[list.length-1] : null;
   return it && locOf(it) ? navSpot(it.h, locOf(it), {st:it.st||undefined, src:'plan'}) : navSpot('ที่พัก (Sun Hing Building)', HOTEL_LL, {st:'MOK', src:'hotel', exit:'E1', exitName:'ใกล้ที่พัก'});
@@ -1632,7 +1775,7 @@ function navRoutes(a,b){
 }
 function navStepsHTML(o, a, b){
   if(o.mode==='mtr') return `${o.w1>60?`<div class="how" style="margin-bottom:6px">${ic('walk')} เดินจาก ${esc(a.n)} ไปสถานี ${esc(stName(NET.byCode[o.from]))} ~${o.w1} ม.${o.inEx?` เข้าทาง <span class="exit">Exit ${esc(o.inEx.ref)}</span>`:''}</div>`:''}
-    ${stepsHTML(o.legs, o.inEx?exitTxt(o.inEx).replace(/^Exit /,''):null, o.outEx?exitTxt(o.outEx).replace(/^Exit /,''):null)}
+    ${stepsHTML(o.legs, o.inEx?exitTxt(o.inEx).replace(/^Exit /,''):null, o.outEx?exitTxt(o.outEx).replace(/^Exit /,''):null, b&&!b.isSt?b.ll:null)}
     ${o.w2>60?`<div class="how">${ic('walk')} ออกสถานีแล้วเดินต่อ ~${o.w2} ม. ถึง ${esc(b.n)}</div>`:''}
     <a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}เวลารถไฟขบวนถัดไป</a>`;
   if(o.bx) return busSteps(o.bx);
@@ -1790,6 +1933,7 @@ function drawSheet(){
       <button type="button" data-addx="place"><span class="ai" style="background:var(--mint-soft);color:var(--mint)">${ic('pin')}</span><b>เพิ่มที่เที่ยว</b><small>ค้นหาสถานที่ ร้านอาหาร ลงแผนวัน${tripDay()?'นี้':'ที่ '+DAYS[S.day-1].d+' พ.ย.'}</small></button></div></div>`; return }
   if(d.kind==='hotel'){ el.innerHTML = '<div class="wrap"><div class="grab"></div><h2 id="sheet-title">ที่พักของเรา <button class="x" type="button" data-close aria-label="ปิด">'+ic('x')+'</button></h2>'+hotelCardHTML()+'</div>'; return }
   if(d.kind==='water'){ el.innerHTML = waterSheetHTML(); return }
+  if(d.kind==='sos'){ el.innerHTML = sosSheetHTML(); return }
   if(d.kind==='taxi'){ el.innerHTML = `<div class="wrap"><div class="grab"></div>
       <h2 id="sheet-title">ยื่นให้คนขับดู <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
       <div class="taxi"><div class="tz">請送我去</div><div class="tz big">${HOTEL.zh}</div>
@@ -2045,7 +2189,7 @@ function renderAll(){
   if(S.tab==='plan') renderPlan(); else if(S.tab==='go') renderGo(); else if(S.tab==='money') renderMoney(); else if(S.tab==='dz') renderDisney(); else if(S.tab==='home') renderHome(); else renderSet();
 }
 function setTab(t){
-  S.tab=t; lsSet('hk-tab',t);
+  S.tab=t; lsSet('hk-tab',t); if(t==='dz') dzQueueFetch();
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===t));
   ['home','plan','go','dz','money','set'].forEach(k=>{ const v=document.getElementById('v-'+k); if(v) v.hidden = k!==t });
   renderAll(); window.scrollTo(0,0);
@@ -2097,6 +2241,10 @@ document.addEventListener('click', e=>{
   if(t.id==='nav-add'){ const b=S.nav.to; const dn=tripDay()||S.day; openItem(dn,null); const p=PL&&PL.p.find(q=>(q[2]||q[0])===b.n); if(p){ pickPlace(PL.p.indexOf(p)); return } Object.assign(S.sheet,{h:b.n.replace(/ (MTR)$/,''), st:b.st||'', ll:b.ll}); drawSheet(); return }
   if(ds.hday){ const v=Number(ds.hday); S.homeDay = S.homeDay===v ? null : v; renderHome(); return }
   if(ds.live) return liveShow(ds.live);
+  if(ds.gps){ if(ds.gps==='on') gpsStart(true); else gpsStop(); renderHome(); return }
+  if(ds.sos){ openSheet({kind:'sos'}); return }
+  if(ds.say) return speakHK(ds.say);
+  if(ds.savephones){ const p=[0,1].map(i=>(document.getElementById('ph'+i).value||'').trim().slice(0,24)); S.settings={...S.settings, phones:p}; if(db) db.doc('trip/settings').set(S.settings).catch(()=>toast('บันทึกไม่สำเร็จ')); else lsSave(); toast('บันทึกเบอร์แล้ว'); drawSheet(); return }
   if(ds.setkey){ const v=(document.getElementById('keyin').value||'').trim().replace(/^.*#k=/,''); if(v.length<16){ toast('รหัสไม่ถูกต้อง'); return } lsSet('hk-key',v); location.reload(); return }
   if(ds.mapzoom){ S.mapBig=!S.mapBig; renderHome(); const w=document.querySelector('.tmwrap');
     if(w&&S.mapBig){ const h=px(HOTEL_LL), sc=w.scrollWidth/MAP.w; w.scrollLeft=h[0]*sc-w.clientWidth/2; w.scrollTop=h[1]*sc-w.clientHeight/2 } return }
@@ -2178,6 +2326,8 @@ try{ const g=JSON.parse(lsGet('hk-go','null')); if(g && NET && g.from in NET.byC
 let savedTab = lsGet('hk-tab','home'); if(savedTab==='set'){ savedTab='money'; S.moneySub='oct' }
 S.tab = ['home','plan','go','dz','money'].includes(savedTab) ? savedTab : 'home';
 setTab(S.tab);
+warnFetch(); setInterval(warnFetch, 10*60e3); gpsStart(false);
+setInterval(()=>{ if(S.tab==='dz') dzQueueFetch() }, 60e3);
 setInterval(()=>{ if(!S.sheet && S.tab==='home' && document.activeElement?.id!=='chk-new') renderHome(); if(!S.sheet && S.tab==='plan') renderPlan(); if(!S.sheet && S.tab==='dz' && !S.dzEdit) renderDisney(); renderHeader() }, 60000);
 
 function goLocal(){
