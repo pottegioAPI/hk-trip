@@ -390,6 +390,17 @@ nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding-
 .wbtn{flex:none;width:38px;height:38px;border-radius:50%;border:none;background:var(--sky-soft);color:var(--sky);display:grid;place-items:center;padding:0}
 .wbtn svg{width:22px;height:22px}
 .ocline{display:block;margin-top:8px;border:none;background:rgba(255,255,255,.22);color:inherit;border-radius:99px;padding:5px 12px;font-size:12.5px;font-weight:600}
+.hero .lab{font-size:15px;opacity:1}
+.hero .lab b{font-weight:700}
+.hero .big{font-size:40px;margin-top:2px}
+.bar.left{height:12px;background:rgba(0,0,0,.18)}
+.bar.left i{background:#fff}
+.barcap{font-size:12.5px;opacity:.95;margin-top:2px}
+.hero .people{gap:12px;margin-top:14px}
+.hero .person{background:#fff;color:var(--ink);padding:12px 14px}
+.hero .person .nm{font-size:12.5px;font-weight:500;color:var(--muted)}
+.hero .person .v{font-size:21px;margin:2px 0}
+.hero .person small{color:var(--muted);opacity:1;font-size:12px}
 .nextc{background:var(--surface);border:2px solid var(--pink);border-radius:22px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px}
 .nextc.pre{border-color:var(--line);box-shadow:none}
 .nextc .nk{font-size:12.5px;font-weight:700;color:var(--pink);letter-spacing:.02em}
@@ -1772,23 +1783,24 @@ function renderMoney(){
     ${moneySw()}
     ${setPanelHTML()}
     <div class="hero">
-      ${B ? `<div class="lab">${left>=0?'เงินคงเหลือ':'เกินงบแล้ว'}ของ${nm(me)} · ส่วนตัว ${nm(other(me))} มองไม่เห็น</div>
+      ${B ? `<div class="lab"><b>${left>=0?'เงินคงเหลือ':'เกินงบแล้ว'}</b> ของ${nm(me)}</div>
       <div class="big num">${hk(Math.abs(left))} <small>${thb(Math.abs(left))}</small></div>`
       : `<div class="lab">${nm(me)} ใช้ไปแล้ว · ส่วนตัว ${nm(other(me))} มองไม่เห็น</div>
       <div class="big num">${hk(tot)} <small>${thb(tot)}</small></div>`}
       ${(()=>{ const o=octoState(); return o.spent||o.bal!=null ? `<button type="button" class="ocline" data-msub="oct">จ่ายผ่าน Octopus ${hk(o.spent)} · คงเหลือในบัตร ${o.bal==null?'–':hk(o.bal)} ›</button>` : '' })()}
-      <div class="bar${left<0?' over':''}" style="margin-top:10px"><i style="width:${B?Math.min(100,tot/B*100):0}%"></i></div>
+      ${B?`<div class="bar left${left<0?' over':''}" style="margin-top:12px"><i style="width:${Math.max(0,Math.min(100,left/B*100))}%"></i></div>
+      <div class="barcap">${left>=0?`เหลือ ${Math.round(left/B*100)}% ของงบ`:'ใช้เกินงบแล้ว'} · ส่วนตัว ${nm(other(me))} มองไม่เห็น</div>`:''}
       <div class="people" style="margin-top:8px">
         ${B ? `<div class="person"><div class="nm">ใช้ไปแล้ว</div><div class="v num">${hk(tot)}</div><small class="num">จากงบ ${hk(B)}</small></div>`
           : `<div class="person"><div class="nm">งบของ${nm(me)}</div><div class="v num">ยังไม่ตั้ง</div><small>ไปตั้งที่แท็บ ตั้งงบ</small></div>`}
         <div class="person"><div class="nm">ใช้ได้อีกวันละ</div><div class="v num">${B&&left>0&&daysLeft>0?'~'+hk(left/daysLeft):'–'}</div><small>${daysLeft?`เหลือ ${daysLeft} วัน`:'จบทริปแล้ว'}</small></div>
       </div>
     </div>
-    <div class="panel"><h3>เคลียร์เงิน ${nm(0)} ↔ ${nm(1)} <small>เห็นตรงกันทั้ง 2 เครื่อง</small></h3>
+    ${owe<0.05?'':`<div class="panel"><h3>เคลียร์เงิน ${nm(0)} ↔ ${nm(1)} <small>เห็นตรงกันทั้ง 2 เครื่อง</small></h3>
       <div class="debt">${owe<0.05 ? `<div class="settle"><div class="ic">${ic('check',2.4)}</div><div><b>ไม่มีใครติดเงินใคร</b><br><span class="mini">รายการหารหรือออกให้ก่อนจะมาสรุปที่นี่</span></div></div>`
         : `<div class="settle"><div class="ic">${ic('swap')}</div><div><b>${nm(debtor)}</b> ต้องคืน <b>${nm(creditor)}</b><br><span class="num" style="font-family:var(--display);font-size:24px">${hk(owe)}</span> <span class="mini num">${thb(owe)}</span></div></div>
            <button class="save" type="button" id="settle-btn" style="margin-top:0">${nm(debtor)} คืนเงิน ${hk(owe)} แล้ว</button>`}
-        <div class="mini">ยอดค้างคิดจากรายการแบบ "หารครึ่ง" และ "ออกให้ก่อน" ทั้งหมด หักกับที่คืนแล้ว</div></div></div>
+        <div class="mini">ยอดค้างคิดจากรายการแบบ "หารครึ่ง" และ "ออกให้ก่อน" ทั้งหมด หักกับที่คืนแล้ว</div></div></div>`}
     <div class="panel"><h3>${nm(me)} ใช้ไปกับอะไร</h3>${tot?`<div class="stack">${CATS.filter(c=>byCat[c.k]).map(c=>`<i style="width:${byCat[c.k]/tot*100}%;background:${c.c}"></i>`).join('')}</div>`:''}
       <div class="legend">${CATS.map(c=>`<div><span class="dot" style="background:${c.c}"></span>${c.n}<span class="n">${hk(byCat[c.k]||0)}</span></div>`).join('')}</div></div>
     <div class="panel"><h3>รายวันของ${nm(me)} <small>HK$</small></h3><div class="daybars">${DAYS.map((d,i)=>`<div class="db"><span class="amt num">${byDay[i]?fmt(byDay[i]):''}</span>
