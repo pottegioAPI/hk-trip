@@ -50,6 +50,8 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .sync.on i{background:var(--mint)}
 .live{margin-top:6px}.lvl{list-style:none;margin:0 0 6px;padding:8px 10px;background:var(--mint-soft);border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:13px}.lvl li{display:flex;gap:8px;align-items:baseline}.lvl b{min-width:62px;color:var(--ink)}
 .sync.wait i{background:var(--sun)}
+.dzfw{background:linear-gradient(135deg,#2A1B5E,#6B3FA0);color:#fff;border-radius:18px;padding:12px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:3px}.dzfw b{font-family:var(--display);font-weight:500;font-size:17px}.dzfw small{opacity:.9;font-size:12.5px}.dzfw label{color:#fff;font-size:12px}.dzfw input{color:var(--ink)}.dzfw.now{background:var(--danger);animation:flash 1.2s ease-in-out infinite alternate}.dzmeal{background:var(--sun-soft);border-radius:16px;padding:10px 12px;margin-bottom:10px;display:flex;flex-direction:column;gap:2px}.dzmeal.go{background:var(--mint-soft);border:2px solid var(--mint)}.dzmeal b{font-size:15px}.dzmeal small{font-size:12.5px;color:var(--muted)}
+@keyframes rideflash{from{filter:brightness(1)}to{filter:brightness(1.35)}}.ridehead.flash{animation:rideflash .5s ease-in-out infinite alternate}
 .exh{background:var(--sun-soft);border-radius:10px;padding:6px 9px;color:var(--ink)!important;display:block!important}.arrowbox{width:220px;height:220px;margin:6px auto 10px;border-radius:50%;background:var(--sky-soft);display:grid;place-items:center;box-shadow:inset 0 0 0 6px var(--surface),0 0 0 3px var(--sky)}.arrow{width:150px;height:150px;transition:transform .3s}.arrowinfo{text-align:center;display:flex;flex-direction:column;gap:2px;margin-bottom:10px}.arrowinfo b{font-family:var(--display);font-size:30px}.arrowinfo small{color:var(--muted)}
 .ridehead{background:var(--sky-soft);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;margin-bottom:10px;position:sticky;top:0;z-index:1}.ridehead.hot{background:var(--danger);color:#fff}.ridehead b{font-family:var(--display);font-size:26px}.ridehead small{opacity:.8}.ridelist{list-style:none;margin:0;padding:0 0 0 6px;max-height:46vh;overflow:auto}.ridelist li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:13.5px;position:relative}.ridelist li i{width:12px;height:12px;border-radius:50%;border:3px solid var(--sky);background:var(--surface);flex:none;margin-top:3px}.ridelist li.past{opacity:.45}.ridelist li.past i{background:var(--sky)}.ridelist li.here i{background:var(--pink);border-color:var(--pink);box-shadow:0 0 0 4px var(--pink-soft)}.ridelist li.end i{border-color:var(--danger)}.ridelist li.end b{color:var(--danger)}.ridelist li.prev small{color:var(--sun);font-weight:700}
 .ghbtns{display:flex;gap:14px;flex-wrap:wrap}.opts.others{margin-top:4px}.opts.others .op{opacity:.92}
@@ -599,7 +601,9 @@ const DEFAULT_PLAN = [
  [
   {id:'3a',t:'08:00',e:'08:45',h:'อาหารเช้าให้อิ่มจุก',p:'วันนี้ต้องเดินเยอะมาก กินให้เต็มที่',st:'MOK'},
   {id:'3b',t:'09:00',e:'20:30',h:'Hong Kong Disneyland!',exit:'A',p:'เล่นเครื่องเล่น ถ่ายรูปกับตัวละคร ช้อปของที่ระลึก',tip:'รถไฟสาย Disneyland มีหน้าต่างรูปมิกกี้ อย่าลืมถ่ายรูป',map:'Hong Kong Disneyland',st:'DIS',ll:[22.3130,114.0413]},
-  {id:'3c',t:'20:30',e:'21:00',h:'โชว์ Momentous หน้าปราสาท',p:'การแสดงพลุ แสง สี เสียง',tip:'ไปจองที่หน้าปราสาทก่อนเวลาสักหน่อย จะได้มุมสวย',st:'DIS'},
+  {id:'3l',t:'12:15',e:'13:15',h:'มื้อเที่ยง Royal Banquet Hall',p:'ใช้ตั๋วรวมอาหาร ร้านอยู่ Fantasyland ใกล้ปราสาท',tip:'ดูคำแนะนำในแท็บ Disneyland ว่าควรกินตอนไหนดี',st:'DIS'},
+  {id:'3n',t:'17:30',e:'18:30',h:'มื้อเย็น Royal Banquet Hall',p:'ใช้ตั๋วรวมอาหาร กินให้เสร็จก่อนไปจองที่ดูพลุ',st:'DIS'},
+  {id:'3c',t:'20:30',e:'21:00',h:'🎆 พลุหน้าปราสาท (ห้ามพลาด!)',p:'การแสดงพลุ แสง สี เสียง',tip:'ไปจองที่หน้าปราสาทก่อนเวลาสักหน่อย จะได้มุมสวย',st:'DIS'},
   {id:'3d',t:'21:00',e:'22:00',h:'กลับที่พัก',p:'นั่ง MTR กลับแล้วเดินกลับเกสต์เฮาส์',st:'MOK',exit:'E1'}
  ],
  [
@@ -712,7 +716,7 @@ const OFFICIAL_EXITS = {
   'hotel':['MOK','E1','ใกล้ที่พัก'], '1b':['MOK','E1','Chong Hing Square (601 Nathan Rd) ติดกับที่พัก'], '2a':['MOK','E1','ใกล้ที่พัก'], '2g':['MOK','E1','ใกล้ที่พัก'], '3a':['MOK','E1','ใกล้ที่พัก'], '3d':['MOK','E1','ใกล้ที่พัก'], '4a':['MOK','E1','ใกล้ที่พัก'],
   '1c':['TST','E','Avenue of Stars'], '2b':['WTS','B3','Sik Sik Yuen Wong Tai Sin Temple'], '2c':['CKT','B','Che Kung Temple'],
   '2d':['CEN','A','Two IFC / Central Harbourfront ทางไป Exchange Square'], '2f':['KET','C','Cadogan Street Promenade ริมทะเล'],
-  '3b':['DIS','A','Hong Kong Disneyland'], '3c':['DIS','A','Hong Kong Disneyland'],
+  '3b':['DIS','A','Hong Kong Disneyland'], '3c':['DIS','A','Hong Kong Disneyland'], '3l':['DIS','A','Hong Kong Disneyland'], '3n':['DIS','A','Hong Kong Disneyland'],
   '4b':['TUC','C','Citygate Outlets'], '4c':['TUC','B','Tung Chung Cable Car Terminal (Ngong Ping 360)'], '4d':['TUC','C','Citygate Outlets']
 };
 const HOTEL_IDS = new Set(['hotel','1b','2a','2g','3a','3d','4a']);
@@ -1142,7 +1146,8 @@ async function dzQueueFetch(force){
   if(window.claude || (!force && DZQ && Date.now()-DZQ.at<4*60e3)) return;
   try{ const j=await liveJSON(SB.url+'/functions/v1/hk-queue'), m={};
     for(const r of j.rides||[]){ if(/single rider/i.test(r.name)) continue; const k=Object.keys(DZ_RIDES).find(k=>dzNorm(r.name).startsWith(dzNorm(DZ_RIDES[k].n))); if(k) m[k]={open:r.open, w:r.wait, at:Date.parse(r.updated)} }
-    DZQ={at:Date.now(), m, anyOpen:Object.values(m).some(x=>x.open)}; if(S.tab==='dz' && !S.dzEdit) renderDisney() }catch(e){}
+    const rb=(j.rides||[]).find(r=>dzNorm(r.name)==='royalbanquethall');
+    DZQ={at:Date.now(), m, anyOpen:Object.values(m).some(x=>x.open), rbh: rb ? {open:rb.open, w:rb.wait, at:Date.parse(rb.updated)} : null}; if(S.tab==='dz' && !S.dzEdit) renderDisney() }catch(e){}
 }
 
 
@@ -1508,8 +1513,8 @@ function rideDraw(){
   if(gpsFresh()){ // the stop we are at or just passed: the closest one, never going backwards
     let best=R.at, bd=Infinity; for(let i=R.at;i<R.stops.length;i++){ const d=metres(S.gps.ll, stopLL(R.stops[i])); if(d<bd){ bd=d; best=i } } R.at=best; R.dist=bd }
   const last=R.stops.length-1, left=last-R.at, nextD=gpsFresh()&&R.at<last?metres(S.gps.ll, stopLL(R.stops[R.at+1])):null;
-  if(left<=1 && !R.warned && gpsFresh()){ R.warned=true; try{ const u=new SpeechSynthesisUtterance('ป้ายหน้าลงแล้ว เตรียมกดกริ่ง'); u.lang='th-TH'; speechSynthesis.speak(u) }catch(e){} toast(R.gmb?'ป้ายหน้าลง! บอกคนขับ "เหยา ล็อก" (有落)':'ป้ายหน้าลง! กดกริ่งได้เลย') }
-  el.innerHTML = `<div class="ridehead${left<=1?' hot':''}"><b class="num">${left<=0?'ถึงป้ายลงแล้ว 🎉':left===1?'ป้ายหน้าลง!':'อีก '+left+' ป้าย'}</b>
+  if(left<=1 && !R.warned && gpsFresh()){ R.warned=true; try{ navigator.vibrate && navigator.vibrate([400,150,400,150,400]) }catch(e){} toast(R.gmb?'ป้ายหน้าลง! บอกคนขับ "เหยา ล็อก" (有落)':'ป้ายหน้าลง! กดกริ่งได้เลย') }
+  el.innerHTML = `<div class="ridehead${left<=1?' hot flash':''}"><b class="num">${left<=0?'ถึงป้ายลงแล้ว 🎉':left===1?'ป้ายหน้าลง!':'อีก '+left+' ป้าย'}</b>
       <span>${left<=1?(R.gmb?'บอกคนขับว่า "เหยา ล็อก" (有落) แปลว่าขอลง':'กดกริ่ง (ปุ่ม STOP สีแดง) ตอนนี้เลย'):`ลงที่ ${esc(stopName(R.stops[last]))}`}</span>
       ${!gpsFresh()?'<small>เปิด GPS เพื่อให้แอปนับป้ายให้อัตโนมัติ</small>':nextD!=null?`<small>ป้ายถัดไปอีก ~${wDist(nextD)}</small>`:''}</div>
     <ol class="ridelist">${R.stops.map((s,i)=>`<li class="${i<R.at?'past':i===R.at?'here':''}${i===last?' end':i===last-1?' prev':''}"><i></i><span>${esc(stopName(s))}${i===last?' <b>← ลงป้ายนี้</b>':i===last-1?' <small>ป้ายก่อนลง เตรียมกดกริ่ง</small>':''}</span></li>`).join('')}</ol>`;
@@ -1852,13 +1857,14 @@ const DZ_RIDES = {
 const DZ_PLAN = [
   {t:'10:00', e:'11:15', zone:'World of Frozen', why:'เปิดสวนคนยังน้อย รีบไปโซนที่แถวยาวที่สุดก่อน', rides:['oaken','frozen']},
   {t:'11:15', e:'12:15', zone:'Toy Story Land', why:'แถวยังสั้นก่อนเที่ยง', rides:['para','rc','slinky']},
-  {t:'12:15', e:'13:30', zone:'Grizzly Gulch + Mystic Point', why:'อยู่ติดกัน ใช้แถวคนเดียวถ้าแถวปกติยาว', rides:['grizzly','manor']},
-  {t:'13:30', e:'14:15', zone:'พักกินข้าว', why:'กินหลังคนเที่ยงลด หรือกินก่อน 11:30 ก็ได้', rides:[], meal:'River View Cafe หรือ Explorer\'s Club Restaurant (Adventureland)'},
+  {t:'12:15', e:'13:15', zone:'มื้อเที่ยง Royal Banquet Hall', why:'ใช้ตั๋วรวมอาหาร ร้านอยู่ Fantasyland ใกล้ปราสาท · ถ้าเครื่องเล่นแถวยาวแต่ร้านคิวสั้น แอปจะแนะนำให้กินก่อน', rides:[], meal:'Royal Banquet Hall (ตั๋วรวมมื้อเที่ยง)'},
+  {t:'13:15', e:'14:15', zone:'Grizzly Gulch + Mystic Point', why:'อยู่ติดกัน ใช้แถวคนเดียวถ้าแถวปกติยาว', rides:['grizzly','manor']},
   {t:'14:15', e:'15:30', zone:'Tomorrowland', why:'เครื่องเล่นในร่ม แถวไม่ยาวทั้งวัน เหมาะช่วงบ่ายร้อน', rides:['hyper','ironman','antman']},
   {t:'15:30', e:'16:45', zone:'Fantasyland', why:'เครื่องเล่นเบาๆ ในร่ม พักขา', rides:['philhar','small','pooh','tea']},
   {t:'16:45', e:'17:45', zone:'Adventureland', why:'ช่วงเย็นแถวลดลง', rides:['jungle','dumbo']},
-  {t:'17:45', e:'19:45', zone:'เก็บตกที่ชอบ + มื้อเย็น', why:'แถวโซนยอดฮิตมักสั้นลงช่วงเย็น ลอง Frozen หรือ Toy Story อีกรอบ', rides:[], meal:'มื้อเย็นในสวน แล้วซื้อของที่ระลึกก่อนร้านแน่น'},
-  {t:'19:45', e:'21:00', zone:'โชว์ Momentous', why:'จองที่หน้าปราสาทก่อนเริ่ม 20:30 ตามแผน', rides:[]}
+  {t:'17:30', e:'18:30', zone:'มื้อเย็น Royal Banquet Hall', why:'กินให้เสร็จก่อน 19:00 จะได้มีเวลาไปจองที่ดูพลุ', rides:[], meal:'Royal Banquet Hall (ตั๋วรวมมื้อเย็น)'},
+  {t:'18:30', e:'19:45', zone:'เก็บตกที่ชอบ', why:'แถวโซนยอดฮิตมักสั้นลงช่วงเย็น ลอง Frozen หรือ Toy Story อีกรอบ', rides:[], meal:'มื้อเย็นในสวน แล้วซื้อของที่ระลึกก่อนร้านแน่น'},
+  {t:'19:45', e:'21:00', zone:'🎆 พลุและโชว์หน้าปราสาท (ห้ามพลาด!)', why:'ไปจองที่ลานหน้าปราสาทหรือปลาย Main Street ก่อนเริ่ม 30–40 นาที', rides:[]}
 ];
 const DZ_LV = ['','เบา','กลาง','หวาดเสียว'];
 function waitTag(r,k){ const lv=k&&dzLive()[k], q=k&&DZQ&&DZQ.anyOpen&&DZQ.m[k]&&Date.now()-DZQ.m[k].at<20*60e3?DZQ.m[k]:null;
@@ -1878,20 +1884,21 @@ function dzWait(k, min){
   const q=DZQ&&DZQ.anyOpen&&DZQ.m[k]; if(q && Date.now()-q.at<20*60e3) return q.open ? {w:q.w, live:true, qt:true, ago:Math.max(0,Math.round((Date.now()-q.at)/60e3))} : {w:999, closed:true};
   const h=Math.floor(min/60), f=DZ_HOUR[h] ?? (h<9?.5:.4); return {w:Math.round(DZ_RIDES[k].avg*f/5)*5, live:false};
 }
-function dzRecommend(){
+function dzRecommend(any){
   const n=hkNow(), min = n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 600), here=S.dzLand||'MS';
   return Object.keys(DZ_RIDES).filter(k=>!S.done['dz:'+k]).map(k=>{ const w=dzWait(k,min), walk=dzWalk(here,DZ_LAND_OF[k]);
+    if(!any && min+walk+w.w+10+dzWalk(DZ_LAND_OF[k],'MS') > fwBeThere()) return null;   // would miss the fireworks
     return w.closed ? null : {k, w, walk, score:w.w + walk + (DZ_RIDES[k].avg>=25 && min<11*60 ? -10 : 0)} }).filter(Boolean).sort((a,b)=>a.score-b.score).slice(0,3);
 }
 function dzSmartHTML(){
   const recs=dzRecommend(), n=hkNow(), today=n.date==='2026-11-16';
-  return `<div class="panel dzsmart"><h3>เล่นอะไรต่อดี? <button type="button" class="btn-s" data-dzrefresh="1">${ic('swap')}รีเฟรช</button></h3>
+  return `${dzMealHTML(dzNowMin())}<div class="panel dzsmart"><h3>เล่นอะไรต่อดี? <button type="button" class="btn-s" data-dzrefresh="1">${ic('swap')}รีเฟรช</button></h3>
     <div class="mini" style="margin-bottom:6px">ตอนนี้อยู่โซนไหน</div>
     <div class="places" style="margin:0 -14px 8px">${Object.entries(DZ_LANDS).map(([k,l])=>`<button class="chip" type="button" data-dzland="${k}" aria-pressed="${(S.dzLand||'MS')===k}">${l[0]}</button>`).join('')}</div>
     ${today?'':`<div class="mini" style="margin-bottom:6px">ยังไม่ถึงวันที่ 16 ลองดูคำแนะนำตามเวลา: ${[10,12,14,17,19].map(h=>`<button type="button" class="chip num" data-dzsim="${h*60}" aria-pressed="${(S.dzSimMin??600)===h*60}" style="padding:2px 8px;font-size:12px">${h}:00</button>`).join(' ')}</div>`}
     ${recs.length ? recs.map((r,i)=>{ const R=DZ_RIDES[r.k]; return `<div class="dzrec${i===0?' top':''}"><span class="rk">${i+1}</span>
       <span class="rn"><b>${esc(R.n)}</b><small>${DZ_LANDS[DZ_LAND_OF[r.k]][0]} · เดิน ~${r.walk} นาที · ${r.w.qt?`รอ ${r.w.w} นาที (สดเมื่อ ${r.w.ago} นาทีก่อน)`:r.w.live?`รอ ${r.w.w} นาที (ข้อมูลจริงที่กรอกเมื่อ ${r.w.ago} นาทีก่อน)`:`คาดว่ารอ ~${r.w.w} นาที`}</small></span>
-      <b class="num tot">~${r.w.w+r.walk}<small>นาที</small></b></div>` }).join('') : '<p class="mini">เล่นครบทุกเครื่องแล้ว!</p>'}
+      <b class="num tot">~${r.w.w+r.walk}<small>นาที</small></b></div>` }).join('') : (dzNowMin()>=fwBeThere()-15 ? '<p class="mini">ใกล้เวลาพลุแล้ว ไม่แนะนำเครื่องเล่นเพิ่ม ไปจองที่ดูพลุกัน 🎆</p>' : '<p class="mini">เล่นครบทุกเครื่องแล้ว!</p>')}
     <div class="note">${ic('info')}${DZQ&&DZQ.anyOpen?`เวลารอสดทุก 5 นาที Powered by Queue-Times.com (อัปเดต ${new Date(DZQ.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.) · `:''}เวลารอคาดจากสถิติย้อนหลังตามช่วงเวลา ถ้าเห็นเวลารอจริงที่ป้ายหน้าเครื่องเล่นหรือในแอป Disney แตะป้ายเวลารอของเครื่องนั้นด้านล่างแล้วกรอก แอปจะใช้ตัวเลขจริงแทนเป็นเวลา 40 นาที</div>
     <div class="acts"><a class="btn-s" href="https://queue-times.com/parks/31/queue_times" target="_blank" rel="noopener">${ic('info')}ดูเวลารอสด</a>
       <button type="button" class="btn-s" data-dzreset="1">${S.dzResetSure?'แตะอีกครั้งเพื่อล้าง':'ล้างที่เล่นแล้วทั้งหมด'}</button></div></div>`;
@@ -1904,6 +1911,39 @@ async function dzReset(){
   if(!S.dzResetSure){ S.dzResetSure=true; renderDisney(); setTimeout(()=>{ S.dzResetSure=false; if(S.tab==='dz') renderDisney() },4000); return }
   S.dzResetSure=false; const next={...S.done}; for(const k of Object.keys(DZ_RIDES)) delete next['dz:'+k]; S.done=next; lsSet('hk-dzlive','{}'); renderDisney(); saveProgress(); toast('ล้างแล้ว');
 }
+
+/* ---------- Disney meals (ticket includes lunch + dinner at Royal Banquet Hall) and the fireworks ---------- */
+const DZ_MEALS = {lunch:{n:'มื้อเที่ยง', from:11*60, to:14*60+30, late:13*60}, dinner:{n:'มื้อเย็น', from:16*60+30, to:19*60, late:18*60+15}};
+const fwTime = () => toMin((S.settings && S.settings.fw) || '20:30');
+const fwBeThere = () => fwTime()-40;                       // be at the castle 40 minutes before the show
+function dzNowMin(){ const n=hkNow(); return n.date==='2026-11-16' ? n.min : (S.dzSimMin ?? 600) }
+function dzMealNow(min){
+  // which meal is due now, and should we go now? (restaurant queue short while rides are long, or getting late)
+  for(const [k,m] of Object.entries(DZ_MEALS)){
+    if(S.done['dz:'+k] || min<m.from || min>m.to) continue;
+    const rbh=DZQ&&DZQ.rbh&&Date.now()-DZQ.rbh.at<20*60e3?DZQ.rbh:null, recs=dzRecommend(true), best=recs.length?Math.min(...recs.map(r=>r.w.w)):0;
+    const go = (rbh && rbh.open && (rbh.w<=15 && best>=25 || rbh.w<=10 && min>=m.from+30)) || min>=m.late;
+    return {k, m, rbh, best, go};
+  }
+  return null;
+}
+function dzMealHTML(min){
+  const x=dzMealNow(min), parts=[];
+  if(x){ const why = x.rbh && x.rbh.open ? (x.go&&min<x.m.late ? `ร้านรอแค่ ~${x.rbh.w} นาที ขณะที่เครื่องเล่นรอ ${x.best}+ นาที กินตอนนี้คุ้มกว่า` : `ร้านรอ ~${x.rbh.w} นาที${x.best?` · เครื่องเล่นรอ ${x.best}+ นาที`:''}`) : x.go ? 'ใกล้หมดช่วงมื้ออาหารแล้ว' : 'ยังไม่มีเวลารอสดของร้าน';
+    parts.push(`<div class="dzmeal${x.go?' go':''}"><b>🍽️ ${x.go?'แนะนำ: ไปกิน'+x.m.n+'ตอนนี้':x.m.n+' Royal Banquet Hall'}</b><small>${why} · ร้านอยู่ Fantasyland ใกล้ปราสาท · ใช้ตั๋วรวมอาหาร</small>
+      <div class="acts"><button type="button" class="btn-s pay" data-dzmeal="${x.k}">กิน${x.m.n.replace('มื้อ','')}แล้ว</button></div></div>`) }
+  const left=fwBeThere()-min;
+  if(left<=25) parts.unshift(`<div class="dzfw now"><b>🎆 ${left<=0?'ไปที่ดูพลุเลย!':'อีก '+left+' นาที ไปจองที่ดูพลุ'}</b><small>เดินไปลานหน้าปราสาท / ปลาย Main Street หันหน้าเข้าปราสาท · พลุเริ่ม ${hhmm(fwTime())} น.</small></div>`);
+  return parts.join('');
+}
+function dzFwHTML(){
+  const min=dzNowMin(), left=fwTime()-min, wx=WARN&&WARN.list.some(w=>/TC|WRAIN|WTS/.test(w.code));
+  return `<div class="dzfw"><b>🎆 พลุและโชว์หน้าปราสาท · ห้ามพลาด!</b>
+    <small>เริ่ม ${hhmm(fwTime())} น. · ไปจองที่ก่อน ${hhmm(fwBeThere())} น.${left>0&&left<24*60?` · อีก ${Math.floor(left/60)} ชม. ${left%60} นาที`:''} · แอปจะไม่แนะนำเครื่องเล่นที่เล่นไม่ทันก่อนเวลานี้</small>
+    ${wx?'<small style="color:var(--danger)">มีประกาศฝน/ลมจากหอดูดาว พลุอาจงดหรือเลื่อน เช็คในแอป Disney</small>':''}
+    <div class="fin" style="margin-top:6px"><label for="fwt">เวลาพลุจริง (ดูในแอป Disney วันนั้น)</label><input id="fwt" type="time" value="${hhmm(fwTime())}" style="width:110px"><button type="button" class="btn-s" data-fwsave="1">บันทึก</button></div></div>`;
+}
+
 function renderDisney(){
   const n=hkNow(), today = n.date==='2026-11-16';
   const slot = today ? DZ_PLAN.findIndex(b=>toMin(b.t)<=n.min && n.min<toMin(b.e)) : -1;
@@ -1912,6 +1952,7 @@ function renderDisney(){
     <div class="dzhero">${DZ_CASTLE}
       <div><div class="eyebrow">จันทร์ 16 พ.ย. 2569</div><h2>Hong Kong Disneyland</h2>
       <div class="pillrow"><span class="pill mint">วันจันทร์ คนค่อนข้างน้อย</span><span class="pill">เล่นแล้ว ${doneN}/${Object.keys(DZ_RIDES).length}</span></div></div></div>
+    ${dzFwHTML()}
     ${dzSmartHTML()}
     <div class="links" style="margin-bottom:14px">
       <a class="lk" href="https://queue-times.com/parks/31/queue_times" target="_blank" rel="noopener">${ic('info')}<span>ดูเวลารอสดตอนนี้<small>queue-times.com · อัปเดตทุก 5 นาที</small></span></a>
@@ -1955,7 +1996,7 @@ const MAP_ICON = {
 };
 // [icon, name, drawn-at override, nudge in px so close neighbours don't overlap]
 const MAP_SPOT = {'1a':['plane','สนามบิน',null,[-4,-6]], '4e':['plane','สนามบิน',null,[-4,-6]], '1c':['star','Avenue of Stars',null,[34,-2]], '2b':['temple','หวังต้าเซียน'], '2c':['temple','แชกงหมิว'],
-  '2d':['city','Central',null,[6,16]], '2e':['beach','Repulse Bay'], '2f':['sunset','Kennedy Town',null,[-16,8]], '3b':['castle','Disneyland'], '3c':['castle','Disneyland'],
+  '2d':['city','Central',null,[6,16]], '2e':['beach','Repulse Bay'], '2f':['sunset','Kennedy Town',null,[-16,8]], '3b':['castle','Disneyland'], '3c':['castle','Disneyland'], '3l':['castle','Disneyland'], '3n':['castle','Disneyland'],
   '4b':['bag','Citygate',null,[8,10]], '4d':['bag','Citygate',null,[8,10]], '4c':['buddha','พระใหญ่',[22.2540,113.9050]]};
 function tripMapSVG(){
   const land = HK_LAND;
@@ -2036,6 +2077,7 @@ function alertsHTML(){
     const spent=allExp().filter(e=>e.day===td).reduce((s,e)=>s+share(e,me),0), per=Number(S.budget)/4;
     if(spent>per) out.push(['warn',`วันนี้ใช้ไป ${hk(spent)} เกินงบเฉลี่ยต่อวัน (${hk(per)})`,'money']);
   }
+  if(td===3 && !S.done['3c']){ const left=fwBeThere()-n.min; if(left<=30 && left>-40) out.unshift(['warn',`🎆 ${left>0?'อีก '+left+' นาที':'ถึงเวลา'}ไปจองที่ดูพลุหน้าปราสาท (พลุเริ่ม ${hhmm(fwTime())} น.)`,'dz']) }
   if(td){ const {delay}=dayDelay(dayItems(td)); if(delay!=null && delay>=30) out.push(['info',`ช้ากว่าแผน ${delay} นาที ลองตัดหรือเลื่อนบางจุดในแผนวันนี้`,'plan']) }
   const now=n.min<4*60?n.min+1440:n.min, lh=(td||n.date==='2026-11-18') && now>=21*60 ? lastHome() : null;
   if(lh){ const left=lh.m-now;
@@ -2472,9 +2514,10 @@ async function saveExpense(){
 }
 function fixHotel(items){ const defs=Object.fromEntries(DEFAULT_PLAN.flat().map(d=>[d.id,d]));
   if(items && items.some(i=>i.id==='1a')) for(const id of ['1f','1s']) if(!items.some(i=>i.id===id)) items.unshift(clone(defs[id]));
+  if(items && items.some(i=>i.id==='3b')) for(const id of ['3l','3n']) if(!items.some(i=>i.id===id)) items.push(clone(defs[id]));
   if(items && items.some(i=>i.id==='4e')) for(const id of ['4f','4g']) if(!items.some(i=>i.id===id)) items.push(clone(defs[id]));
   for(const it of items||[]){ const d=defs[it.id]; if(!d || it.custom) continue;
-    for(const k of ['p','tip','map','ll']) if(d[k]!==undefined) it[k]=clone(d[k]); else delete it[k];
+    for(const k of ['h','p','tip','map','ll']) if(d[k]!==undefined) it[k]=clone(d[k]); else delete it[k];
     if(!it.exitUser){ if(d.exit) it.exit=d.exit; else delete it.exit } }
   for(const it of items||[]) if(defs[it.id]){ if(defs[it.id].bus) it.bus=clone(defs[it.id].bus); else delete it.bus } // presets follow the checked data
   for(const it of items||[]) if(HOTEL_IDS.has(it.id) && it.st==='TST'){ it.st='MOK'; if(it.exit==='D2'){ it.exit='E1'; delete it.exitUser } if(/Mirador/.test(it.map||'')) it.map='Sun Hing Building 607 Nathan Road Mong Kok';
@@ -2536,7 +2579,7 @@ async function saveItem(){
   if(d.p.trim()!==plain) it.p=esc(d.p.trim()); // user notes are stored escaped
   if(!d.p.trim()) delete it.p;
   // edited by hand: later data updates leave this item's notes and place alone
-  if(old && (d.p.trim()!==plain || d.map.trim()!==(old.it.map||'') || (d.st||null)!==(old.it.st||null) || d.preview)) it.custom=true;
+  if(old && (d.h.trim()!==old.it.h || d.p.trim()!==plain || d.map.trim()!==(old.it.map||'') || (d.st||null)!==(old.it.st||null) || d.preview)) it.custom=true;
   if(old && old.dn!==d.day) S.plan[old.dn-1]=S.plan[old.dn-1].filter(x=>x.id!==it.id);
   const arr=S.plan[d.day-1], k=arr.findIndex(x=>x.id===it.id);
   if(k>=0) arr[k]=it; else arr.push(it);
@@ -2631,6 +2674,8 @@ document.addEventListener('click', e=>{
   if(ds.dzsim){ S.dzSimMin=Number(ds.dzsim); renderDisney(); return }
   if(ds.dzrefresh){ renderDisney(); toast('อัปเดตคำแนะนำแล้ว'); return }
   if(ds.dzreset) return dzReset();
+  if(ds.dzmeal){ const k='dz:'+ds.dzmeal; const next={...S.done}; if(next[k]) delete next[k]; else next[k]={at:hhmm(hkNow().min)}; S.done=next; saveProgress(); renderDisney(); toast(next[k]?'บันทึกแล้ว อิ่มอร่อย!':'ยกเลิกแล้ว'); return }
+  if(ds.fwsave){ const v=document.getElementById('fwt').value; if(!/^\d{2}:\d{2}$/.test(v)) return; S.settings={...S.settings, fw:v}; if(db) db.doc('trip/settings').set(S.settings).catch(()=>{}); else lsSave(); renderDisney(); toast('ตั้งเวลาพลุ '+v+' น. แล้ว'); return }
   if(ds.navpick) return openNavPick(ds.navpick);
   if(ds.nextnav){ const fi=findItem(ds.nextnav); S.nav.from=planSpot(); const x=exitFor(fi.it); S.nav.to=navSpot(fi.it.h, locOf(fi.it), {st:fi.it.st||undefined, exit:x&&x.src!=='auto'?x.ref:undefined, exitName:x&&x.name}); S.navOpen=0; return setTab('go') }
   if(ds.chkopen){ S.checkOpen=!S.checkOpen; renderHome(); return }
