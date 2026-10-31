@@ -965,7 +965,7 @@ function hkNow(){ const d=new Date(Date.now()+8*3600e3); return {date:d.toISOStr
 const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return h*60+(m||0) };
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('44958cb36c|30 ต.ค. 23:18');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('fa5c6c4046|31 ต.ค. 09:28');
 let APP_NEWER=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
