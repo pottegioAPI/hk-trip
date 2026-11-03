@@ -578,7 +578,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 .dzpickb:active{background:var(--sun-soft)}
 .dzpickb small{display:block}
 .dzpickb .dzpickhint{color:var(--pink,#FF4F8B);font-weight:600;margin-top:2px}
-.dzunpick{all:unset;display:block;margin-top:6px;font-size:12px;font-weight:600;color:var(--muted);text-decoration:underline;cursor:pointer}
+.dzunpick{all:unset;display:inline-block;margin-top:8px;padding:6px 12px;border-radius:999px;background:var(--pink);color:var(--pink-ink);font-size:12.5px;font-weight:700;cursor:pointer}
 </style>
 
 <header class="top">
@@ -2379,7 +2379,7 @@ function dzRouteHTML(full){
     const wb=`<span class="dzwb" style="--wc:${wc}"><b class="num">${s.wait}</b><small>${s.meal?'คิวร้าน':'นาที'}${live?' · สด':''}</small></span>`;
     const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
     const picked = i===0 && S.dzPick===(s.k||'m:'+s.meal);
-    return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>${picked?'คุณเลือกไปอันนี้':'ไปต่อเลย'} · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small>${picked?`<button type="button" class="dzunpick" data-dzpick="">↩︎ กลับไปลำดับที่แอปแนะนำ</button>`:''}</div><div class="dzbtns">${inq}${btn}${later}</div></div>`
+    return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>${picked?'คุณเลือกไปอันนี้':'ไปต่อเลย'} · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small>${picked?`<button type="button" class="dzunpick" data-dzrefresh="1">✨ ให้แอปจัดลำดับให้</button>`:''}</div><div class="dzbtns">${inq}${btn}${later}</div></div>`
       : `<div class="dzstep${late?' late':''}">${wb}<button type="button" class="dzpickb" data-dzpick="${s.k||'m:'+s.meal}" aria-label="ไป ${esc(s.k?DZ_RIDES[s.k].n:DZ_MEALS[s.meal].n)} ก่อน"><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small>${i===1?'<small class="dzpickhint">แตะชื่อเครื่องไหนก็ได้ เพื่อไปอันนั้นก่อน</small>':''}</button><div class="dzbtns">${btn}${later}</div></div>`;
   };
   const shown = full ? p.steps : p.steps.slice(0,3);
@@ -2398,7 +2398,7 @@ function dzSrcHTML(){
 }
 function dzSmartHTML(){
   const today=dzLiveNow(), trial=today&&hkNow().date!=='2026-11-16';
-  return `${dzMealHTML(dzNowMin())}<div class="panel dzsmart"><h3>🧭 เส้นทางแนะนำ <button type="button" class="btn-s" data-dzrefresh="1">${ic('swap')}คำนวณใหม่</button></h3>
+  return `${dzMealHTML(dzNowMin())}<div class="panel dzsmart"><h3>🧭 เส้นทางแนะนำ <button type="button" class="btn-s${S.dzPick?' pay':''}" data-dzrefresh="1">✨ ให้แอปจัดลำดับ</button></h3>
     <button type="button" class="dzwhere" data-dzset="1">📍 ตอนนี้อยู่ <b>${esc(DZ_LANDS[S.dzLand||'MS'][0])}</b>${today?'':` · ตัวอย่างเริ่ม ${hhmm(S.dzSimMin??630)}`} <span>${S.dzSetOpen?'ปิด ▴':'เปลี่ยน ▾'}</span></button>
     ${S.dzSetOpen?`<div class="dzset"><div class="mini">อยู่โซนไหน (ปกติไม่ต้องกด แอปเปลี่ยนให้เองเมื่อกด "เล่นแล้ว")</div>
       <div class="places" style="margin:0 -14px 6px">${Object.entries(DZ_LANDS).map(([k,l])=>`<button class="chip" type="button" data-dzland="${k}" aria-pressed="${(S.dzLand||'MS')===k}">${l[0]}</button>`).join('')}</div>
@@ -3333,7 +3333,8 @@ document.addEventListener('click', e=>{
   if(ds.dzset){ S.dzSetOpen=!S.dzSetOpen; renderDisney(); return }
   if(ds.dzland){ S.dzLand=ds.dzland; renderDisney(); return }
   if(ds.dzsim){ S.dzSimMin=Number(ds.dzsim); renderDisney(); return }
-  if(ds.dzrefresh){ renderDisney(); toast('อัปเดตคำแนะนำแล้ว'); return }
+  // the app's own best order from here: drop a hand-picked next stop and plan from scratch with the newest queues
+  if(ds.dzrefresh){ S.dzPick=null; DZ_LAST_ORDER=[]; DZ_MEMO=null; dzQueueFetch(true); renderAll(); toast('จัดลำดับใหม่ให้เหมาะที่สุดแล้ว'); return }
   if(ds.dzreset) return dzReset();
   if(ds.dzmeal){ const on=dzLinkToggle('dz:'+ds.dzmeal); toast(on?'บันทึกแล้ว':'ยกเลิกแล้ว'); return }
   if(ds.fwreset){ const s={...S.settings}; delete s.fw; delete s.dzOpen; delete s.dzClose; S.settings=s; if(db) db.doc('trip/settings').set(S.settings).catch(()=>{}); else lsSave(); renderDisney(); toast('ใช้เวลาจากปฏิทินทางการแล้ว'); return }
