@@ -965,7 +965,7 @@ function hkNow(){ const d=new Date(Date.now()+8*3600e3); return {date:d.toISOStr
 const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return h*60+(m||0) };
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('e6a0cecdc0|2 พ.ย. 09:20');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('6c13e8dc55|3 พ.ย. 09:27');
 let APP_NEWER=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1599,7 +1599,7 @@ function tripStats(){
 }
 function summarySheetHTML(){
   const s=tripStats(), cats=Object.entries(s.byCat).sort((a,b)=>b[1]-a[1]), max=cats.length?cats[0][1]:1;
-  const owe = Math.abs(s.bal)<0.05 ? 'เคลียร์เงินกันครบแล้ว ✓' : `${nm(s.bal>0?1:0)} ต้องคืน ${nm(s.bal>0?0:1)} ${hk(Math.abs(s.bal))}`;
+  const dbt=s.bal>0?1:0, owe = Math.abs(s.bal)<0.05 ? 'เคลียร์เงินกันครบแล้ว ✓' : `${dbt===S.me?`ฉันต้องคืน ${nm(other(dbt))}`:`${nm(dbt)} ต้องคืนฉัน`} ${hk(Math.abs(s.bal))}`;
   return `<div class="wrap"><div class="grab"></div><h2 id="sheet-title">สรุปทริปฮ่องกง <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
     <div class="sumgrid"><div><b class="num">${s.visited.length}</b><small>ที่เที่ยว</small></div><div><b class="num">${s.rides}</b><small>เที่ยวรถ</small></div><div><b class="num">${s.dz}</b><small>เครื่องเล่น Disney</small></div><div><b class="num">${s.stamps}/${s.stampsAll}</b><small>แสตมป์</small></div></div>
     <div class="panel"><h3>เงินของ${nm(s.me)} <small>เห็นคนเดียว</small></h3><div class="hbig2 num">${hk(s.spent)}</div>
@@ -1978,8 +1978,8 @@ function renderMoney(){
     </div>
     ${owe<0.05?'':`<div class="panel"><h3>เคลียร์เงิน ${nm(0)} ↔ ${nm(1)} <small>เห็นตรงกันทั้ง 2 เครื่อง</small></h3>
       <div class="debt">${owe<0.05 ? `<div class="settle"><div class="ic">${ic('check',2.4)}</div><div><b>ไม่มีใครติดเงินใคร</b><br><span class="mini">รายการหารหรือออกให้ก่อนจะมาสรุปที่นี่</span></div></div>`
-        : `<div class="settle"><div class="ic">${ic('swap')}</div><div><b>${nm(debtor)}</b> ต้องคืน <b>${nm(creditor)}</b><br><span class="num" style="font-family:var(--display);font-size:24px">${hk(owe)}</span> <span class="mini num">${thb(owe)}</span></div></div>
-           <button class="save" type="button" id="settle-btn" style="margin-top:0">${nm(debtor)} คืนเงิน ${hk(owe)} แล้ว</button>`}
+        : `<div class="settle"><div class="ic">${ic('swap')}</div><div>${debtor===me?`ฉันต้องคืน <b>${nm(creditor)}</b>`:`<b>${nm(debtor)}</b> ต้องคืนฉัน`}<br><span class="num" style="font-family:var(--display);font-size:24px">${hk(owe)}</span> <span class="mini num">${thb(owe)}</span></div></div>
+           <button class="save" type="button" id="settle-btn" style="margin-top:0">${debtor===me?`ฉันคืน ${nm(creditor)} แล้ว`:`${nm(debtor)} คืนฉันแล้ว`} ${hk(owe)}</button>`}
         <div class="mini">ยอดค้างคิดจากรายการแบบ "หารครึ่ง" และ "ออกให้ก่อน" ทั้งหมด หักกับที่คืนแล้ว</div></div></div>`}
     <div class="panel"><h3>${nm(me)} ใช้ไปกับอะไร</h3>${tot?`<div class="stack">${CATS.filter(c=>byCat[c.k]).map(c=>`<i style="width:${byCat[c.k]/tot*100}%;background:${c.c}"></i>`).join('')}</div>`:''}
       <div class="legend">${CATS.map(c=>`<div><span class="dot" style="background:${c.c}"></span>${c.n}<span class="n">${hk(byCat[c.k]||0)}</span></div>`).join('')}</div></div>
@@ -1997,9 +1997,10 @@ function whoCard(){
 }
 function exRow(e){
   const c=CAT[e.cat]||CAT.other, open=S.openEx===e.id, p=e.payer;
-  const sub = e.kind==='settle' ? `${nm(p)} คืนเงินให้ ${nm(other(p))}`
-    : e.type==='split' ? `${nm(p)} จ่าย · หารครึ่ง คนละ ${hk(e.amt/2)}`
-    : e.type==='adv' ? `${nm(p)} ออกให้ ${nm(other(p))} ก่อน` : `ส่วนตัว · เห็นคนเดียว`;
+  const pn=i=>i===S.me?'ฉัน':nm(i);   // the same words as the card above: "ฉัน" is whoever holds this phone
+  const sub = e.kind==='settle' ? `${pn(p)}คืนเงินให้${pn(other(p))}แล้ว`
+    : e.type==='split' ? `${pn(p)}จ่าย · หารครึ่ง คนละ ${hk(e.amt/2)}`
+    : e.type==='adv' ? `${pn(p)}ออกให้${pn(other(p))}ก่อน` : `ส่วนตัว · เห็นคนเดียว`;
   return `<li class="ex"><button class="exbtn" type="button" data-ex="${esc(e.id)}" aria-expanded="${open}">
     <span class="ci" style="background:${e.kind==='settle'?'var(--mint-soft)':c.s};color:${e.kind==='settle'?'var(--mint)':c.c}">${ic(e.kind==='settle'?'swap':c.i)}</span>
     <span class="t"><div>${esc(e.note||c.n)}</div><small>${sub}${e.auto?'<span class="tag">อัตโนมัติ</span>':''}${e.oct&&e.payer===S.me?'<span class="tag" style="background:var(--mint-soft)">Octopus</span>':''}</small></span>
@@ -2329,7 +2330,7 @@ function dzSmartHTML(){
       ${today?'':`<div class="mini">ลองดูแผนถ้าเริ่มตอน (ใช้ดูก่อนวันจริงเท่านั้น วันที่ 16 แอปใช้เวลาจริงเอง)</div><div class="places" style="margin:0 -14px">${[10.5,12,14,17,19].map(h=>`<button type="button" class="chip num" data-dzsim="${h*60}" aria-pressed="${(S.dzSimMin??630)===h*60}">${hhmm(h*60)}</button>`).join('')}</div>`}</div>`:''}
     ${dzSrcHTML()}
     ${dzRouteHTML(true)}
-    <div class="note">${ic('info')}เรียงลำดับให้เดินน้อยและรอคิวน้อยที่สุด กินตามเวลา voucher และเสร็จก่อนไปจองที่ดูพลุ${DZQ&&DZQ.anyOpen?` · คิวสดจาก Queue-Times.com อัปเดต ${new Date(DZQ.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.`:' · ตอนนี้ใช้สถิติคิวย้อนหลัง วันจริงใช้คิวสด'} · ถ้าเห็นคิวจริงที่ป้ายไม่ตรง แตะป้ายเวลารอในรายการด้านล่างแล้วกรอก</div>
+    <div class="note">${ic('info')}เรียงลำดับให้เดินน้อยและรอคิวน้อยที่สุด กินตามเวลา voucher และเสร็จก่อนไปจองที่ดูพลุ${DZQ&&DZQ.anyOpen?` · คิวสดจาก Queue-Times.com อัปเดต ${new Date(DZQ.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.`:' · ตอนนี้ใช้สถิติคิวย้อนหลัง วันจริงใช้คิวสด'}</div>
     <div class="acts"><button type="button" class="btn-s" data-dzreset="1">${S.dzResetSure?'แตะอีกครั้งเพื่อล้าง':'ล้างที่เล่นแล้วทั้งหมด'}</button></div></div>`;
 }
 async function dzReset(){
@@ -2918,8 +2919,8 @@ function openItem(dn, it){
 }
 function expHint(d){
   const a=Number(d.amt)||0, me=S.me, o=other(me), N=i=>(S.settings.names||DEFAULTS.names)[i];
-  return {own:`ส่วนตัว ${N(o)} มองไม่เห็น`, split:`${N(o)} จะติดเงิน${N(me)} ${hk(a/2)}`, 'split-them':`${N(me)} จะติดเงิน${N(o)} ${hk(a/2)}`,
-    'adv-me':`${N(o)} จะติดเงิน${N(me)} ${hk(a)}`, 'adv-them':`${N(me)} จะติดเงิน${N(o)} ${hk(a)}`}[d.type] || '';
+  return {own:`ส่วนตัว ${N(o)} มองไม่เห็น`, split:`ฉันจ่ายก่อน · ${N(o)} ต้องคืนฉัน ${hk(a/2)}`, 'split-them':`${N(o)} จ่ายก่อน · ฉันต้องคืน ${N(o)} ${hk(a/2)}`,
+    'adv-me':`ฉันออกให้ก่อน · ${N(o)} ต้องคืนฉัน ${hk(a)}`, 'adv-them':`${N(o)} ออกให้ก่อน · ฉันต้องคืน ${N(o)} ${hk(a)}`}[d.type] || '';
 }
 /* ---------- station picker: pick a line by colour, then a station along it ---------- */
 const LINE_ORDER = ['TWL','ISL','KTL','TCL','DRL','TML','EAL','TKL','SIL'];
