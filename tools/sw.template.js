@@ -9,7 +9,7 @@ self.addEventListener('fetch', e=>{
   if(url.origin===location.origin){
     // the page: newest if the network answers within 4 s, otherwise the saved copy
     if(req.mode==='navigate'){
-      e.respondWith(timeout(fetch(req),4000).then(r=>{ const c=r.clone(); caches.open(CACHE).then(x=>x.put('index.html',c)); return r })
+      e.respondWith(timeout(fetch(req.url,{cache:'no-store'}),4000).then(r=>{ const c=r.clone(); caches.open(CACHE).then(x=>x.put('index.html',c)); return r })
         .catch(()=>caches.match('index.html',{ignoreSearch:true})));
       return;
     }

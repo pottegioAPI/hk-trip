@@ -962,9 +962,20 @@ let APP_NEWER=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
   try{ const t=await (await fetch('sw.js?t='+Date.now(),{cache:'no-store'})).text(), m=t.match(/VERSION='([0-9a-f]+)'/);
-    if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1]; renderAll() } }catch(e){}
+    if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1];
+      // a newer version is out: switch to it by itself, once per version, when nothing is being typed or open
+      if(lsGet('hk-autoupd','')!==m[1] && !S.sheet && !(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))){ lsSet('hk-autoupd',m[1]); return appUpdate() }
+      renderAll() } }catch(e){}
 }
-const verHTML = () => `<div class="appver">${APP_NEWER?`<button type="button" class="btn-s pay" data-appupdate="1">มีเวอร์ชันใหม่ แตะเพื่ออัปเดต</button>`:''}
+// fetch the newest app past every cache: the offline copy, the phone's web cache (a new address) and the service worker
+async function appUpdate(){
+  toast('กำลังอัปเดตแอป...');
+  try{ const reg=navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if(reg) await reg.update() }catch(e){}
+  try{ for(const k of await caches.keys()) if(k.startsWith('hk-') && k!=='hk-fonts') await caches.delete(k) }catch(e){}
+  location.replace(location.pathname+'?v='+Date.now()+location.hash);
+}
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) verCheck() });
+const verHTML = () => `<div class="appver"><button type="button" class="btn-s${APP_NEWER?' pay':''}" data-appupdate="1">${APP_NEWER?'มีเวอร์ชันใหม่ แตะเพื่ออัปเดต':'🔄 อัปเดตแอปเป็นเวอร์ชันล่าสุด'}</button>
   <small>เวอร์ชัน ${esc(APP_VER.v)}${APP_VER.at?' · สร้าง '+esc(APP_VER.at)+' น. (เวลาฮ่องกง)':''}${APP_NEWER?'':APP_VER.v==='dev'?'':' · ล่าสุดแล้ว ✓'}</small></div>`;
 /* ---------- push notifications (iPhone: only for the app opened from the Home Screen icon) ---------- */
 const PUSH_FN = 'https://btagqhxhljlbhwwkzghr.supabase.co/functions/v1/hk-push';
@@ -3362,7 +3373,7 @@ document.addEventListener('click', e=>{
   if(ds.pushtest) return pushTest();
   if(ds.pushoff) return pushOff();
   if(ds.pushkind) return pushKind(ds.pushkind);
-  if(ds.appupdate){ location.reload(); return }
+  if(ds.appupdate) return appUpdate();
   if(ds.setpin) return setPin();
   if(ds.setkey){ const v=(document.getElementById('keyin').value||'').trim().replace(/^.*#k=/,''); if(v.length<16){ toast('รหัสไม่ถูกต้อง'); return } lsSet('hk-key',v); location.reload(); return }
   if(ds.mapzoom){ S.mapBig=!S.mapBig; renderHome(); const w=document.querySelector('.tmwrap');
