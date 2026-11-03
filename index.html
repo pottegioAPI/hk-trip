@@ -602,6 +602,8 @@ input[type=time].txt{appearance:none;min-height:46px}
 .dzn-auto{border:none;border-radius:99px;background:var(--surface);color:var(--pink);font-size:12px;font-weight:700;padding:5px 11px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 /* the land a ride is in: the thing to look for on the park's signs */
 .dzzone{font-weight:700;color:var(--ink)}
+/* plan: a stop passed without tapping "ถึงแล้ว" (a later one was tapped) */
+.it.skip .card{opacity:.55}
 .dznext .dzzone{display:inline-block;background:var(--surface);border-radius:99px;padding:2px 9px;margin:2px 4px 2px 0;font-size:12.5px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 .dznext.inq{background:var(--sky-soft);border-color:var(--sky)}
 .dznext.inq .dzn-top>span{color:var(--sky);opacity:1}
@@ -994,7 +996,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('fd5abe7ad3|3 พ.ย. 11:30|1.04');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('ff649445a2|3 พ.ย. 11:37|1.05');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1088,7 +1090,13 @@ function tripDay(){ const n=hkNow(); const d=DAYS.find(x=>x.date===n.date); retu
 const dayItems = dn => (S.plan[dn-1]||[]).slice().sort((a,b)=>toMin(a.t)-toMin(b.t));
 const hhmm = m => { m=((Math.round(m)%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0') };
 const arrivedAt = id => { const v=S.done[id]; return v && typeof v==='object' ? v.at : null };
-function nextItem(dn){ if(DAYS[dn-1].date!==hkNow().date) return null; const it=dayItems(dn).find(i=>!S.done[i.id]); return it?it.id:null }
+// the next stop is the first one after the latest "ถึงแล้ว": stops left unticked before it were skipped
+function nextItem(dn){ if(DAYS[dn-1].date!==hkNow().date) return null; const L=dayItems(dn), last=lastDoneIdx(L); const it=L.find((i,k)=>k>last && !S.done[i.id]); return it?it.id:null }
+const lastDoneIdx = L => { let last=-1; L.forEach((i,k)=>{ if(S.done[i.id]) last=k }); return last };
+const skippedStop = (L,k) => !S.done[L[k].id] && k<lastDoneIdx(L);
+// a flight is boarded, not arrived at
+const FLIGHT_OUT = new Set(['1f','4f']);
+const arriveWord = (it,done) => FLIGHT_OUT.has(it.id) ? (done?'ยกเลิกขึ้นเครื่องแล้ว':'ขึ้นเครื่องแล้ว') : (done?'ยกเลิกถึงแล้ว':'ถึงแล้ว');
 // how late (+) or early (−) the trip is running, from the latest stop marked as arrived
 function dayDelay(list){ let delay=null, idx=-1; list.forEach((it,k)=>{ const a=arrivedAt(it.id); if(a){ delay=toMin(a)-toMin(it.t); idx=k } });
   const ka=list.findIndex(i=>i.id==='1a'), fi=typeof flightInfo==='function'?flightInfo('EK384'):null;
@@ -1954,11 +1962,11 @@ function renderPlan(){
       ${!done && sel.manual ? `<div class="fin">${sel.key==='bus:c'?`<input type="text" id="no-${it.id}" placeholder="เลขสาย" value="${esc(it.go&&it.go.no||'')}" style="width:80px">`:''}
          <label for="fare-${it.id}">${sel.shared?'ค่ารถรวม':'ค่ารถ/คน'} HK$</label><input type="number" inputmode="decimal" min="0" step="0.1" id="fare-${it.id}" data-fare="${it.id}" data-key="${sel.key}" value="${sel.fare??''}"></div>`:''}
     </div>` : '';
-    return `<li class="it${done?' done':''}${cur===it.id?' now':''}" id="it-${it.id}">
-      <button class="tick" type="button" data-arrive="${it.id}" aria-label="${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}: ${esc(it.h)}">${ic('check')}</button>
+    return `<li class="it${done?' done':''}${cur===it.id?' now':''}${skippedStop(list,k)?' skip':''}" id="it-${it.id}">
+      <button class="tick" type="button" data-arrive="${it.id}" aria-label="${arriveWord(it,done)}: ${esc(it.h)}">${ic('check')}</button>
       <div class="card">
         <div class="time num"><span${r?' style="text-decoration:line-through;opacity:.6"':''}>${esc(tShow(it.t,it))}${it.e?' – '+esc(tShow(it.e,it)):''} น.${tzTag(it)}</span>
-          ${done&&arrivedAt(it.id)?`<span class="nowtag" style="background:var(--mint)">ถึงจริง ${tShow(arrivedAt(it.id),it)}</span>`:''}
+          ${done&&arrivedAt(it.id)?`<span class="nowtag" style="background:var(--mint)">${FLIGHT_OUT.has(it.id)?'ขึ้นเครื่อง':'ถึงจริง'} ${tShow(arrivedAt(it.id),it)}</span>`:skippedStop(list,k)?'<span class="nowtag" style="background:var(--line);color:var(--muted)">ข้ามไป</span>':''}
           ${r?`<span class="nowtag" style="background:var(--sun);color:var(--ink)">≈ ${hhmm(r.t)}${r.e!=null?'–'+hhmm(r.e):''}</span>`:''}
           ${cur===it.id?'<span class="nowtag">ถัดไป</span>':''}</div>
         ${r?`<div class="mini" style="color:${r.miss||r.leave?'var(--danger)':'var(--muted)'}">${movedNote(r)}</div>`:''}
@@ -1973,7 +1981,7 @@ function renderPlan(){
         ${eatHTML(it)}
         ${gh}
         <div class="acts">
-          <button class="arrive${done?' undo':''}" type="button" data-arrive="${it.id}">${ic('check',2.4)}${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}</button>
+          <button class="arrive${done?' undo':''}" type="button" data-arrive="${it.id}">${ic('check',2.4)}${arriveWord(it,done)}</button>
           ${it.map||it.h?`<a class="btn-s" href="${mapUrl((eatOf(it)||{}).q||it.map||it.h)}" target="_blank" rel="noopener">${ic('pin')}แผนที่</a>`:''}
           ${it.cost?(allExp().some(e=>e.planId===it.id)?`<span class="btn-s paid">${ic('check')}จด ${hk(it.cost.amt)} แล้ว</span>`:`<button class="btn-s pay" type="button" data-cost="${it.id}">${ic('plus')}จด ${esc(it.cost.note)} ${hk(it.cost.amt)}</button>`):''}
           ${/disney/i.test((it.map||'')+it.h)&&it.id!=='3b'?`<button class="btn-s pay" type="button" data-tab="dz">${ic('ticket')}แผนเครื่องเล่น</button>`:''}
@@ -1998,7 +2006,7 @@ function renderPlan(){
 function compactItem(it, done, cur, sel, r){
   const how = sel ? `${ic(MODES[sel.mode].i)}${esc(sel.n)}${sel.fare?` ${hk(sel.fare)}`:''}${sel.mins?` · ~${sel.mins} นาที`:''}` : '';
   return `<li class="it${done?' done':''}${cur===it.id?' now':''}" id="it-${it.id}">
-    <button class="tick" type="button" data-arrive="${it.id}" aria-label="${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}: ${esc(it.h)}">${ic('check')}</button>
+    <button class="tick" type="button" data-arrive="${it.id}" aria-label="${arriveWord(it,done)}: ${esc(it.h)}">${ic('check')}</button>
     <button class="card cline" type="button" data-full="${it.id}">
       <span class="time num">${r?`≈ ${hhmm(r.t)}${r.miss?' ⚠️':''}`:esc(tShow(it.t,it))+tzTag(it)}${done&&arrivedAt(it.id)?` · ถึง ${arrivedAt(it.id)}`:''}${cur===it.id?' <span class="nowtag">ถัดไป</span>':''}</span>
       <span class="cn">${esc(it.h)}</span>
@@ -2720,7 +2728,7 @@ function nextStopHTML(){
     <b>${esc(it.h)}</b>${eatOf(it)?`<div class="mini">🍽️ ${esc(eatOf(it).n)}</div>`:""}${prev?`<small>จาก ${esc(prev.h)}${sel&&sel.fare!=null?' · '+(sel.fare?hk(sel.fare):'ฟรี'):''}${sel&&sel.mins?' · ~'+sel.mins+' นาที':''}</small>`:''}
     ${how?`<div class="nhow">${how}</div>`:''}
     <div class="acts">${it.flight||(prev&&prev.flight)?'':`<button type="button" class="hbtn main" data-nextnav="${it.id}">${ic('pin',2.2)}นำทาง</button>`}
-      <button type="button" class="hbtn" data-arrive="${it.id}">${ic('check',2.4)}ถึงแล้ว</button>
+      <button type="button" class="hbtn" data-arrive="${it.id}">${ic('check',2.4)}${arriveWord(it,false)}</button>
       <button type="button" class="hbtn" data-gotoday="${td}">ดูแผน</button></div>${flightFor(it.id)?flightHTML(flightFor(it.id)):''}</div>`;
 }
 /* ---------- home: alerts (only when something needs attention) ---------- */
