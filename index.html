@@ -581,6 +581,12 @@ input[type=time].txt{appearance:none;min-height:46px}
 .bxd summary::-webkit-details-marker{display:none}
 .bxd[open] summary{border-color:var(--sky);background:var(--sky-soft)}
 .bxd .route{margin-top:6px}
+/* Disney route: tap a later ride to make it the next one */
+.dzpickb{all:unset;flex:1;min-width:0;cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:10px}
+.dzpickb:active{background:var(--sun-soft)}
+.dzpickb small{display:block}
+.dzpickb .dzpickhint{color:var(--pink,#FF4F8B);font-weight:600;margin-top:2px}
+.dzunpick{all:unset;display:block;margin-top:6px;font-size:12px;font-weight:600;color:var(--muted);text-decoration:underline;cursor:pointer}
 </style>
 
 <header class="top">
@@ -970,7 +976,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('12254fc88c|3 พ.ย. 11:09|1.01');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('0b4fe77e0d|3 พ.ย. 11:16|1.02');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -2311,7 +2317,7 @@ const dzQMins = () => Math.round((Date.now()-S.dzQ.at)/60e3);
 const dzQLeft = () => Math.max(3, S.dzQ.w-dzQMins());
 function dzQSet(k){ S.dzQ = k ? {k, at:Date.now(), w:dzPredWait(k, dzNowMin(), dzNowMin())} : null; lsSet('hk-dzq', JSON.stringify(S.dzQ)); if(k) S.dzLand=DZ_LAND_OF[k]; DZ_MEMO=null; renderAll() }
 function dzOptimize(){
-  const mk=[dzNowMin(), S.dzLand, JSON.stringify(S.dzLater||{}), JSON.stringify(Object.keys(S.done).filter(k=>/^dz:|^3[lnc]$/.test(k)).sort()), DZQ&&DZQ.at, fwTime(), dzOpenT(), S.dzQ&&S.dzQ.k].join('|');
+  const mk=[dzNowMin(), S.dzLand, JSON.stringify(S.dzLater||{}), JSON.stringify(Object.keys(S.done).filter(k=>/^dz:|^3[lnc]$/.test(k)).sort()), DZQ&&DZQ.at, fwTime(), dzOpenT(), S.dzQ&&S.dzQ.k, S.dzPick].join('|');
   if(DZ_MEMO && DZ_MEMO.k===mk) return DZ_MEMO.v;
   const v=dzOptimizeRun(); DZ_MEMO={k:mk, v}; return v;
 }
@@ -2321,7 +2327,9 @@ function dzOptimizeRun(){
   const key=x=>x.k||(x.snack?'snack':'m:'+x.meal), byKey=new Map(tasks.map(x=>[key(x),x]));
   // a voucher meal that is due now (short restaurant queue while rides are long, or getting late) goes first,
   // so the route and the meal card never disagree and a paid meal isn't pushed past its hours
-  const due=dzMealNow(now), inQ=tasks.find(x=>x.k&&dzInQ(x.k)), first=inQ || (due&&due.go?tasks.find(x=>x.meal===due.k):null), lock=first?1:0, front=a=>first?[first,...a.filter(x=>x!==first)]:a;
+  // first stop: the line we're standing in, else the one tapped ("ไปอันนี้ก่อน"), else a voucher meal that is due
+  const pick=S.dzPick&&tasks.find(x=>(x.k||(x.meal?'m:'+x.meal:''))===S.dzPick);
+  const due=dzMealNow(now), inQ=tasks.find(x=>x.k&&dzInQ(x.k)), first=inQ || pick || (due&&due.go?tasks.find(x=>x.meal===due.k):null), lock=first?1:0, front=a=>first?[first,...a.filter(x=>x!==first)]:a;
   // start from the previous plan (so it doesn't jump around), else nearest-first
   let seq=DZ_LAST_ORDER.map(k=>byKey.get(k)).filter(Boolean); for(const x of tasks) if(!seq.includes(x)) seq.push(x);
   seq=front(seq);
@@ -2378,8 +2386,9 @@ function dzRouteHTML(full){
     const live=!s.meal && i===0 && dzWait(s.k,now).live, wc=s.wait>=40?'var(--danger)':s.wait>=25?'#E58A00':'var(--mint)';
     const wb=`<span class="dzwb" style="--wc:${wc}"><b class="num">${s.wait}</b><small>${s.meal?'คิวร้าน':'นาที'}${live?' · สด':''}</small></span>`;
     const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
-    return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>ไปต่อเลย · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small></div><div class="dzbtns">${inq}${btn}${later}</div></div>`
-      : `<div class="dzstep${late?' late':''}">${wb}<span><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small></span><div class="dzbtns">${btn}${later}</div></div>`;
+    const picked = i===0 && S.dzPick===(s.k||'m:'+s.meal);
+    return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>${picked?'คุณเลือกไปอันนี้':'ไปต่อเลย'} · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small>${picked?`<button type="button" class="dzunpick" data-dzpick="">↩︎ กลับไปลำดับที่แอปแนะนำ</button>`:''}</div><div class="dzbtns">${inq}${btn}${later}</div></div>`
+      : `<div class="dzstep${late?' late':''}">${wb}<button type="button" class="dzpickb" data-dzpick="${s.k||'m:'+s.meal}" aria-label="ไป ${esc(s.k?DZ_RIDES[s.k].n:DZ_MEALS[s.meal].n)} ก่อน"><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small>${i===1?'<small class="dzpickhint">แตะชื่อเครื่องไหนก็ได้ เพื่อไปอันนั้นก่อน</small>':''}</button><div class="dzbtns">${btn}${later}</div></div>`;
   };
   const shown = full ? p.steps : p.steps.slice(0,3);
   return `${shown.map(row).join('')}
@@ -3327,7 +3336,8 @@ document.addEventListener('click', e=>{
   if(ds.arrive) return toggleArrive(ds.arrive);
   if(ds.dz) return toggleDz(ds.dz);
   if(ds.dzq!==undefined){ dzQSet(ds.dzq||null); toast(ds.dzq?'บันทึกว่ากำลังต่อคิว':'ออกจากคิวแล้ว'); return }
-  if(ds.dzlater){ if(dzInQ(ds.dzlater)) dzQSet(null); S.dzLater={...(S.dzLater||{}), [ds.dzlater]:dzNowMin()+45}; DZ_MEMO=null; renderAll(); toast('เลื่อนไว้ทีหลังแล้ว'); return }
+  if(ds.dzpick!==undefined){ S.dzPick=ds.dzpick||null; DZ_MEMO=null; renderAll(); if(ds.dzpick) document.querySelector('.dznext')?.scrollIntoView({block:'center',behavior:'smooth'}); toast(ds.dzpick?'ย้ายขึ้นมาเป็นอันถัดไปแล้ว':'กลับไปลำดับที่แนะนำแล้ว'); return }
+  if(ds.dzlater){ if(dzInQ(ds.dzlater)) dzQSet(null); if(S.dzPick===ds.dzlater) S.dzPick=null; S.dzLater={...(S.dzLater||{}), [ds.dzlater]:dzNowMin()+45}; DZ_MEMO=null; renderAll(); toast('เลื่อนไว้ทีหลังแล้ว'); return }
   if(ds.dzset){ S.dzSetOpen=!S.dzSetOpen; renderDisney(); return }
   if(ds.dzland){ S.dzLand=ds.dzland; renderDisney(); return }
   if(ds.dzsim){ S.dzSimMin=Number(ds.dzsim); renderDisney(); return }
