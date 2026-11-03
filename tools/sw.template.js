@@ -8,6 +8,8 @@ self.addEventListener('fetch', e=>{
   const req=e.request, url=new URL(req.url);
   if(req.method!=='GET') return;
   if(url.origin===location.origin){
+    // the version check reads this file: always from the network, never a saved copy (a saved one said "newest" forever)
+    if(/\/sw\.js$/.test(url.pathname)) return;
     // the page: newest if the network answers within 4 s, otherwise the saved copy
     if(req.mode==='navigate'){
       e.respondWith(timeout(fetch(req.url,{cache:'no-store'}),4000).then(r=>{ const c=r.clone(); caches.open(CACHE).then(x=>x.put('index.html',c)); return r })

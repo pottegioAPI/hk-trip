@@ -970,10 +970,12 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('67cf3c639d|3 พ.ย. 11:04|1.00');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('12254fc88c|3 พ.ย. 11:09|1.01');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
+  // the browser also re-checks the offline worker, so a new one takes over even if this page is an old copy
+  try{ const reg=navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if(reg) reg.update().catch(()=>{}) }catch(e){}
   try{ const t=await (await fetch('sw.js?t='+Date.now(),{cache:'no-store'})).text(), m=t.match(/VERSION='([0-9a-f]+)'/);
     if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1]; APP_NEWER_N=(t.match(/release ([\d.]+)/)||[])[1]||null;
       // a newer version is out: switch to it by itself, once per version, when nothing is being typed or open

@@ -1,6 +1,6 @@
 // Offline copy of the app: opens without signal, updates itself when online.
-// release 1.00
-const VERSION='67cf3c639d', CACHE='hk-'+VERSION, FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-180.png","bus.json","places.json","water.json","weather.json","lasttrain.json","dzcal.json"];
+// release 1.01
+const VERSION='12254fc88c', CACHE='hk-'+VERSION, FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-180.png","bus.json","places.json","water.json","weather.json","lasttrain.json","dzcal.json"];
 self.addEventListener('install', e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())) });
 self.addEventListener('activate', e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('hk-')&&k!==CACHE&&k!=='hk-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim())) });
 const timeout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('slow')),ms))]);
@@ -8,6 +8,8 @@ self.addEventListener('fetch', e=>{
   const req=e.request, url=new URL(req.url);
   if(req.method!=='GET') return;
   if(url.origin===location.origin){
+    // the version check reads this file: always from the network, never a saved copy (a saved one said "newest" forever)
+    if(/\/sw\.js$/.test(url.pathname)) return;
     // the page: newest if the network answers within 4 s, otherwise the saved copy
     if(req.mode==='navigate'){
       e.respondWith(timeout(fetch(req.url,{cache:'no-store'}),4000).then(r=>{ const c=r.clone(); caches.open(CACHE).then(x=>x.put('index.html',c)); return r })
