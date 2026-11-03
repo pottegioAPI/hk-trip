@@ -999,7 +999,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('97abf5058a|3 พ.ย. 23:52|1.10');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('293bebe2e8|4 พ.ย. 00:27|1.11');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -2306,8 +2306,39 @@ function dzRecommend(any){
 const DZ_MUST = new Set(['frozen','rc','hyper','grizzly','ironman']);
 const dzCurve = m => { const h=m/60, a=Math.floor(h), f0=DZ_HOUR[a] ?? (a<9?.5:.4), f1=DZ_HOUR[a+1] ?? f0; return f0+(f1-f0)*(h-a) };
 const dzClosedNow = k => { const n=dzNowMin(), w=dzWait(k,n); return !!w.closed };
+/* each ride's usual queue through a weekday, learned from the real board (logged every 5 minutes before the trip,
+   see supabase/hk-dzlog). It answers "this line is long now, will it be shorter later today?" */
+let DZPROF=null; try{ DZPROF=JSON.parse(lsGet('hk-dzprof','null')) }catch(e){}
+async function dzProfFetch(){ if(window.claude) return;
+  try{ const j=await liveJSON(SB.url+'/functions/v1/hk-dzlog'); if(j && j.prof && j.days){ DZPROF={at:Date.now(), days:j.days, prof:j.prof}; lsSet('hk-dzprof', JSON.stringify(DZPROF)); DZ_MEMO=null; rerender() } }catch(e){} }
+// usual queue of ride k at minute m: half-hour averages smoothed with their neighbours, read between slot middles
+function dzUsual(k, m){
+  const p=DZPROF && DZPROF.prof && DZPROF.prof[k]; if(!p) return null;
+  const slots=Object.keys(p).map(Number).sort((a,b)=>a-b); if(slots.length<4) return null;
+  const sm=s=>{ const v=[s-30,s,s+30].filter(x=>p[x]!=null).map(x=>p[x]); return v.reduce((a,b)=>a+b,0)/v.length };
+  const c=m-15, lo=Math.floor(c/30)*30, hi=lo+30, a=p[lo]!=null?sm(lo):null, b=p[hi]!=null?sm(hi):null;
+  if(a==null && b==null) return sm(slots.reduce((x,y)=>Math.abs(y-c)<Math.abs(x-c)?y:x));
+  return a==null ? b : b==null ? a : a+(b-a)*(c-lo)/30;
+}
+// how busy the park is today compared with the logged weekdays (median over the rides on the live board):
+// a crowded day stays crowded, so later hours are scaled by it too (busy days run up to ~8x a quiet weekday)
+let DZ_CROWD=null;
+function dzCrowd(now){
+  const key=(DZQ&&DZQ.at)+'|'+now; if(DZ_CROWD && DZ_CROWD.k===key) return DZ_CROWD.v;
+  const r=[]; for(const k of Object.keys(DZ_RIDES)){ const w=dzWait(k,now), u=dzUsual(k,now); if(w.live && !w.closed && u!=null && u>=5) r.push(w.w/u) }
+  r.sort((a,b)=>a-b); const v = r.length>=3 ? Math.min(8, Math.max(0.5, r[Math.floor(r.length/2)])) : 1;
+  DZ_CROWD={k:key, v}; return v;
+}
 function dzPredWait(k, at, now){
-  const w=dzWait(k, now); if(w.closed) return Math.round(DZ_RIDES[k].avg * Math.pow(dzCurve(at), DZ_RIDES[k].avg>=25 ? 1.8 : 1));
+  const w=dzWait(k, now), u=dzUsual(k, at);
+  if(u!=null){
+    const f=dzCrowd(now);
+    if(w.closed || !w.live) return Math.round(u*f);
+    // the live board now, drifting over the next couple of hours to this ride's usual queue at today's crowd level
+    const u0=dzUsual(k, now), dev=u0==null ? 0 : w.w-u0*f;
+    return Math.max(0, Math.round(u*f + dev*Math.exp(-Math.max(0,at-now)/90)));
+  }
+  if(w.closed) return Math.round(DZ_RIDES[k].avg * Math.pow(dzCurve(at), DZ_RIDES[k].avg>=25 ? 1.8 : 1));
   const c = m => Math.pow(dzCurve(m), DZ_RIDES[k].avg>=25 ? 1.8 : 1);              // headline rides swing harder: short at opening, long midday
   if(w.live) return Math.max(0, Math.round(w.w * c(at)/c(now)));                  // what the board says now, along the day's shape
   return Math.round(DZ_RIDES[k].avg * c(at));
@@ -2336,9 +2367,10 @@ function dzSim(seq, start, here){
     else { wait=dzPredWait(s.k,t,now); const lt=(S.dzLater||{})[s.k]; if(lt && t<lt) pen+=(lt-t)*4;
       if(dzClosedNow(s.k) && t<now+45) pen+=(now+45-t)*5;   // down right now: come back later
       // leaving a headline ride for late is a gamble (queues and breakdowns stack up): do the big ones while there's slack
-      if(DZ_RIDES[s.k].avg>=25) pen+=Math.max(0,t-16*60)*0.35 }
+      // (kept light once real history says a ride gets shorter later: waiting for that is the point)
+      if(DZ_RIDES[s.k].avg>=25) pen+=Math.max(0,t-16*60)*(dzUsual(s.k,t)!=null?0.15:0.35) }
     steps.push({...s, at:t, walk, wait}); t+=wait+s.dur; waitSum+=wait; land=s.land;
-    if(s.k && DZ_MUST.has(s.k)){ if(t+dzWalk(land,'MS')>deadline) pen+=900; pen+=Math.max(0,t-15*60)*0.5 }   // must-dos: early, and never past the fireworks
+    if(s.k && DZ_MUST.has(s.k)){ if(t+dzWalk(land,'MS')>deadline) pen+=900; pen+=dzUsual(s.k,t)!=null ? Math.max(0,t-16*60)*0.2 : Math.max(0,t-15*60)*0.5 }   // must-dos: early, and never past the fireworks
   }
   const back=dzWalk(land,'MS'), end=t+back, late=Math.max(0,end-deadline);
   return {steps, end, walkSum:walkSum+back, waitSum, cost: end + walkSum*0.6 + late*8 + pen};
@@ -2412,6 +2444,17 @@ function dzPlayedHTML(){
   const done=Object.keys(DZ_RIDES).filter(k=>S.done['dz:'+k]); if(!done.length) return shutHTML;
   return shutHTML+`<div class="dzplayed"><div class="mini">✅ เล่นแล้ว ${done.length} เครื่อง</div>${done.map(k=>`<div class="dzstep played"><span><b>${DZ_MUST.has(k)?'⭐ ':''}${esc(DZ_RIDES[k].n)}</b><small>เล่นตอน ${esc(S.done['dz:'+k].at||'')} น.</small></span><button type="button" class="dzlater" data-dz="${k}">เล่นอีกครั้ง</button></div>`).join('')}</div>`;
 }
+// why a ride sits later in the route: its queue on the board now vs what its history says at the planned time
+function dzWhyLater(k, at, wait, now){
+  const w=dzWait(k,now); if(!w.live || w.closed || at<now+30 || dzUsual(k,at)==null) return '';
+  return w.w-wait>=10 ? ` · 📉 ตอนนี้รอ ${w.w} นาที สถิติบอกว่าตอน ${hhmm(at)} เหลือ ~${wait}` : '';
+}
+// the ride up next is long right now and is usually much shorter later today
+function dzBetterLater(k, now){
+  const w=dzWait(k,now); if(!w.live || w.closed || w.w<20 || dzUsual(k,now)==null) return null;
+  let best=null; for(let t=now+30; t<=fwBeThere()-30; t+=15){ const p=dzPredWait(k,t,now); if(!best || p<best.w) best={t, w:p} }
+  return best && w.w-best.w>=10 ? best : null;
+}
 function dzRouteHTML(full){
   const p=dzOptimize(), now=dzNowMin(), today=dzLiveNow(), deadline=fwBeThere();
   if(!p.steps.length) return `<p class="mini">เล่นครบและกินครบแล้ว! ไปจองที่ดูพลุได้เลย 🎆</p>${full?dzPlayedHTML():''}`;
@@ -2430,11 +2473,12 @@ function dzRouteHTML(full){
     const live=!s.meal && i===0 && dzWait(s.k,now).live, wc=s.wait>=40?'var(--danger)':s.wait>=25?'#E58A00':'var(--mint)';
     const wb=`<span class="dzwb" style="--wc:${wc}"><b class="num">${s.wait}</b><small>${s.meal?'คิวร้าน':'นาที'}${live?' · สด':''}</small></span>`;
     const info=`<span class="dzzone">📍 ${esc(DZ_LANDS[s.land][0])}</span> ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
-    const picked = i===0 && S.dzPick===(s.k||'m:'+s.meal);
+    const picked = i===0 && S.dzPick===(s.k||'m:'+s.meal), bl = i===0 && !s.meal ? dzBetterLater(s.k, now) : null;
     return i===0 ? card(late?' late':'', `${picked?'📌 คุณเลือกเอง':'👉 ไปต่อเลย'} · ถึง ~${hhmm(s.at)} น.`,
-        picked?`<button type="button" class="dzn-auto" data-dzrefresh="1">✨ ให้แอปเลือก</button>`:'', wb, info, big,
+        picked?`<button type="button" class="dzn-auto" data-dzrefresh="1">✨ ให้แอปเลือก</button>`:'', wb,
+        info+(bl?`<br>💡 ปกติราว ${hhmm(bl.t)} น. เหลือ ~${bl.w} นาที ถ้าอยากรอ กด "ไว้ทีหลัง"`:''), big,
         s.meal?'':`<button type="button" class="dzn-btn" data-dzq="${s.k}">🕒 เข้าคิวแล้ว</button><button type="button" class="dzn-btn" data-dzlater="${s.k}">⏭️ ไว้ทีหลัง</button>`)
-      : `<div class="dzstep${late?' late':''}">${wb}<button type="button" class="dzpickb" data-dzpick="${s.k||'m:'+s.meal}" aria-label="ไป ${esc(s.k?DZ_RIDES[s.k].n:DZ_MEALS[s.meal].n)} ก่อน"><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small>${i===1?'<small class="dzpickhint">👆 แตะชื่อเพื่อไปอันนี้ก่อน</small>':''}</button><div class="dzbtns">${btn}${later}</div></div>`;
+      : `<div class="dzstep${late?' late':''}">${wb}<button type="button" class="dzpickb" data-dzpick="${s.k||'m:'+s.meal}" aria-label="ไป ${esc(s.k?DZ_RIDES[s.k].n:DZ_MEALS[s.meal].n)} ก่อน"><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${s.k?dzWhyLater(s.k,s.at,s.wait,now):''}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small>${i===1?'<small class="dzpickhint">👆 แตะชื่อเพื่อไปอันนี้ก่อน</small>':''}</button><div class="dzbtns">${btn}${later}</div></div>`;
   };
   const shown = full ? p.steps : p.steps.slice(0,3);
   return `${shown.map(row).join('')}
@@ -2447,8 +2491,9 @@ function dzRouteHTML(full){
 // the queue numbers are Disney's own (official app feed via Queue-Times), with the time they were read
 function dzSrcHTML(){
   const live=DZQ&&DZQ.anyOpen&&Date.now()-DZQ.at<20*60e3;
-  if(live) return `<p class="dzsrc on">● คิวสดจากระบบ Disney (ตัวเลขเดียวกับในแอป Disney) · อัปเดต ${hhmm(hkNow().min-Math.round((Date.now()-(DZQ.upd||DZQ.at))/60e3))} น. เวลาฮ่องกง</p>`;
-  return `<p class="dzsrc">${DZQ&&!DZQ.anyOpen?'สวนปิดอยู่':'ยังดึงคิวสดไม่ได้ (เช็คเน็ต)'} · ตอนนี้ใช้คิวเฉลี่ยย้อนหลัง</p>`;
+  const hist = DZPROF && DZPROF.days ? ` · คาดคิวช่วงต่อไปจากสถิติจริง ${DZPROF.days} วันธรรมดา` : '';
+  if(live) return `<p class="dzsrc on">● คิวสดจากระบบ Disney (ตัวเลขเดียวกับในแอป Disney) · อัปเดต ${hhmm(hkNow().min-Math.round((Date.now()-(DZQ.upd||DZQ.at))/60e3))} น. เวลาฮ่องกง${hist}</p>`;
+  return `<p class="dzsrc">${DZQ&&!DZQ.anyOpen?'สวนปิดอยู่':'ยังดึงคิวสดไม่ได้ (เช็คเน็ต)'} · ตอนนี้ใช้${hist?'สถิติคิวจริง '+DZPROF.days+' วันธรรมดา':'คิวเฉลี่ยย้อนหลัง'}</p>`;
 }
 function dzSmartHTML(){
   const today=dzLiveNow(), trial=today&&hkNow().date!=='2026-11-16';
@@ -3555,7 +3600,7 @@ let savedTab = lsGet('hk-tab','home'); if(savedTab==='set'){ savedTab='money'; S
 S.tab = ['home','plan','go','dz','money'].includes(savedTab) ? savedTab : 'home';
 setTab(S.tab);
 // live feeds start once the whole script has run (the Supabase address is defined further down)
-setTimeout(()=>{ warnFetch(); nowFetch(); flightFetch(); dzQueueFetch(); verCheck() }, 0); setInterval(verCheck, 30*60e3);
+setTimeout(()=>{ warnFetch(); nowFetch(); flightFetch(); dzQueueFetch(); dzProfFetch(); verCheck() }, 0); setInterval(verCheck, 30*60e3); setInterval(dzProfFetch, 6*3600e3);
 setInterval(warnFetch, 10*60e3); setInterval(nowFetch, 10*60e3); setInterval(()=>flightFetch(), 5*60e3); gpsStart(false);
 setInterval(()=>{ if(document.visibilityState==='visible') dzQueueFetch() }, 60e3);   // the plan's park stop needs it too, not only the Disney tab
 setInterval(()=>{ if(!S.sheet && S.tab==='home' && !['chk-new','pinin','keyin'].includes(document.activeElement?.id)) renderHome(); if(!S.sheet && S.tab==='plan') renderPlan(); if(!S.sheet && S.tab==='dz' && !S.dzEdit) renderDisney(); renderHeader() }, 60000);
