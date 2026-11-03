@@ -2924,7 +2924,8 @@ function navHTML(){
     </div>
     ${a&&a.src?`<div class="mini" style="margin-top:6px">${ic('pin')} "จาก" ตั้งให้อัตโนมัติ${a.src==='plan'?'จากจุดล่าสุดที่กด "ถึงแล้ว"':'เป็นที่พัก'} แตะเพื่อเปลี่ยน</div>`:''}
     <div class="places"><button class="chip homechip" type="button" data-gohome="1">${ic('home')}กลับที่พัก</button>${PLACES.map((p,i)=>`<button class="chip" type="button" data-navplace="${i}">${esc(p.n)}</button>`).join('')}</div>
-    ${b ? (list.length ? `<div class="res"><div class="opts">${list.map((o,i)=>{ const open=S.navOpen===i;
+    ${b && a && a.ll && b.ll && metres(a.ll,b.ll)<150 ? `<div class="res"><p class="mini">${ic('pin')}"จาก" กับ "ไป" เป็นที่เดียวกัน ถ้าตอนนี้ไม่ได้อยู่ที่${esc(b.n)} แตะช่อง "จาก" เพื่อบอกว่าอยู่ไหน (หรือใช้ GPS)</p></div>`
+      : b ? (list.length ? `<div class="res"><div class="opts">${list.map((o,i)=>{ const open=S.navOpen===i;
         return `<div class="navo${open?' open':''}"><button class="op" type="button" data-navx="${i}" aria-pressed="${open}">
           <span class="oi">${ic(MODES[o.mode].i)}</span>
           <span class="on">${esc(o.n)}${o.cheap?'<span class="bdg cheap">ถูกสุด</span>':''}${o.fast?'<span class="bdg fast">เร็วสุด</span>':''}<small>${esc(o.d)}</small></span>
@@ -3159,11 +3160,12 @@ function sugHTML(q){
   return list.map(p=>{ const i=PL.p.indexOf(p), ll=[p[3]/1e5,p[4]/1e5], ns=nearestStation(ll), km=ref?metres(ref,ll)/1000:null;
     return `<button type="button" class="sg" data-pick="${i}"><b>${esc(p[2]||p[0])}</b>${p[2]?` <small>${esc(p[0])}</small>`:''}<small>${PCAT[p[5]]?PCAT[p[5]][0]:''}${p[8]?' · '+esc(p[8]):''}${ns?` · MTR ${esc(codeName(ns.c))} ~${ns.m} ม.`:''}${isFood(p)&&km!=null?` · ห่างจาก${esc(refName)} ${km<1?Math.round(km*1000)+' ม.':km.toFixed(1)+' กม.'}`:''}</small></button>` }).join('');
 }
-function readItemForm(){ const d=S.sheet; for(const k of ['h','t','e','p','map','ex']) { const el=document.getElementById('i-'+k); if(el) d[k]=el.value } const st=document.getElementById('i-st'); if(st) d.st=st.value }
+function readItemForm(){ const d=S.sheet; for(const k of ['h','t','e','p','map','ex']) { const el=document.getElementById('i-'+k); if(el) d[k]=el.value } }   // the station comes from the station picker (d.st)
 
 /* ---------- writes ---------- */
 const chains={};
-function serial(key, fn){ chains[key]=(chains[key]||Promise.resolve()).then(fn); return chains[key] }
+// one write at a time per document; a failed write must not block the ones after it
+function serial(key, fn){ chains[key]=(chains[key]||Promise.resolve()).catch(()=>{}).then(fn); return chains[key] }
 function savePlanDay(dn){
   if(!db){ lsSave(); return Promise.resolve() }
   const items=S.plan[dn-1];
