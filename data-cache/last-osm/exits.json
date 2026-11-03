@@ -2,8 +2,8 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-03T03:18:02Z",
-    "timestamp_areas_base": "2026-11-02T23:51:00Z",
+    "timestamp_osm_base": "2026-11-03T23:23:19Z",
+    "timestamp_areas_base": "2026-11-03T16:54:38Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -5445,9 +5445,9 @@
   "lat": 22.2894025,
   "lon": 113.9418428,
   "tags": {
-    "name": "D: 富東街 Fu Tung Street",
-    "name:en": "D: Fu Tung Street",
-    "name:zh": "D: 富東街",
+    "name": "富東街 Fu Tung Street",
+    "name:en": "Fu Tung Street",
+    "name:zh": "富東街",
     "railway": "subway_entrance",
     "ref": "D",
     "wheelchair": "yes"
@@ -5459,9 +5459,9 @@
   "lat": 22.2895009,
   "lon": 113.9415262,
   "tags": {
-    "name": "C: 東薈城名店倉 Citygate Outlets",
-    "name:en": "C: Citygate Outlets",
-    "name:zh": "C: 東薈城名店倉",
+    "name": "東薈城名店倉 Citygate Outlets",
+    "name:en": "Citygate Outlets",
+    "name:zh": "東薈城名店倉",
     "railway": "subway_entrance",
     "ref": "C"
   }
@@ -5472,11 +5472,11 @@
   "lat": 22.2891486,
   "lon": 113.9409809,
   "tags": {
-    "name": "B: 昂坪360 Ngong Ping 360",
-    "name:en": "B: Ngong Ping 360",
-    "name:zh": "B: 昂坪360",
-    "name:zh-Hans": "B: 昂坪360",
-    "name:zh-Hant": "B: 昂坪360",
+    "name": "昂坪360 Ngong Ping 360",
+    "name:en": "Ngong Ping 360",
+    "name:zh": "昂坪360",
+    "name:zh-Hans": "昂坪360",
+    "name:zh-Hant": "昂坪360",
     "railway": "subway_entrance",
     "ref": "B"
   }
@@ -5487,11 +5487,11 @@
   "lat": 22.2889151,
   "lon": 113.9411657,
   "tags": {
-    "name": "A: 東堤灣畔 (1至3座) Tung Chung Crescent (Block 1 to 3)",
-    "name:en": "A: Tung Chung Crescent (Block 1 to 3)",
-    "name:zh": "A: 東堤灣畔 (1至3座)",
-    "name:zh-Hans": "A: 东堤湾畔 (1至3座)",
-    "name:zh-Hant": "A: 東堤灣畔 (1至3座)",
+    "name": "東堤灣畔 (1至3座) Tung Chung Crescent (Block 1 to 3)",
+    "name:en": "Tung Chung Crescent (Block 1 to 3)",
+    "name:zh": "東堤灣畔 (1至3座)",
+    "name:zh-Hans": "东堤湾畔 (1至3座)",
+    "name:zh-Hant": "東堤灣畔 (1至3座)",
     "railway": "subway_entrance",
     "ref": "A"
   }
