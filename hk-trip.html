@@ -2322,7 +2322,7 @@ function dzSmartHTML(){
       ${today?'':`<div class="mini">ลองดูแผนถ้าเริ่มตอน (ใช้ดูก่อนวันจริงเท่านั้น วันที่ 16 แอปใช้เวลาจริงเอง)</div><div class="places" style="margin:0 -14px">${[10.5,12,14,17,19].map(h=>`<button type="button" class="chip num" data-dzsim="${h*60}" aria-pressed="${(S.dzSimMin??630)===h*60}">${hhmm(h*60)}</button>`).join('')}</div>`}</div>`:''}
     ${dzSrcHTML()}
     ${dzRouteHTML(true)}
-    <div class="note">${ic('info')}เรียงลำดับให้เดินน้อยและรอคิวน้อยที่สุด กินตามเวลา voucher และเสร็จก่อนไปจองที่ดูพลุ${DZQ&&DZQ.anyOpen?` · คิวสดจาก Queue-Times.com อัปเดต ${new Date(DZQ.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.`:' · ตอนนี้ใช้สถิติคิวย้อนหลัง วันจริงใช้คิวสด'}</div>
+    <div class="note">${ic('info')}เรียงลำดับให้เดินน้อยและรอคิวน้อยที่สุด กินตามเวลา voucher และเสร็จก่อนไปจองที่ดูพลุ${DZQ&&DZQ.anyOpen?` · คิวสดอัปเดต${new Date(DZQ.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Hong_Kong'})} น.`:' · ตอนนี้ใช้สถิติคิวย้อนหลัง วันจริงใช้คิวสด'}</div>
     <div class="acts"><button type="button" class="btn-s" data-dzreset="1">${S.dzResetSure?'แตะอีกครั้งเพื่อล้าง':'ล้างที่เล่นแล้วทั้งหมด'}</button></div></div>`;
 }
 async function dzReset(){
@@ -2510,7 +2510,7 @@ function renderDisney(){
       <li>ไปถึงประตูก่อนสวนเปิด พอเปิดแล้วเดินตามกล่อง "ไปต่อเลย" ทันที ช่วงเช้าคิวสั้นที่สุดของวัน</li>
       <li>กด "เล่นแล้ว" ทันทีที่ลงจากเครื่อง แอปจะคิดเส้นทางที่เหลือใหม่จากโซนที่อยู่</li>
       <li>ถ้าหน้าเครื่องคิวยาวกว่าที่แอปบอกมาก กด "ไว้ทีหลัง" แอปจะจัดเครื่องอื่นให้ก่อน</li></ul>
-      <div class="src">คิวสดจากระบบแอป Hong Kong Disneyland (ผ่าน Queue-Times.com สำรองด้วย ThemeParks.wiki) อัปเดตทุก 2 นาที · เวลาเปิดสวน โชว์ และเครื่องที่ปิดซ่อม จากปฏิทินทางการของ Disney อัปเดตทุกเช้า</div></div>`;
+      <div class="src">คิวสดจากระบบแอป Hong Kong Disneyland (อ่านจาก Queue-Times.com และ ThemeParks.wiki พร้อมกัน ใช้ตัวเลขที่ใหม่กว่า) อัปเดตทุก 2 นาที · เวลาเปิดสวน โชว์ และเครื่องที่ปิดซ่อม จากปฏิทินทางการของ Disney อัปเดตทุกเช้า</div></div>`;
 }
 function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else { next['dz:'+k]={at:hhmm(hkNow().min), d:hkNow().date}; S.dzLand=DZ_LAND_OF[k] } S.done=next; renderAll(); saveProgress() }
 const DZ_CASTLE = `<svg class="castle" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 58V30l4-6 4 6v28M46 58V30l4-6 4 6v28M18 58V36h28v22" fill="var(--pink-soft)" stroke="var(--pink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 36V22l8-12 8 12v14" fill="var(--sky-soft)" stroke="var(--sky)" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 58v-9a4 4 0 0 1 8 0v9" fill="var(--surface)" stroke="var(--pink)" stroke-width="2.5"/><path d="M32 10V4l5 2-5 2" fill="var(--sun)" stroke="var(--sun)" stroke-width="2"/><circle cx="32" cy="27" r="2.5" fill="var(--sun)"/></svg>`;
