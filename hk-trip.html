@@ -578,7 +578,25 @@ input[type=time].txt{appearance:none;min-height:46px}
 .dzpickb:active{background:var(--sun-soft)}
 .dzpickb small{display:block}
 .dzpickb .dzpickhint{color:var(--pink,#FF4F8B);font-weight:600;margin-top:2px}
-.dzunpick{all:unset;display:inline-block;margin-top:8px;padding:6px 12px;border-radius:999px;background:var(--pink);color:var(--pink-ink);font-size:12.5px;font-weight:700;cursor:pointer}
+/* the "next" card: label row, ride + queue, one big done button, two quiet choices */
+.dznext{display:block;padding:12px 14px 14px;box-shadow:0 6px 18px -10px rgba(229,138,0,.45)}
+.dznext .dzn-top{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;min-height:26px}
+.dznext .dzn-top>span{font-size:12.5px;font-weight:600;color:var(--ink);opacity:.72}
+.dznext .dzn-main{display:flex;flex-direction:row;align-items:center;gap:12px;margin:6px 0 12px}
+.dznext .dzn-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.dznext .dzn-txt b{font-size:19px;line-height:1.25}
+.dznext .dzn-txt small{font-size:12.5px;line-height:1.4}
+.dzn-ok{display:block;width:100%;border:none;border-radius:14px;background:var(--mint);color:#fff;font-weight:700;font-size:16px;padding:13px;box-shadow:0 4px 12px -6px rgba(34,192,139,.7)}
+.dzn-ok:active{transform:scale(.98)}
+.dzn-sub{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.dzn-sub:has(> :only-child){grid-template-columns:1fr}
+.dzn-btn{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;font-size:13px;font-weight:600;padding:9px 6px;color:var(--ink)}
+.dzn-auto{border:none;border-radius:99px;background:var(--surface);color:var(--pink);font-size:12px;font-weight:700;padding:5px 11px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+/* the land a ride is in: the thing to look for on the park's signs */
+.dzzone{font-weight:700;color:var(--ink)}
+.dznext .dzzone{display:inline-block;background:var(--surface);border-radius:99px;padding:2px 9px;margin:2px 4px 2px 0;font-size:12.5px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.dznext.inq{background:var(--sky-soft);border-color:var(--sky)}
+.dznext.inq .dzn-top>span{color:var(--sky);opacity:1}
 </style>
 
 <header class="top">
@@ -2372,15 +2390,22 @@ function dzRouteHTML(full){
     const late=s.at+s.wait+s.dur>deadline, must=s.k&&DZ_MUST.has(s.k), name=s.meal?`🍽️ ${DZ_MEALS[s.meal].n} · Royal Banquet Hall`:(must?'⭐ ':'')+esc(DZ_RIDES[s.k].n)+(must?' <span class="mustt">ห้ามพลาด</span>':'');
     const btn=s.meal?`<button type="button" class="dzok" data-dzmeal="${s.meal}">กินแล้ว</button>`:`<button type="button" class="dzok" data-dz="${s.k}">เล่นแล้ว</button>`;
     const later=s.meal?'':`<button type="button" class="dzlater" data-dzlater="${s.k}">ไว้ทีหลัง</button>`;
-    if(i===0 && !s.meal && dzInQ(s.k)) return `<div class="dznext"><span class="dzwb" style="--wc:var(--sky)"><b class="num">${dzQLeft()}</b><small>นาทีที่เหลือ</small></span><div><small>🕒 ต่อคิวอยู่ · ${dzQMins()} นาทีแล้ว</small><b>${name}</b><small>ลงจากเครื่องแล้วกด "เล่นแล้ว" แอปจะบอกเครื่องถัดไป</small></div><div class="dzbtns">${btn}<button type="button" class="dzlater" data-dzq="">ออกจากคิว</button></div></div>`;
-    const inq = i===0 && !s.meal ? `<button type="button" class="dzlater" data-dzq="${s.k}">เข้าคิวแล้ว</button>` : '';
+    // the "next" card, stacked so nothing wraps: what and how long on top, one big "done" button, small choices under it
+    const card=(cls, lab, badge, wbx, sub, main, small)=>`<div class="dznext${cls}"><div class="dzn-top"><span>${lab}</span>${badge}</div>
+      <div class="dzn-main">${wbx}<div class="dzn-txt"><b>${name}</b><small>${sub}</small></div></div>
+      <div class="dzn-acts">${main}${small?`<div class="dzn-sub">${small}</div>`:''}</div></div>`;
+    const big=s.meal?`<button type="button" class="dzn-ok" data-dzmeal="${s.meal}">✓ กินแล้ว</button>`:`<button type="button" class="dzn-ok" data-dz="${s.k}">✓ เล่นแล้ว</button>`;
+    if(i===0 && !s.meal && dzInQ(s.k)) return card(' inq', `🕒 ต่อคิวอยู่ · ${dzQMins()} นาทีแล้ว`, '', `<span class="dzwb" style="--wc:var(--sky)"><b class="num">${dzQLeft()}</b><small>นาทีเหลือ</small></span>`,
+      `<span class="dzzone">📍 ${esc(DZ_LANDS[s.land][0])}</span> ลงจากเครื่องแล้วกด "เล่นแล้ว" แอปจะบอกเครื่องถัดไป`, big, `<button type="button" class="dzn-btn" data-dzq="">ออกจากคิว</button>`);
     // the queue is what decides "go now or skip", so it is the biggest thing on the row
     const live=!s.meal && i===0 && dzWait(s.k,now).live, wc=s.wait>=40?'var(--danger)':s.wait>=25?'#E58A00':'var(--mint)';
     const wb=`<span class="dzwb" style="--wc:${wc}"><b class="num">${s.wait}</b><small>${s.meal?'คิวร้าน':'นาที'}${live?' · สด':''}</small></span>`;
-    const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
+    const info=`<span class="dzzone">📍 ${esc(DZ_LANDS[s.land][0])}</span> ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
     const picked = i===0 && S.dzPick===(s.k||'m:'+s.meal);
-    return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>${picked?'คุณเลือกไปอันนี้':'ไปต่อเลย'} · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small>${picked?`<button type="button" class="dzunpick" data-dzrefresh="1">✨ ให้แอปจัดลำดับให้</button>`:''}</div><div class="dzbtns">${inq}${btn}${later}</div></div>`
-      : `<div class="dzstep${late?' late':''}">${wb}<button type="button" class="dzpickb" data-dzpick="${s.k||'m:'+s.meal}" aria-label="ไป ${esc(s.k?DZ_RIDES[s.k].n:DZ_MEALS[s.meal].n)} ก่อน"><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small>${i===1?'<small class="dzpickhint">แตะชื่อเครื่องไหนก็ได้ เพื่อไปอันนั้นก่อน</small>':''}</button><div class="dzbtns">${btn}${later}</div></div>`;
+    return i===0 ? card(late?' late':'', `${picked?'📌 คุณเลือกเอง':'👉 ไปต่อเลย'} · ถึง ~${hhmm(s.at)} น.`,
+        picked?`<button type="button" class="dzn-auto" data-dzrefresh="1">✨ ให้แอปเลือก</button>`:'', wb, info, big,
+        s.meal?'':`<button type="button" class="dzn-btn" data-dzq="${s.k}">🕒 เข้าคิวแล้ว</button><button type="button" class="dzn-btn" data-dzlater="${s.k}">⏭️ ไว้ทีหลัง</button>`)
+      : `<div class="dzstep${late?' late':''}">${wb}<button type="button" class="dzpickb" data-dzpick="${s.k||'m:'+s.meal}" aria-label="ไป ${esc(s.k?DZ_RIDES[s.k].n:DZ_MEALS[s.meal].n)} ก่อน"><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small>${i===1?'<small class="dzpickhint">👆 แตะชื่อเพื่อไปอันนี้ก่อน</small>':''}</button><div class="dzbtns">${btn}${later}</div></div>`;
   };
   const shown = full ? p.steps : p.steps.slice(0,3);
   return `${shown.map(row).join('')}
