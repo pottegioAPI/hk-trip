@@ -1042,6 +1042,48 @@ function dayDelay(list){ let delay=null, idx=-1; list.forEach((it,k)=>{ const a=
   const ka=list.findIndex(i=>i.id==='1a'), fi=typeof flightInfo==='function'?flightInfo('EK384'):null;
   if(ka>=0 && idx<ka && !S.done['1a'] && fi && fi.delay!=null && fi.kind!=='cancel'){ delay=fi.delay; idx=ka }   // landing time from the airport board
   return {delay,idx} }
+/* the rest of the day re-timed from the latest "ถึงแล้ว" (or the landing time on the airport board):
+   a later stop starts when we can really get there, never earlier than planned, and the time lost is won back
+   by staying a little shorter (down to ~65% of the planned stay). Flights, Disney's meals and fireworks, and
+   leaving for the airport don't move: the stop before one is cut to fit, and flagged when even that isn't enough. */
+const FIXED_STOP = new Set(['1s','1f','3c','4e','4f','4g']), INSIDE_STOP = new Set(['3l','3n']);   // 3l/3n: meals inside Disney, timed by the Disney tab
+function replan(dn, list){
+  const map={}, T=toMin, L=list.filter(i=>!INSIDE_STOP.has(i.id));
+  let a=-1, at=null; L.forEach((it,k)=>{ const v=arrivedAt(it.id); if(v){ a=k; at=T(v) } });
+  const ka=L.findIndex(i=>i.id==='1a'), fi=ka>a && !S.done['1a'] && typeof flightInfo==='function' ? flightInfo('EK384') : null;
+  if(fi && fi.tm!=null && fi.kind!=='cancel'){ a=ka; at=fi.tm }
+  if(a<0) return {map, delay:null};
+  const stay=it=>it.e?T(it.e)-T(it.t):0;
+  const minStay=(it,mins)=>Math.max(Math.round(stay(it)*.65), Math.min(stay(it), (mins||0)+15));
+  const A=L[a]; let end = A.e && !FIXED_STOP.has(A.id) ? Math.max(at+minStay(A), T(A.e)) : at, plannedEnd=T(A.e||A.t), prev=A;
+  // where we are now: when to move on (cut further below if a flight or the airport is coming)
+  map[A.id]={t:at, e:A.e?end:null, late:at-T(A.t), cut:A.e?stay(A)-(end-at):0, here:A.id!=='3b'};   // Disney's own day is planned in the Disney tab
+  for(let k=a+1;k<L.length;k++){
+    const it=L[k]; if(S.done[it.id]) continue;
+    const g=Math.max(0, T(it.t)-plannedEnd), gap = end>plannedEnd ? Math.round(g*.75) : g;
+    if(FIXED_STOP.has(it.id)){
+      const over=end+gap-T(it.t);
+      if(over>0 && prev && !FIXED_STOP.has(prev.id) && map[prev.id].e!=null){ const p=map[prev.id], pe=Math.max(p.t, T(it.t)-gap);   // cut the stop before to leave on time
+        p.cut+=p.e-pe; p.e=pe; p.leave=true; if(pe-p.t<minStay(prev)) p.tight=true; if(pe-p.t<10) p.miss=true }
+      map[it.id]={t:T(it.t), e:it.e?T(it.e):null, late:0, cut:0, fixed:true};
+      end=T(it.e||it.t); plannedEnd=end; prev=it; continue;
+    }
+    const {opts}=optionsFor(dn,it), sel=opts.length?chosen(dn,it,opts):null;
+    const t=Math.max(T(it.t), end+gap), e=it.e ? Math.max(t+minStay(it, sel&&sel.mins), T(it.e)) : null;
+    map[it.id]={t, e, late:t-T(it.t), cut: it.e ? stay(it)-(e-t) : 0};
+    end=e??t; plannedEnd=T(it.e||it.t); prev=it;
+  }
+  const nx=L.find((it,k)=>k>a && !S.done[it.id]), r=nx&&map[nx.id];
+  return {map, delay: r ? r.late : null};
+}
+// what the plan shows for a re-timed stop: the new time, and why it changed
+const moved = r => r && !r.fixed && !r.here && (r.late>=10 || r.cut>=10 || r.tight || r.miss);
+// the stop we're at, reached late: when to leave so the rest still works
+const hereNote = r => r && r.here && r.e!=null && (r.cut>=10 || r.leave) ? (r.leave ? `⚠️ ต้องออกจากที่นี่ภายใน ${hhmm(r.e)} น. ให้ทันจุดถัดไป` : `ถึงช้า ${r.late} นาที ควรออกจากที่นี่ประมาณ ${hhmm(r.e)} น.`) : '';
+function movedNote(r){
+  if(!moved(r)) return '';
+  return r.miss ? '⚠️ เวลาไม่พอแล้ว แนะนำข้ามจุดนี้' : r.leave ? `⚠️ ต้องออกภายใน ${hhmm(r.e)} น. ให้ทันจุดถัดไป` : r.cut>=10 ? `อยู่สั้นลง ${r.cut} นาที เพื่อให้ทันแผนที่เหลือ` : `เลื่อนตามเวลาที่ถึงจริง`;
+}
 let toastT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2800) }
 
 /* ---------- getting here: options for one stop ---------- */
@@ -1376,7 +1418,7 @@ const PDB = (()=>{ let p=null;
 // day 1 of the trip: photos and hand-typed waits from trying the app out beforehand don't count
 // (the shared ticks, expenses and game are cleared on the server at the same moment)
 function freshStart(){ if(hkNow().date<'2026-11-14' || lsGet('hk-fresh','')==='1') return Promise.resolve();
-  lsSet('hk-dzlive','{}'); lsSet('hk-ch','null'); return PDB.keys().then(ks=>Promise.all((ks||[]).map(k=>PDB.del(k)))).catch(()=>{}).finally(()=>lsSet('hk-fresh','1')) }
+  lsSet('hk-dzlive','{}'); lsSet('hk-ch','null'); lsSet('hk-dzq','null'); S.dzQ=null; return PDB.keys().then(ks=>Promise.all((ks||[]).map(k=>PDB.del(k)))).catch(()=>{}).finally(()=>lsSet('hk-fresh','1')) }
 freshStart();
 const photoURL = new Map();   // key -> object URL, so images show without re-reading
 async function photoSrc(k){ if(photoURL.has(k)) return photoURL.get(k); const b=await PDB.get(k).catch(()=>null); const u=b?URL.createObjectURL(b):''; photoURL.set(k,u); return u }
@@ -1841,14 +1883,14 @@ function autoIds(id){ return [`auto-${id}-0`,`auto-${id}-1`,`auto-${id}-t`] }
 const routeIsOpen = (id,cur) => !S.routeShut.has(id) && (S.routeOn.has(id) || cur===id);
 function routeToggle(id){ const open=routeIsOpen(id, nextItem(S.day)); if(open){ S.routeShut.add(id); S.routeOn.delete(id) } else { S.routeShut.delete(id); S.routeOn.add(id) } renderPlan() }
 function renderPlan(){
-  const d=DAYS[S.day-1], cur=nextItem(S.day), list=dayItems(S.day), {delay,idx:lastIdx}=dayDelay(list);
-  const shift = delay!=null && Math.abs(delay)>=10;
+  const d=DAYS[S.day-1], cur=nextItem(S.day), list=dayItems(S.day), {map:RP, delay:RPd}=replan(S.day, list);
   const dayChips = DAYS.map(x=>`<button class="day" type="button" data-day="${x.n}" aria-pressed="${x.n===S.day}"><small>${x.dow}</small><b>${x.d}</b><small>วันที่ ${x.n}</small></button>`).join('');
   const doneCount=list.filter(i=>S.done[i.id]).length;
   const items = list.map((it,k)=>{
     const done=!!S.done[it.id], {prev,opts}=optionsFor(S.day,it), sel=opts.length?chosen(S.day,it,opts):null;
     const open = !done && S.ghOpen.has(it.id), routeOpen = routeIsOpen(it.id, cur);   // the next stop's route is open by itself; other ways only on request
-    if(S.compact) return compactItem(it, done, cur, sel, shift&&k>lastIdx&&!done ? delay : null);
+    const r=!done&&moved(RP[it.id])?RP[it.id]:null;
+    if(S.compact) return compactItem(it, done, cur, sel, r);
     const gh = opts.length ? `<div class="gh"><div class="lab">วิธีไปจาก ${esc(prev.h)}${done?' (ถึงแล้ว)':''}</div>
       <div class="opts">${optHTML(it,sel,true)}</div>
       ${!done && routeOpen && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it))}
@@ -1863,10 +1905,12 @@ function renderPlan(){
     return `<li class="it${done?' done':''}${cur===it.id?' now':''}" id="it-${it.id}">
       <button class="tick" type="button" data-arrive="${it.id}" aria-label="${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}: ${esc(it.h)}">${ic('check')}</button>
       <div class="card">
-        <div class="time num"><span${shift&&k>lastIdx&&!done?' style="text-decoration:line-through;opacity:.6"':''}>${esc(tShow(it.t,it))}${it.e?' – '+esc(tShow(it.e,it)):''} น.${tzTag(it)}</span>
+        <div class="time num"><span${r?' style="text-decoration:line-through;opacity:.6"':''}>${esc(tShow(it.t,it))}${it.e?' – '+esc(tShow(it.e,it)):''} น.${tzTag(it)}</span>
           ${done&&arrivedAt(it.id)?`<span class="nowtag" style="background:var(--mint)">ถึงจริง ${tShow(arrivedAt(it.id),it)}</span>`:''}
-          ${shift&&k>lastIdx&&!done?`<span class="nowtag" style="background:var(--sun);color:var(--ink)">≈ ${hhmm(toMin(it.t)+delay)}</span>`:''}
+          ${r?`<span class="nowtag" style="background:var(--sun);color:var(--ink)">≈ ${hhmm(r.t)}${r.e!=null?'–'+hhmm(r.e):''}</span>`:''}
           ${cur===it.id?'<span class="nowtag">ถัดไป</span>':''}</div>
+        ${r?`<div class="mini" style="color:${r.miss||r.leave?'var(--danger)':'var(--muted)'}">${movedNote(r)}</div>`:''}
+        ${done&&hereNote(RP[it.id])?`<div class="mini" style="color:${RP[it.id].leave?'var(--danger)':'var(--muted)'}">${hereNote(RP[it.id])}</div>`:''}
         ${it.st&&NET?(()=>{ const x=exitFor(it); return `<div class="mini">MTR ${esc(codeName(it.st))}${x?` · ออก <span class="exit">Exit ${esc(x.ref)}</span>${x.name?' '+esc(x.name):''}${x.d!=null?` (~${x.d} ม.)`:''}`:''}
           ${x&&x.planRef?`<span class="tag" style="background:var(--sun-soft)">แผนเดิมเขียน Exit ${esc(x.planRef)} · ปรับตามข้อมูลจริงแล้ว</span>`:''}</div>` })():''}
         <h3>${esc(it.h)}</h3>
@@ -1892,19 +1936,19 @@ function renderPlan(){
     <div class="dayhead"><div class="blob" aria-hidden="true"></div>
       <div class="eyebrow">DAY ${d.n} · ${d.dow} ${d.d} พ.ย. 2569</div>
       <h2>${esc(d.title)}</h2>
-      <div class="pillrow"><span class="pill mint num">ถึงแล้ว ${doneCount}/${list.length}</span>${(()=>{ const n=list.filter(i=>{ const x=exitFor(i); return x&&x.planRef }).length; return n?`<span class="pill sun num">ปรับ Exit ตามข้อมูลจริง ${n} จุด</span>`:'' })()}${shift?`<span class="pill sun num">${delay>0?`ช้ากว่าแผน ${delay}`:`เร็วกว่าแผน ${-delay}`} นาที · เวลาที่เหลือขยับให้แล้ว</span>`:''}<span class="pill sky num">ค่าเดินทางที่จดวันนี้ ${hk(transportToday(d.n))}/คน</span></div>
+      <div class="pillrow"><span class="pill mint num">ถึงแล้ว ${doneCount}/${list.length}</span>${(()=>{ const n=list.filter(i=>{ const x=exitFor(i); return x&&x.planRef }).length; return n?`<span class="pill sun num">ปรับ Exit ตามข้อมูลจริง ${n} จุด</span>`:'' })()}${RPd!=null&&RPd>=10?`<span class="pill sun num">ช้ากว่าแผน ${RPd} นาที · ปรับเวลาที่เหลือให้แล้ว</span>`:''}<span class="pill sky num">ค่าเดินทางที่จดวันนี้ ${hk(transportToday(d.n))}/คน</span></div>
     </div>
     <div class="viewsw" role="group" aria-label="มุมมองแผน">${[[false,'แบบเต็ม'],[true,'ดูภาพรวม']].map(([v,l])=>`<button type="button" data-compact="${v?1:0}" aria-pressed="${S.compact===v}">${l}</button>`).join('')}</div>
     ${list.length?`<ol class="tl${S.compact?' compact':''}">${items}</ol>`:`<div class="empty">${ic('pin',1.6)}<div>วันนี้ยังไม่มีที่เที่ยว</div></div>`}
     <button class="addit" type="button" data-additem="${d.n}">${ic('plus',2.2)}เพิ่มที่เที่ยววันนี้</button>`;
 }
 // one line per stop: time, name, how you get there — for seeing the whole day at once
-function compactItem(it, done, cur, sel, delay){
+function compactItem(it, done, cur, sel, r){
   const how = sel ? `${ic(MODES[sel.mode].i)}${esc(sel.n)}${sel.fare?` ${hk(sel.fare)}`:''}${sel.mins?` · ~${sel.mins} นาที`:''}` : '';
   return `<li class="it${done?' done':''}${cur===it.id?' now':''}" id="it-${it.id}">
     <button class="tick" type="button" data-arrive="${it.id}" aria-label="${done?'ยกเลิกถึงแล้ว':'ถึงแล้ว'}: ${esc(it.h)}">${ic('check')}</button>
     <button class="card cline" type="button" data-full="${it.id}">
-      <span class="time num">${delay!=null?`≈ ${hhmm(toMin(it.t)+delay)}`:esc(tShow(it.t,it))+tzTag(it)}${done&&arrivedAt(it.id)?` · ถึง ${arrivedAt(it.id)}`:''}${cur===it.id?' <span class="nowtag">ถัดไป</span>':''}</span>
+      <span class="time num">${r?`≈ ${hhmm(r.t)}${r.miss?' ⚠️':''}`:esc(tShow(it.t,it))+tzTag(it)}${done&&arrivedAt(it.id)?` · ถึง ${arrivedAt(it.id)}`:''}${cur===it.id?' <span class="nowtag">ถัดไป</span>':''}</span>
       <span class="cn">${esc(it.h)}</span>
       ${how?`<span class="ch">${how}</span>`:''}</button></li>`;
 }
@@ -2215,6 +2259,7 @@ function dzSim(seq, start, here){
     let wait;
     if(s.meal){ if(t<s.from){ pen+=(s.from-t)*0.5; t=s.from } wait=rbh; if(t>s.to) pen+=3000;   // a free meal missed costs real money   // eat inside the voucher hours
       const pref=s.meal==='lunch'?13*60+30:18*60; if(t>pref) pen+=(t-pref)*0.4 }                    // and not too late to be hungry
+    else if(dzInQ(s.k)) wait=dzQLeft();   // already standing in this line: only what's left of it
     else { wait=dzPredWait(s.k,t,now); const lt=(S.dzLater||{})[s.k]; if(lt && t<lt) pen+=(lt-t)*4;
       if(dzClosedNow(s.k) && t<now+45) pen+=(now+45-t)*5;   // down right now: come back later
       // leaving a headline ride for late is a gamble (queues and breakdowns stack up): do the big ones while there's slack
@@ -2230,8 +2275,15 @@ function dzSim(seq, start, here){
 const DZ_KEEP = {manor:9, oaken:7, jungle:6, para:6, philhar:6, antman:5, small:5, slinky:4, pooh:4, tea:3, dumbo:2};
 const DZ_CART_LANDS = ['MS','TL','FL','AL','GG','MP'];
 let DZ_LAST_ORDER=[], DZ_MEMO=null;
+// "เข้าคิวแล้ว": we're standing in this ride's line. The plan keeps it first, counts only what's left of the queue,
+// and plans the rest from that zone. Kept on this phone only; cleared by "เล่นแล้ว", "ไว้ทีหลัง" or "ออกจากคิว".
+try{ S.dzQ=JSON.parse(lsGet('hk-dzq','null')) }catch(e){ S.dzQ=null }
+const dzInQ = k => !!(S.dzQ && S.dzQ.k===k && !S.done['dz:'+k] && Date.now()-S.dzQ.at<3*3600e3);
+const dzQMins = () => Math.round((Date.now()-S.dzQ.at)/60e3);
+const dzQLeft = () => Math.max(3, S.dzQ.w-dzQMins());
+function dzQSet(k){ S.dzQ = k ? {k, at:Date.now(), w:dzPredWait(k, dzNowMin(), dzNowMin())} : null; lsSet('hk-dzq', JSON.stringify(S.dzQ)); if(k) S.dzLand=DZ_LAND_OF[k]; DZ_MEMO=null; renderAll() }
 function dzOptimize(){
-  const mk=[dzNowMin(), S.dzLand, JSON.stringify(S.dzLater||{}), JSON.stringify(Object.keys(S.done).filter(k=>/^dz:|^3[lnc]$/.test(k)).sort()), DZQ&&DZQ.at, fwTime(), dzOpenT()].join('|');
+  const mk=[dzNowMin(), S.dzLand, JSON.stringify(S.dzLater||{}), JSON.stringify(Object.keys(S.done).filter(k=>/^dz:|^3[lnc]$/.test(k)).sort()), DZQ&&DZQ.at, fwTime(), dzOpenT(), S.dzQ&&S.dzQ.k].join('|');
   if(DZ_MEMO && DZ_MEMO.k===mk) return DZ_MEMO.v;
   const v=dzOptimizeRun(); DZ_MEMO={k:mk, v}; return v;
 }
@@ -2241,7 +2293,7 @@ function dzOptimizeRun(){
   const key=x=>x.k||(x.snack?'snack':'m:'+x.meal), byKey=new Map(tasks.map(x=>[key(x),x]));
   // a voucher meal that is due now (short restaurant queue while rides are long, or getting late) goes first,
   // so the route and the meal card never disagree and a paid meal isn't pushed past its hours
-  const due=dzMealNow(now), first=due&&due.go?tasks.find(x=>x.meal===due.k):null, lock=first?1:0, front=a=>first?[first,...a.filter(x=>x!==first)]:a;
+  const due=dzMealNow(now), inQ=tasks.find(x=>x.k&&dzInQ(x.k)), first=inQ || (due&&due.go?tasks.find(x=>x.meal===due.k):null), lock=first?1:0, front=a=>first?[first,...a.filter(x=>x!==first)]:a;
   // start from the previous plan (so it doesn't jump around), else nearest-first
   let seq=DZ_LAST_ORDER.map(k=>byKey.get(k)).filter(Boolean); for(const x of tasks) if(!seq.includes(x)) seq.push(x);
   seq=front(seq);
@@ -2292,11 +2344,13 @@ function dzRouteHTML(full){
     const late=s.at+s.wait+s.dur>deadline, must=s.k&&DZ_MUST.has(s.k), name=s.meal?`🍽️ ${DZ_MEALS[s.meal].n} · Royal Banquet Hall`:(must?'⭐ ':'')+esc(DZ_RIDES[s.k].n)+(must?' <span class="mustt">ห้ามพลาด</span>':'');
     const btn=s.meal?`<button type="button" class="dzok" data-dzmeal="${s.meal}">กินแล้ว</button>`:`<button type="button" class="dzok" data-dz="${s.k}">เล่นแล้ว</button>`;
     const later=s.meal?'':`<button type="button" class="dzlater" data-dzlater="${s.k}">ไว้ทีหลัง</button>`;
+    if(i===0 && !s.meal && dzInQ(s.k)) return `<div class="dznext"><span class="dzwb" style="--wc:var(--sky)"><b class="num">${dzQLeft()}</b><small>นาทีที่เหลือ</small></span><div><small>🕒 ต่อคิวอยู่ · ${dzQMins()} นาทีแล้ว</small><b>${name}</b><small>ลงจากเครื่องแล้วกด "เล่นแล้ว" แอปจะบอกเครื่องถัดไป</small></div><div class="dzbtns">${btn}<button type="button" class="dzlater" data-dzq="">ออกจากคิว</button></div></div>`;
+    const inq = i===0 && !s.meal ? `<button type="button" class="dzlater" data-dzq="${s.k}">เข้าคิวแล้ว</button>` : '';
     // the queue is what decides "go now or skip", so it is the biggest thing on the row
     const live=!s.meal && i===0 && dzWait(s.k,now).live, wc=s.wait>=40?'var(--danger)':s.wait>=25?'#E58A00':'var(--mint)';
     const wb=`<span class="dzwb" style="--wc:${wc}"><b class="num">${s.wait}</b><small>${s.meal?'คิวร้าน':'นาที'}${live?' · สด':''}</small></span>`;
     const info=`${esc(DZ_LANDS[s.land][0])} · ${s.walk?`เดิน ${s.walk} นาที`:'อยู่โซนนี้'}${!s.meal&&dzClosedNow(s.k)?' · ⚠️ ตอนนี้ปิดชั่วคราว เลื่อนไว้ทีหลัง':''}${s.meal?` · ${s.meal==='lunch'?'แลกได้ 11:30–16:00':'แลกได้ 16:30–20:00'} · ชุดไม่เกิน HK$170`:''}`;
-    return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>ไปต่อเลย · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small></div><div class="dzbtns">${btn}${later}</div></div>`
+    return i===0 ? `<div class="dznext${late?' late':''}">${wb}<div><small>ไปต่อเลย · ถึงประมาณ ${hhmm(s.at)} น.</small><b>${name}</b><small>${info}</small></div><div class="dzbtns">${inq}${btn}${later}</div></div>`
       : `<div class="dzstep${late?' late':''}">${wb}<span><b>${name}</b><small>${hhmm(s.at)} น. · ${info}${late?(must?' · ⚠️ อาจไม่ทันก่อนพลุ':' · ข้ามได้ถ้าเวลาไม่พอ'):''}</small></span><div class="dzbtns">${btn}${later}</div></div>`;
   };
   const shown = full ? p.steps : p.steps.slice(0,3);
@@ -2512,7 +2566,7 @@ function renderDisney(){
       <li>ถ้าหน้าเครื่องคิวยาวกว่าที่แอปบอกมาก กด "ไว้ทีหลัง" แอปจะจัดเครื่องอื่นให้ก่อน</li></ul>
       <div class="src">คิวสดจากระบบแอป Hong Kong Disneyland (อ่านจาก Queue-Times.com และ ThemeParks.wiki พร้อมกัน ใช้ตัวเลขที่ใหม่กว่า) อัปเดตทุก 2 นาที · เวลาเปิดสวน โชว์ และเครื่องที่ปิดซ่อม จากปฏิทินทางการของ Disney อัปเดตทุกเช้า</div></div>`;
 }
-function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else { next['dz:'+k]={at:hhmm(hkNow().min), d:hkNow().date}; S.dzLand=DZ_LAND_OF[k] } S.done=next; renderAll(); saveProgress() }
+function toggleDz(k){ const next={...S.done}; if(next['dz:'+k]) delete next['dz:'+k]; else { next['dz:'+k]={at:hhmm(hkNow().min), d:hkNow().date}; S.dzLand=DZ_LAND_OF[k]; if(S.dzQ&&S.dzQ.k===k){ S.dzQ=null; lsSet('hk-dzq','null') } } S.done=next; renderAll(); saveProgress() }
 const DZ_CASTLE = `<svg class="castle" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 58V30l4-6 4 6v28M46 58V30l4-6 4 6v28M18 58V36h28v22" fill="var(--pink-soft)" stroke="var(--pink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 36V22l8-12 8 12v14" fill="var(--sky-soft)" stroke="var(--sky)" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 58v-9a4 4 0 0 1 8 0v9" fill="var(--surface)" stroke="var(--pink)" stroke-width="2.5"/><path d="M32 10V4l5 2-5 2" fill="var(--sun)" stroke="var(--sun)" stroke-width="2"/><circle cx="32" cy="27" r="2.5" fill="var(--sun)"/></svg>`;
 
 /* ---------- home: countdown, trip map, four days at a glance ---------- */
@@ -2596,11 +2650,11 @@ function nextStopHTML(){
   }
   const list=dayItems(td), id=nextItem(td), it=list.find(i=>i.id===id);
   if(!it) return `<div class="nextc"><div class="nk">วันนี้เที่ยวครบแล้ว</div><b>กลับไปพักผ่อนกัน</b><div class="acts"><button type="button" class="hbtn main" data-gohome="1">${ic('home',2.2)}พากลับที่พัก</button></div></div>`;
-  const {delay,idx}=dayDelay(list), k=list.indexOf(it), shiftOn=delay!=null&&Math.abs(delay)>=10&&k>idx;
+  const r=replan(td,list).map[it.id], shiftOn=moved(r);
   const {prev,opts}=optionsFor(td,it), sel=opts.length?chosen(td,it,opts):null, x=exitFor(it);
   const how = sel ? (sel.legs ? sel.legs.filter(l=>l.line!=='WALK').map(l=>`<span class="ln" style="background:${LINES[l.line].c}">${LINES[l.line].n.split(' ')[0]}</span>`).join(' → ')+` ลง ${esc(stName(sel.legs[sel.legs.length-1].to))}${x?' · Exit '+esc(x.ref):''}`
     : sel.bx ? `${esc(sel.n)} ลงป้าย ${esc(stopName(sel.bx.to))}` : esc(sel.n)) : '';
-  return `<div class="nextc"><div class="nk">ถัดไป · ${shiftOn?'≈ '+hhmm(toMin(it.t)+delay):esc(tShow(it.t,it))} น.${tzTag(it)}</div>
+  return `<div class="nextc"><div class="nk">ถัดไป · ${shiftOn?'≈ '+hhmm(r.t):esc(tShow(it.t,it))} น.${tzTag(it)}</div>${shiftOn?`<div class="mini">${movedNote(r)}</div>`:''}
     <b>${esc(it.h)}</b>${eatOf(it)?`<div class="mini">🍽️ ${esc(eatOf(it).n)}</div>`:""}${prev?`<small>จาก ${esc(prev.h)}${sel&&sel.fare!=null?' · '+(sel.fare?hk(sel.fare):'ฟรี'):''}${sel&&sel.mins?' · ~'+sel.mins+' นาที':''}</small>`:''}
     ${how?`<div class="nhow">${how}</div>`:''}
     <div class="acts">${it.flight||(prev&&prev.flight)?'':`<button type="button" class="hbtn main" data-nextnav="${it.id}">${ic('pin',2.2)}นำทาง</button>`}
@@ -2619,7 +2673,10 @@ function alertsHTML(){
   if(td===3 && !dzMealDone('lunch') && n.min>=14*60+30 && n.min<16*60) out.unshift(['warn',`🍽️ ยังไม่ได้กินมื้อเที่ยง voucher ต้องสั่งก่อน 16:00 (อีก ${16*60-n.min} นาที) ไปกินตอนนี้เลย`,'dz']);
   if(td===3 && !dzMealDone('dinner') && n.min>=18*60+15 && n.min<19*60+30) out.unshift(['warn', n.min<19*60 ? `🍽️ ยังไม่ได้กินมื้อเย็น ไปกินตอนนี้ (อีก ${19*60-n.min} นาที) จะทันไปจองที่ดูพลุ` : `🍽️ มื้อเย็น voucher ยังแลกได้ถึงประมาณ 19:30 สั่งแบบกลับบ้าน ถือไปกินระหว่างรอพลุ`,'dz']);
   if(td===3 && !S.done['3c']){ const left=fwBeThere()-n.min; if(left<=30 && left>-40) out.unshift(['warn',`🎆 ${left>0?'อีก '+left+' นาที':'ถึงเวลา'}ไปจองที่ดูพลุหน้าปราสาท (พลุเริ่ม ${hhmm(fwTime())} น.)`,'dz']) }
-  if(td){ const {delay}=dayDelay(dayItems(td)); if(delay!=null && delay>=30) out.push(['info',`ช้ากว่าแผน ${delay} นาที ลองตัดหรือเลื่อนบางจุดในแผนวันนี้`,'plan']) }
+  if(td){ const L=dayItems(td), {map,delay}=replan(td,L), miss=L.filter(i=>map[i.id]&&map[i.id].miss&&!S.done[i.id]), here=Object.values(map).find(r=>r.here&&r.leave);
+    if(here) out.push(['warn',hereNote(here),'plan']);
+    else if(miss.length) out.push(['warn',`เวลาไม่พอแล้ว แนะนำข้าม ${miss.map(i=>i.h).join(', ')} เพื่อให้ทันจุดถัดไป`,'plan']);
+    else if(delay!=null && delay>=30) out.push(['info',`ช้ากว่าแผน ${delay} นาที แอปปรับเวลาจุดที่เหลือวันนี้ให้แล้ว`,'plan']) }
   const now=n.min<4*60?n.min+1440:n.min, lh=(td||n.date==='2026-11-18') && now>=21*60 ? lastHome() : null;
   if(lh){ const left=lh.m-now;
     if(left<0) out.push(['warn',`รถไฟเที่ยวสุดท้ายกลับมงก๊กจาก ${stName(NET.byCode[lh.st])} ออกไปแล้ว (${hhmm(lh.m%1440)} น.) กด "พากลับที่พัก" ดูรถบัสกลางคืนหรือแท็กซี่`,'home']);
@@ -3241,7 +3298,8 @@ document.addEventListener('click', e=>{
   if(ds.day && !S.sheet){ S.day=Number(ds.day); renderPlan(); return }
   if(ds.arrive) return toggleArrive(ds.arrive);
   if(ds.dz) return toggleDz(ds.dz);
-  if(ds.dzlater){ S.dzLater={...(S.dzLater||{}), [ds.dzlater]:dzNowMin()+45}; DZ_MEMO=null; renderAll(); toast('เลื่อนไว้ทีหลังแล้ว'); return }
+  if(ds.dzq!==undefined){ dzQSet(ds.dzq||null); toast(ds.dzq?'บันทึกว่ากำลังต่อคิว':'ออกจากคิวแล้ว'); return }
+  if(ds.dzlater){ if(dzInQ(ds.dzlater)) dzQSet(null); S.dzLater={...(S.dzLater||{}), [ds.dzlater]:dzNowMin()+45}; DZ_MEMO=null; renderAll(); toast('เลื่อนไว้ทีหลังแล้ว'); return }
   if(ds.dzset){ S.dzSetOpen=!S.dzSetOpen; renderDisney(); return }
   if(ds.dzland){ S.dzLand=ds.dzland; renderDisney(); return }
   if(ds.dzsim){ S.dzSimMin=Number(ds.dzsim); renderDisney(); return }
