@@ -1,10 +1,10 @@
-# Every morning (07:45 Hong Kong time) check from outside that everything the trip needs works:
+# Every morning (04:23 Hong Kong time, often run 1-5 hours late by GitHub) check from outside that everything the trip needs works:
 # website, live Disney queues, flight status, sync database, last night's backup, fresh data.
 # A failure fails this job, and GitHub emails the repository owner.
 name: health-check
 on:
   schedule:
-    - cron: '45 23 * * *'
+    - cron: '23 20 * * *'
   workflow_dispatch:
 permissions:
   contents: read

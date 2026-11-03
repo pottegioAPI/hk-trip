@@ -1,6 +1,6 @@
 // Offline copy of the app: opens without signal, updates itself when online.
-// release 1.06
-const VERSION='7b1ece0aba', CACHE='hk-'+VERSION, FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-180.png","bus.json","places.json","water.json","weather.json","lasttrain.json","dzcal.json"];
+// release 1.07
+const VERSION='bd572d8017', CACHE='hk-'+VERSION, FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-180.png","bus.json","places.json","water.json","weather.json","lasttrain.json","dzcal.json"];
 self.addEventListener('install', e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())) });
 self.addEventListener('activate', e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('hk-')&&k!==CACHE&&k!=='hk-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim())) });
 const timeout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('slow')),ms))]);
@@ -10,10 +10,12 @@ self.addEventListener('fetch', e=>{
   if(url.origin===location.origin){
     // the version check reads this file: always from the network, never a saved copy (a saved one said "newest" forever)
     if(/\/sw\.js$/.test(url.pathname)) return;
-    // the page: newest if the network answers within 4 s, otherwise the saved copy
+    // the page asks for 'no-store' when it must know the network really answers (the update check): never a saved copy
+    if(req.cache==='no-store' && req.mode!=='navigate') return;
+    // the page: newest if the network answers within 4 s, otherwise the saved copy; with no saved copy, wait for the network
     if(req.mode==='navigate'){
-      e.respondWith(timeout(fetch(req.url,{cache:'no-store'}),4000).then(r=>{ const c=r.clone(); caches.open(CACHE).then(x=>x.put('index.html',c)); return r })
-        .catch(()=>caches.match('index.html',{ignoreSearch:true})));
+      const net=fetch(req.url,{cache:'no-store'}).then(r=>{ if(r.ok){ const c=r.clone(); caches.open(CACHE).then(x=>x.put('index.html',c)) } return r });
+      e.respondWith(timeout(net,4000).catch(()=>caches.match('index.html',{ignoreSearch:true}).then(hit=>hit||net)));
       return;
     }
     // data files: saved copy straight away, refreshed in the background

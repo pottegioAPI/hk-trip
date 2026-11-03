@@ -999,7 +999,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('7b1ece0aba|3 พ.ย. 11:42|1.06');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('bd572d8017|3 พ.ย. 23:10|1.07');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1008,12 +1008,17 @@ async function verCheck(){
   try{ const t=await (await fetch('sw.js?t='+Date.now(),{cache:'no-store'})).text(), m=t.match(/VERSION='([0-9a-f]+)'/);
     if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1]; APP_NEWER_N=(t.match(/release ([\d.]+)/)||[])[1]||null;
       // a newer version is out: switch to it by itself, once per version, when nothing is being typed or open
-      if(lsGet('hk-autoupd','')!==m[1] && !S.sheet && !(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))){ lsSet('hk-autoupd',m[1]); return appUpdate() }
+      if(lsGet('hk-autoupd','')!==m[1] && !S.sheet && !(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))){ lsSet('hk-autoupd',m[1]); return appUpdate(true) }
       renderAll() } }catch(e){}
 }
 // fetch the newest app past every cache: the offline copy, the phone's web cache (a new address) and the service worker
-async function appUpdate(){
+async function appUpdate(auto){
   toast('กำลังอัปเดตแอป...');
+  // the offline copy is thrown away only once the new page has actually arrived: on a slow or missing
+  // connection (Disney crowds, the MTR) the app keeps the version it has and still opens
+  let ok=false;
+  try{ const r=await Promise.race([fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}), new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),15000))]); ok=r.ok && (await r.text()).length>1000 }catch(e){}
+  if(!ok){ if(auto) lsSet('hk-autoupd',''); toast(auto?'มีเวอร์ชันใหม่ แต่เน็ตช้า จะลองอัปเดตใหม่ทีหลัง':'เน็ตช้าหรือไม่มีเน็ต ยังอัปเดตไม่ได้ ใช้เวอร์ชันเดิมไปก่อน'); return }
   try{ const reg=navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if(reg) await reg.update() }catch(e){}
   try{ for(const k of await caches.keys()) if(k.startsWith('hk-') && k!=='hk-fonts') await caches.delete(k) }catch(e){}
   location.replace(location.pathname+'?v='+Date.now()+location.hash);

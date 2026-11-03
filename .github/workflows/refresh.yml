@@ -1,10 +1,10 @@
-# Every morning (06:00 Hong Kong time) download the latest official MTR, bus, weather and
+# Every night (02:17 Hong Kong time; GitHub often starts scheduled runs 1-5 hours late, so it is done by morning) download the latest official MTR, bus, weather and
 # water-dispenser data, check it, rebuild the site and publish it. If anything fails the
 # old data stays online, nothing is overwritten.
 name: refresh-data
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '17 18 * * *'
   workflow_dispatch:
 permissions:
   contents: write

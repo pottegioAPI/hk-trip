@@ -10,10 +10,12 @@ self.addEventListener('fetch', e=>{
   if(url.origin===location.origin){
     // the version check reads this file: always from the network, never a saved copy (a saved one said "newest" forever)
     if(/\/sw\.js$/.test(url.pathname)) return;
-    // the page: newest if the network answers within 4 s, otherwise the saved copy
+    // the page asks for 'no-store' when it must know the network really answers (the update check): never a saved copy
+    if(req.cache==='no-store' && req.mode!=='navigate') return;
+    // the page: newest if the network answers within 4 s, otherwise the saved copy; with no saved copy, wait for the network
     if(req.mode==='navigate'){
-      e.respondWith(timeout(fetch(req.url,{cache:'no-store'}),4000).then(r=>{ const c=r.clone(); caches.open(CACHE).then(x=>x.put('index.html',c)); return r })
-        .catch(()=>caches.match('index.html',{ignoreSearch:true})));
+      const net=fetch(req.url,{cache:'no-store'}).then(r=>{ if(r.ok){ const c=r.clone(); caches.open(CACHE).then(x=>x.put('index.html',c)) } return r });
+      e.respondWith(timeout(net,4000).catch(()=>caches.match('index.html',{ignoreSearch:true}).then(hit=>hit||net)));
       return;
     }
     // data files: saved copy straight away, refreshed in the background
