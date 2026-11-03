@@ -999,7 +999,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('d978b818ea|3 พ.ย. 23:48|1.09');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('97abf5058a|3 พ.ย. 23:52|1.10');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -3222,7 +3222,10 @@ async function removeExpense(id){
 }
 function saveProgress(){ if(db) return serial('prog',()=>db.doc('trip/progress').set({done:S.done})).catch(()=>toast('บันทึกสถานะไม่สำเร็จ')); lsSave() }
 async function saveExpense(){
-  const d=S.sheet, a=Number(d.amt); if(!(a>0)) return;
+  const d=S.sheet, a=Number(d.amt), say=t=>{ const err=document.getElementById('f-err'); if(err){ err.hidden=false; err.textContent=t } };
+  if(!(a>0)) return say('ใส่จำนวนเงินก่อน (มากกว่า 0)');
+  // a slip of the finger (1500 for 150) would skew the budget and who owes whom: big amounts are confirmed once
+  if(a>=1500 && d.sureAmt!==a){ d.sureAmt=a; return say(`HK$${a.toLocaleString()} (≈ ${Math.round(a*rate()).toLocaleString()} บาท) ถูกต้องไหม? แตะบันทึกอีกครั้งเพื่อยืนยัน`) }
   const T=EXP_TYPES[d.type]||EXP_TYPES.own;
   const row={amt:Math.round(a*100)/100, cat:d.cat, day:Number(d.day), note:d.note.trim().slice(0,60), payer:T.mine?S.me:other(S.me), type:T.type, at:Date.now()};
   if(d.oct && T.mine) row.oct=true;
