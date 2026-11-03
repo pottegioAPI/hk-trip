@@ -999,7 +999,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('fc5a050260|3 พ.ย. 23:31|1.08');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('d978b818ea|3 พ.ย. 23:48|1.09');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1094,7 +1094,11 @@ function pushSetHTML(){
     : `ยังไม่ได้เปิด <div class="acts" style="margin-top:6px"><button type="button" class="btn-s pay" data-pushon="1">เปิดแจ้งเตือน</button></div>`;
   return `<div class="fl">🔔 แจ้งเตือน (เครื่องนี้)</div><div class="mini">${body}</div>`;
 }
-function tripDay(){ const n=hkNow(); const d=DAYS.find(x=>x.date===n.date); return d?d.n:0 }
+// before 04:00 still counts as the night before: at 00:40 on the way home from the night market the app helps
+// get back to the hotel instead of jumping to tomorrow's breakfast (the last day runs on past midnight the same way)
+function tripDay(){ const n=hkNow(); const i=DAYS.findIndex(x=>x.date===n.date);
+  if(n.min<4*60){ if(i>0) return DAYS[i-1].n; if(i<0 && new Date(Date.parse(DAYS[DAYS.length-1].date)+864e5).toISOString().slice(0,10)===n.date) return DAYS[DAYS.length-1].n }
+  return i>=0 ? DAYS[i].n : 0 }
 const dayItems = dn => (S.plan[dn-1]||[]).slice().sort((a,b)=>toMin(a.t)-toMin(b.t));
 const hhmm = m => { m=((Math.round(m)%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0') };
 const arrivedAt = id => { const v=S.done[id]; return v && typeof v==='object' ? v.at : null };
@@ -1663,7 +1667,7 @@ const flightFor = id => ({'1s':'EK384','1f':'EK384','1a':'EK384','4e':'EK385','4
 
 /* ---------- start and end of the trip ---------- */
 const tripStarted = () => !!S.done.start;
-const tripEnded = () => !!S.done['4g'] || hkNow().date>'2026-11-18';
+const tripEnded = () => !!S.done['4g'] || hkNow().date>'2026-11-18' || (hkNow().date==='2026-11-18' && hkNow().min>=6*60);   // the morning after landing, even if "home" was never ticked
 async function letsGo(){
   if(S.done.start) return; S.done={...S.done, start:{at:hhmm(hkNow().min), d:hkNow().date, ts:Date.now()}}; saveProgress(); confetti(); renderAll(); toast('เริ่มทริปแล้ว! เที่ยวให้สนุกนะ');
 }
@@ -1683,7 +1687,8 @@ function heroHTML(){
   else if(td && !tripStarted()) mid=`<div class="hbig">วันนี้แล้ว!</div><div class="hsub">กดปุ่มเพื่อเริ่มทริปพร้อมกัน</div>
     <div class="hgo"><button type="button" class="gobtn big" data-letsgo="1">LET'S GO! ✈️</button></div>`;
   else if(td) mid=`<div class="hbig num">วันที่ ${td}</div><div class="hsub">${esc(DAYS[td-1].title)}</div>`;
-  else mid=`<div class="hbig num">อีก ${days} วัน</div><div class="hsub">ได้บินไปฮ่องกงแล้ว!</div>`;
+  else if(days>0) mid=`<div class="hbig num">อีก ${days} วัน</div><div class="hsub">ได้บินไปฮ่องกงแล้ว!</div>`;
+  else mid=`<div class="hbig">จบทริปแล้ว 🎉</div><div class="hsub">ขอบคุณที่เที่ยวด้วยกันนะ</div>`;
   return `<div class="hhero"><div class="plane" aria-hidden="true">${PLANE_SVG}</div>${hi}${mid}${foot}</div>`;
 }
 
