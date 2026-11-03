@@ -1,5 +1,5 @@
 <!doctype html><html lang="th"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#FF4F8B">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="ฮ่องกง">
@@ -38,6 +38,10 @@
 
 *{box-sizing:border-box}
 html,body{background:var(--bg)}
+/* an app, not a web page: no pinch or double-tap zoom, no sideways drift, and no zoom-in when a field is tapped (iOS zooms below 16px) */
+html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{overflow-x:hidden;max-width:100%}
+input,select,textarea{font-size:max(16px,1em)}
 body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-tap-highlight-color:transparent}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -965,12 +969,13 @@ function hkNow(){ const d=new Date(Date.now()+8*3600e3); return {date:d.toISOStr
 const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return h*60+(m||0) };
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:''} : {v:s.split('|')[0], at:s.split('|')[1]})('d28ee8b148|3 พ.ย. 10:58');
-let APP_NEWER=null;
+// v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('67cf3c639d|3 พ.ย. 11:04|1.00');
+let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
   try{ const t=await (await fetch('sw.js?t='+Date.now(),{cache:'no-store'})).text(), m=t.match(/VERSION='([0-9a-f]+)'/);
-    if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1];
+    if(m && m[1]!==APP_VER.v){ APP_NEWER=m[1]; APP_NEWER_N=(t.match(/release ([\d.]+)/)||[])[1]||null;
       // a newer version is out: switch to it by itself, once per version, when nothing is being typed or open
       if(lsGet('hk-autoupd','')!==m[1] && !S.sheet && !(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))){ lsSet('hk-autoupd',m[1]); return appUpdate() }
       renderAll() } }catch(e){}
@@ -983,8 +988,10 @@ async function appUpdate(){
   location.replace(location.pathname+'?v='+Date.now()+location.hash);
 }
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) verCheck() });
-const verHTML = () => `<div class="appver"><button type="button" class="btn-s${APP_NEWER?' pay':''}" data-appupdate="1">${APP_NEWER?'มีเวอร์ชันใหม่ แตะเพื่ออัปเดต':'🔄 อัปเดตแอปเป็นเวอร์ชันล่าสุด'}</button>
-  <small>เวอร์ชัน ${esc(APP_VER.v)}${APP_VER.at?' · สร้าง '+esc(APP_VER.at)+' น. (เวลาฮ่องกง)':''}${APP_NEWER?'':APP_VER.v==='dev'?'':' · ล่าสุดแล้ว ✓'}</small></div>`;
+// iOS ignores "no zoom" in the page settings: stop pinch-zoom here
+for(const ev of ['gesturestart','gesturechange']) document.addEventListener(ev, e=>e.preventDefault(), {passive:false});
+const verHTML = () => `<div class="appver"><button type="button" class="btn-s${APP_NEWER?' pay':''}" data-appupdate="1">${APP_NEWER?'มีเวอร์ชันใหม่'+(APP_NEWER_N&&APP_NEWER_N!==APP_VER.n?' '+esc(APP_NEWER_N):'')+' แตะเพื่ออัปเดต':'🔄 อัปเดตแอปเป็นเวอร์ชันล่าสุด'}</button>
+  <small>เวอร์ชัน ${esc(APP_VER.n)}${APP_VER.at?' · สร้าง '+esc(APP_VER.at)+' น. (เวลาฮ่องกง)':''}${APP_NEWER?'':APP_VER.v==='dev'?'':' · ล่าสุดแล้ว ✓'}</small></div>`;
 /* ---------- push notifications (iPhone: only for the app opened from the Home Screen icon) ---------- */
 const PUSH_FN = 'https://btagqhxhljlbhwwkzghr.supabase.co/functions/v1/hk-push';
 const pushInfo = () => {
