@@ -596,6 +596,9 @@ input[type=time].txt{appearance:none;min-height:46px}
 .dzzone{font-weight:700;color:var(--ink)}
 /* plan: a stop passed without tapping "ถึงแล้ว" (a later one was tapped) */
 .it.skip .card{opacity:.55}
+.skiplist{list-style:none;margin:0 0 14px;padding:10px 12px;background:var(--sun-soft);border-radius:12px;display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
+.skiplist .num{display:inline-block;min-width:46px;color:var(--muted);font-weight:500}
+.skipacts{display:flex;flex-direction:column;gap:8px}
 .dznext .dzzone{display:inline-block;background:var(--surface);border-radius:99px;padding:2px 9px;margin:2px 4px 2px 0;font-size:12.5px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 .dznext.inq{background:var(--sky-soft);border-color:var(--sky)}
 .dznext.inq .dzn-top>span{color:var(--sky);opacity:1}
@@ -3058,6 +3061,17 @@ function applyStPick(code){
 }
 function drawSheet(){
   const d=S.sheet, el=document.getElementById('sheet'); if(!d) return;
+  if(d.kind==='skipask'){ const L=dayItems(d.dn), it=L.find(i=>i.id===d.id), sk=d.ids.map(x=>L.find(i=>i.id===x)).filter(Boolean);
+    el.innerHTML = `<div class="wrap"><div class="grab"></div>
+      <h2 id="sheet-title">ยังไม่ได้กด ${sk.length} จุดก่อนหน้า <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
+      <p class="mini" style="margin:0 0 10px">กำลังกด "${esc(arriveWord(it,false))}" ที่ <b>${esc(it.h)}</b> แต่จุดเหล่านี้ยังไม่ได้กด:</p>
+      <ul class="skiplist">${sk.map(i=>`<li><span class="num">${esc(tShow(i.t,i))}</span> ${esc(i.h)}</li>`).join('')}</ul>
+      <div class="skipacts">
+        <button type="button" class="save" data-skipgo="all" style="margin:0">✓ ไปมาแล้ว แค่ลืมกด</button>
+        <button type="button" class="save" data-skipgo="skip" style="margin:0;background:var(--sky)">⏭️ ไม่ได้ไป ข้าม${sk.length>1?"ทั้ง "+sk.length+" จุด":"จุดนี้"}</button>
+        <button type="button" class="btn-s" data-close style="justify-content:center">ยกเลิก กดผิด</button></div>
+      <p class="mini" style="margin-top:8px">แอปจะปรับเวลาจุดที่เหลือของวันนี้ตามเวลาที่กดให้เอง</p></div>`;
+    return }
   const chip=(k,v,l,icon)=>`<button class="chip" type="button" data-f="${k}" data-v="${v}" aria-pressed="${String(d[k])===String(v)}">${icon?ic(icon):''}${l}</button>`;
   if(d.kind==='add'){ el.innerHTML = `<div class="wrap"><div class="grab"></div>
       <h2 id="sheet-title">เพิ่มอะไรดี? <button class="x" type="button" data-close aria-label="ปิด">${ic('x')}</button></h2>
@@ -3211,9 +3225,13 @@ function fixHotel(items){ const defs=Object.fromEntries(DEFAULT_PLAN.flat().map(
   for(const it of items||[]) if(HOTEL_IDS.has(it.id) && it.st==='TST'){ it.st='MOK'; if(it.exit==='D2'){ it.exit='E1'; delete it.exitUser } if(/Mirador/.test(it.map||'')) it.map='Sun Hing Building 607 Nathan Road Mong Kok';
     if(it.id==='1b'){ const d=DEFAULT_PLAN[0].find(x=>x.id==='1b'); it.p=d.p; it.tip=d.tip; it.bus=d.bus } } return items }
 function findItem(id){ for(let d=0;d<4;d++){ const it=S.plan[d].find(i=>i.id===id); if(it) return {dn:d+1,it} } return null }
-async function toggleArrive(id){
+// stops before this one, after the latest tap, that were never ticked: tapping past them is asked about, not silent
+function passedOver(dn,id){ const L=dayItems(dn), k=L.findIndex(i=>i.id===id), last=lastDoneIdx(L); return L.filter((i,j)=>j>last && j<k && !S.done[i.id] && !DZ_LINK[i.id]) }
+async function toggleArrive(id, how){
   const f=findItem(id); if(!f) return; const {dn,it}=f;
   if(DZ_LINK[id]){ const on=dzLinkToggle(id); toast(on?'บันทึกแล้ว':'ยกเลิกแล้ว'); return }   // meals and fireworks are ticked the same way as in the Disney tab
+  if(!S.done[id] && !how){ const skip=passedOver(dn,id); if(skip.length) return openSheet({kind:'skipask', id, dn, ids:skip.map(i=>i.id)}) }
+  if(how==='all'){ const n={...S.done}; for(const x of S.sheetIds||[]) if(!n[x]) n[x]={d:hkNow().date, noTime:true}; S.done=n }   // been there, just forgot to tap: done, with no time
   if(S.done[id]){
     const next={...S.done}; delete next[id]; S.done=next; renderPlan(); saveProgress();
     try{ if(S.expenses.some(e=>e.id===`auto-${id}-t`)) await removeExpense(`auto-${id}-t`); await reconcile(); toast('ยกเลิกแล้ว ค่าเดินทางที่จดอัตโนมัติถูกลบออก') }catch(e){ toast('ลบค่าเดินทางไม่สำเร็จ') }
@@ -3387,6 +3405,8 @@ document.addEventListener('click', e=>{
   if(ds.wcenter!=null){ S.wCenter=ds.wcenter||null; if(S.sheet&&S.sheet.kind==='water') drawSheet(); else renderHome(); return }
   if(t.id==='waterbtn') return openSheet({kind:'water'});
   if(t.id==='hotelbtn') return openSheet({kind:'hotel'});
+  if(ds.skipgo && S.sheet && S.sheet.kind==='skipask'){ const {id,ids}=S.sheet; S.sheetIds=ids; closeSheet(); const r=toggleArrive(id, ds.skipgo); S.sheetIds=null;
+    if(ds.skipgo==='skip') toast(`ข้าม ${ids.length} จุด ปรับเวลาที่เหลือให้แล้ว`); return r }
   if(ds.gohome){ if(S.sheet) closeSheet(); return goHome() }
   if(ds.taxicard){ if(S.sheet) closeSheet(); return openSheet({kind:'taxi'}) }
   if(t.id==='nav-swap'){ const a=S.nav.from; S.nav.from=S.nav.to||planSpot(); S.nav.to=a; return setNav('from', S.nav.from) }
