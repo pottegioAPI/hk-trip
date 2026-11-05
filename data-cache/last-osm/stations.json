@@ -2,7 +2,7 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-04T23:39:57Z",
+    "timestamp_osm_base": "2026-11-05T23:37:36Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -1112,7 +1112,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q5510524",
+    "wikipedia": "zh:福田站 (深圳地铁)"
   }
 },
 {
@@ -1550,7 +1552,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q6125779",
+    "wikipedia": "zh:科學館站"
   }
 },
 {
@@ -2017,7 +2021,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q5521287",
+    "wikipedia": "zh:岗厦北站"
   }
 },
 {
@@ -2205,7 +2211,9 @@
     "railway": "station",
     "station": "subway",
     "subway": "yes",
-    "website": "https://www.szmc.net/page/en/stations.html?xl=1&code=0109"
+    "website": "https://www.szmc.net/page/en/stations.html?xl=1&code=0109",
+    "wikidata": "Q841841",
+    "wikipedia": "zh:購物公園站"
   }
 },
 {
@@ -2593,7 +2601,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q5940554",
+    "wikipedia": "zh:莲花村站"
   }
 },
 {
@@ -2813,7 +2823,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q841841",
+    "wikipedia": "zh:購物公園站"
   }
 },
 {
@@ -2829,7 +2841,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q5942202",
+    "wikipedia": "zh:通新岭站"
   }
 },
 {
@@ -2943,7 +2957,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q27825810",
+    "wikipedia": "zh:八卦岭站"
   }
 },
 {
@@ -2997,7 +3013,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q6125779",
+    "wikipedia": "zh:科學館站"
   }
 },
 {
@@ -3153,7 +3171,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q27825810",
+    "wikipedia": "zh:八卦岭站"
   }
 },
 {
@@ -3302,7 +3322,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q5895901",
+    "wikipedia": "zh:紅嶺站"
   }
 },
 {
@@ -3576,7 +3598,9 @@
     "public_transport": "station",
     "railway": "station",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q5895901",
+    "wikipedia": "zh:紅嶺站"
   }
 },
 {

@@ -2,8 +2,8 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-04T23:38:53Z",
-    "timestamp_areas_base": "2026-11-04T21:22:04Z",
+    "timestamp_osm_base": "2026-11-05T23:37:36Z",
+    "timestamp_areas_base": "2026-11-05T18:35:22Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -34,10 +34,9 @@
     "name": "維多利亞公園 Victoria Park",
     "name:en": "Victoria Park",
     "name:zh": "維多利亞公園",
-    "name:zh-Hans": "维多利亚公园",
-    "name:zh-Hant": "維多利亞公園",
     "railway": "subway_entrance",
     "ref": "E",
+    "steps": "only",
     "wheelchair": "no"
   }
 },
@@ -242,14 +241,14 @@
   "lat": 22.2805978,
   "lon": 114.1842425,
   "tags": {
-    "building:entrance": "no",
+    "elevator": "no",
+    "escalator": "yes",
     "name": "崇光百貨 SOGO",
     "name:en": "SOGO",
     "name:zh": "崇光百貨",
-    "name:zh-Hans": "崇光百货",
-    "name:zh-Hant": "崇光百貨",
     "railway": "subway_entrance",
     "ref": "D1",
+    "steps": "yes",
     "wheelchair": "no"
   }
 },
@@ -267,6 +266,7 @@
     "old_name:zh": "渣甸坊",
     "railway": "subway_entrance",
     "ref": "F1",
+    "steps": "only",
     "was:name": "渣甸坊 Jardine's Crescent",
     "was:name:en": "Jardine's Crescent",
     "was:name:zh": "渣甸坊",
@@ -3669,7 +3669,6 @@
     "elevator": "only",
     "highway": "elevator",
     "railway": "subway_entrance",
-    "ref": "D",
     "wheelchair": "yes"
   }
 },
@@ -3680,15 +3679,17 @@
   "lon": 114.1843136,
   "tags": {
     "door": "no",
+    "elevator": "no",
     "entrance": "yes",
+    "indoor": "yes",
     "level": "-1",
+    "location": "underground",
     "name": "崇光百貨 SOGO",
     "name:en": "SOGO",
     "name:zh": "崇光百貨",
-    "name:zh-Hans": "崇光百货",
-    "name:zh-Hant": "崇光百貨",
     "railway": "subway_entrance",
     "ref": "D3",
+    "tunnel": "yes",
     "wheelchair": "no"
   }
 },
@@ -3699,15 +3700,17 @@
   "lon": 114.1841881,
   "tags": {
     "door": "no",
+    "elevator": "no",
     "entrance": "yes",
+    "indoor": "yes",
     "level": "-1",
+    "location": "underground",
     "name": "崇光百貨 SOGO",
     "name:en": "SOGO",
     "name:zh": "崇光百貨",
-    "name:zh-Hans": "崇光百货",
-    "name:zh-Hant": "崇光百貨",
     "railway": "subway_entrance",
     "ref": "D4",
+    "tunnel": "yes",
     "wheelchair": "no"
   }
 },
@@ -6268,21 +6271,6 @@
 },
 {
   "type": "node",
-  "id": 6825575400,
-  "lat": 22.2804322,
-  "lon": 114.1842454,
-  "tags": {
-    "name": "崇光百貨 SOGO",
-    "name:en": "SOGO",
-    "name:zh": "崇光百貨",
-    "name:zh-Hans": "崇光百货",
-    "name:zh-Hant": "崇光百貨",
-    "railway": "subway_entrance",
-    "ref": "D"
-  }
-},
-{
-  "type": "node",
   "id": 6843965291,
   "lat": 22.3828238,
   "lon": 114.1878231,
@@ -6500,26 +6488,28 @@
   "lat": 22.2802725,
   "lon": 114.1842570,
   "tags": {
-    "building:entrance": "no",
+    "elevator": "no",
+    "escalator": "yes",
     "name": "崇光百貨 SOGO",
     "name:en": "SOGO",
     "name:zh": "崇光百貨",
-    "name:zh-Hans": "崇光百货",
-    "name:zh-Hant": "崇光百貨",
     "railway": "subway_entrance",
     "ref": "D2",
+    "steps": "yes",
     "wheelchair": "no"
   }
 },
 {
   "type": "node",
   "id": 7060182527,
-  "lat": 22.2799577,
-  "lon": 114.1840500,
+  "lat": 22.2799498,
+  "lon": 114.1840900,
   "tags": {
     "door": "no",
     "entrance": "yes",
+    "exit": "yes",
     "level": "-1",
+    "location": "underground",
     "name": "希慎廣場 Hysan Place",
     "name:en": "Hysan Place",
     "name:zh": "希慎廣場",
@@ -8466,6 +8456,23 @@
   "tags": {
     "railway": "subway_entrance",
     "ref": "B"
+  }
+},
+{
+  "type": "node",
+  "id": 14352183525,
+  "lat": 22.2804764,
+  "lon": 114.1844403,
+  "tags": {
+    "elevator": "no",
+    "escalator": "yes",
+    "name": "崇光百貨 SOGO",
+    "name:en": "SOGO",
+    "name:zh": "崇光百貨",
+    "railway": "subway_entrance",
+    "ref": "D",
+    "steps": "yes",
+    "wheelchair": "no"
   }
 }
 
