@@ -31,8 +31,12 @@ async function themeParks() {
   return rides;
 }
 
+// one retry after a short pause: on 4 Nov 2026 both sources failed together for a moment at 10:00 and 10:30
+const retry = async <T>(fn: () => Promise<T>) => { try { return await fn() } catch (e) { console.error('retry:', String(e)); await new Promise(r => setTimeout(r, 1500)); return await fn() } };
 async function both() {
-  const [qt, tp] = await Promise.allSettled([queueTimes(), themeParks()]);
+  const [qt, tp] = await Promise.allSettled([retry(queueTimes), retry(themeParks)]);
+  if (qt.status === 'rejected') console.error('queue-times failed:', String(qt.reason));
+  if (tp.status === 'rejected') console.error('themeparks failed:', String(tp.reason));
   const Q = qt.status === 'fulfilled' ? qt.value : null, T = tp.status === 'fulfilled' ? tp.value : null, now = new Date().toISOString();
   if (!Q && !T) throw new Error('no source answered');
   // ThemeParks.wiki alone: its status is current as of now

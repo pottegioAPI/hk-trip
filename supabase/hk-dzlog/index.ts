@@ -51,9 +51,12 @@ Deno.serve(async (req: Request) => {
   const { data } = await db.from('hk_config').select('v').eq('k', 'cron_secret').maybeSingle();
   if (!data || req.headers.get('x-cron') !== data.v) return new Response('forbidden', { status: 403 });
   const K = 'sb_publishable_S8yqxmseObhtyqdxmW2A7w_DCyZwPfd';
+  // the platform now and then answers 502 when one function calls another as it boots (4 Nov 2026: 4 of 129 readings),
+  // so a failed reading is tried again once, 3 seconds later
+  const again = async (u: string, h: Record<string, string> = {}) => { const r = await j(u, h); if (!r.err) return r; await new Promise(z => setTimeout(z, 3000)); return j(u, h) };
   const [a, b]: any[] = await Promise.all([
-    j(Deno.env.get('SUPABASE_URL') + '/functions/v1/hk-queue', { apikey: K, Authorization: 'Bearer ' + K }),
-    j('https://api.themeparks.wiki/v1/entity/bd0eb47b-2f02-4d4d-90fa-cb3a68988e3b/live')]);
+    again(Deno.env.get('SUPABASE_URL') + '/functions/v1/hk-queue', { apikey: K, Authorization: 'Bearer ' + K }),
+    again('https://api.themeparks.wiki/v1/entity/bd0eb47b-2f02-4d4d-90fa-cb3a68988e3b/live')]);
   const rides = (a.rides || []).filter((r: any) => r.open).map((r: any) => [r.name, r.wait, r.updated]);
   const wiki = (b.liveData || []).filter((x: any) => x.entityType === 'ATTRACTION').map((x: any) => [x.name, x.status, x.queue?.STANDBY?.waitTime ?? null]);
   const { error } = await db.from('hk_dzlog').insert({ src: a.source || null, err: a.err || b.err || null, rides, wiki });
