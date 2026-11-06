@@ -2,7 +2,7 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-05T23:37:36Z",
+    "timestamp_osm_base": "2026-11-06T23:08:15Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -84,7 +84,9 @@
     "start_date": "2009-07-26",
     "station": "subway",
     "subway": "yes",
-    "wheelchair": "yes"
+    "wheelchair": "yes",
+    "wikidata": "Q718069",
+    "wikipedia": "zh:康城站 (香港)"
   }
 },
 {
@@ -205,7 +207,8 @@
     "station": "subway",
     "subway": "yes",
     "wheelchair": "yes",
-    "wikipedia": "zh:九龍塘站"
+    "wikidata": "Q996696",
+    "wikipedia": "zh:九龍塘站 (香港)"
   }
 },
 {
@@ -1245,7 +1248,9 @@
     "ref": "HAH",
     "ref:note": "Common use in MTR app indoor navigation labels, station shop units, etc",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q838855",
+    "wikipedia": "zh:坑口站 (香港)"
   }
 },
 {
@@ -1265,7 +1270,9 @@
     "ref:note": "Common use in MTR app indoor navigation labels, station shop units, etc",
     "station": "subway",
     "subway": "yes",
-    "wheelchair": "yes"
+    "wheelchair": "yes",
+    "wikidata": "Q839614",
+    "wikipedia": "zh:油塘站"
   }
 },
 {
@@ -1420,7 +1427,9 @@
     "ref": "SUN",
     "ref:note": "Common use in MTR app indoor navigation labels, station shop units, etc",
     "station": "subway",
-    "subway": "yes"
+    "subway": "yes",
+    "wikidata": "Q837626",
+    "wikipedia": "zh:欣澳站"
   }
 },
 {
@@ -4351,6 +4360,7 @@
     "subway": "yes",
     "tracks": "2",
     "wheelchair": "yes",
+    "wikidata": "Q996447",
     "wikipedia": "zh:美孚站"
   }
 },
