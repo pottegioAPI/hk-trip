@@ -1,4 +1,5 @@
 // OSM attractions → compact places.json for the in-app place search.
+// row: [name:en, name:zh, Thai name, lat*1e5, lon*1e5, category, has wikidata, fee, cuisine, opening_hours (OSM syntax, "" if unknown)]
 const fs=require('fs');const [osmDir,out]=process.argv.slice(2);
 let e=[];for(let i=1;i<=5;i++){const f=osmDir+'/places'+i+'.json';if(fs.existsSync(f))e=e.concat(JSON.parse(fs.readFileSync(f)).elements)}
 // Thai names Thai travellers use for well-known places
@@ -19,7 +20,7 @@ const out_=[];const seen=new Map();
 for(const x of e){const t=x.tags||{};const en=(t['name:en']||'').trim();if(!en)continue;const p=[x.lat??(x.center&&x.center.lat),x.lon??(x.center&&x.center.lon)];if(p[0]==null)continue;
  const k=en.toLowerCase();const prev=seen.get(k);if(prev&&prev.some(q=>md(q,p)<400))continue;(seen.get(k)||seen.set(k,[]).get(k)).push(p);
  const fee=t.charge||(t.fee==='no'?'0':'');
- out_.push([en,(t['name:zh']||t.name||'').replace(/\s*[A-Za-z].*$/,'').slice(0,30),TH[en]||t['name:th']||'',Math.round(p[0]*1e5),Math.round(p[1]*1e5),cat(t),t.wikidata?1:0,fee.slice(0,30),cuisine(t.cuisine)])}
+ out_.push([en,(t['name:zh']||t.name||'').replace(/\s*[A-Za-z].*$/,'').slice(0,30),TH[en]||t['name:th']||'',Math.round(p[0]*1e5),Math.round(p[1]*1e5),cat(t),t.wikidata?1:0,fee.slice(0,30),cuisine(t.cuisine),(t.opening_hours||"").slice(0,200)])}
 out_.sort((a,b)=>b[6]-a[6]);
 fs.writeFileSync(out,JSON.stringify({v:new Date().toISOString().slice(0,10),p:out_}));
 console.log('places',out_.length,'thai',out_.filter(r=>r[2]).length,'bytes',fs.statSync(out).size);

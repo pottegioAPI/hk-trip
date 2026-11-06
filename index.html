@@ -610,6 +610,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 .dznext .dzzone{display:inline-block;background:var(--surface);border-radius:99px;padding:2px 9px;margin:2px 4px 2px 0;font-size:12.5px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 .dznext.inq{background:var(--sky-soft);border-color:var(--sky)}
 .dznext.inq .dzn-top>span{color:var(--sky);opacity:1}
+.ohl{font-size:13px;color:var(--muted);margin:8px 2px 0;line-height:1.4}.ohl.warn,.ohc.warn{color:var(--danger);font-weight:600}
 </style>
 
 <header class="top">
@@ -998,7 +999,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('f8b76291e9|6 พ.ย. 15:06|1.12');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('9b5685f6a7|6 พ.ย. 15:58|1.13');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1200,6 +1201,82 @@ function chosen(dn,it,opts){
 
 /* ---------- place search (OpenStreetMap attractions) ---------- */
 let PL=null, SAMPLE=null;
+/* ---------- opening hours: OpenStreetMap "opening_hours" (places.json column 9), the common forms ---------- */
+const OH_WD=['Su','Mo','Tu','We','Th','Fr','Sa'], OH_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// the open periods on one weekday (0 = Sunday) as [[from,to],...] in minutes ([] = closed all day), or null when the text can't be read safely.
+// Our trip days (14–17 Nov 2026) are not Hong Kong public holidays, so "PH" rules are left out; month ranges count only if they include November.
+function ohFor(src, dow){
+  if(!src) return null; const s=String(src).replace(/"[^"]*"/g,' ').replace(/\bopen\b/g,' ').replace(/[–—]/g,'-').replace(/、/g,',').trim();
+  if(/^24\/7$/.test(s)) return [[0,1440]];
+  const DAY='(?:Mo|Tu|We|Th|Fr|Sa|Su|PH)(?:-(?:Mo|Tu|We|Th|Fr|Sa|Su))?', reDays=new RegExp('^('+DAY+'(?:\\s*,\\s*'+DAY+')*)\\s+');
+  let res=null, any=false;
+  // rules end at ";" (or at a time followed by ", " and more days); rules only for public or school holidays are not ours
+  for(let rule of s.split(/;|(?<=\d)\s*,\s*(?=(?:Mo|Tu|We|Th|Fr|Sa|Su|PH)\b)/)){
+    rule=rule.trim(); if(!rule || /^(PH|SH)\b(?![-,])/.test(rule)) continue;
+    // a month range in front: use the rule only if November is inside it; a single date (e.g. "Dec 24") is a special day, not ours unless in November
+    const mm=rule.match(/^([A-Z][a-z]{2})(?:-([A-Z][a-z]{2}))?(\s+\d{1,2})?\s+/);
+    if(mm && OH_MON.includes(mm[1])){
+      if(mm[3]){ if(mm[1]==='Nov') return null; continue }
+      const a=OH_MON.indexOf(mm[1]), b=mm[2]?OH_MON.indexOf(mm[2]):a; if(b<0) return null;
+      if(!(a<=b ? (a<=10&&10<=b) : (10>=a||10<=b))) continue;
+      rule=rule.slice(mm[0].length);
+    }
+    let days=null; const dm=rule.match(reDays);
+    if(dm){ days=dm[1]; rule=rule.slice(dm[0].length) }
+    else if(/^(Mo|Tu|We|Th|Fr|Sa|Su|PH)[-,A-Za-z]*\s*(off|closed)?$/.test(rule)){ days=rule.split(/\s+/)[0]; rule=rule.slice(days.length) }
+    const body=rule.trim();
+    let iv;
+    if(/^(off|closed)$/i.test(body)) iv=[];
+    else { if(!/^[\d:\-+,\s]+$/.test(body)) return null;
+      iv=[]; for(const p of body.split(',')){ const t=p.trim().match(/^(\d{1,2}):(\d\d)\s*-\s*(\d{1,2}):(\d\d)\+?$|^(\d{1,2}):(\d\d)\+$/); if(!t) return null;
+        if(t[5]!=null){ iv.push([+t[5]*60 + +t[6], 1440]); continue }
+        const a=+t[1]*60 + +t[2]; let b=+t[3]*60 + +t[4]; if(b<=a) b+=1440; iv.push([a,b]) } }
+    let hit=!days;
+    if(days) for(const part of days.split(',')){ const [x,y]=part.trim().split('-'); if(x==='PH') continue;
+      const a=OH_WD.indexOf(x), b=y?OH_WD.indexOf(y):a; if(a<0||b<0) return null;
+      if(a<=b ? (dow>=a&&dow<=b) : (dow>=a||dow<=b)) hit=true }
+    any=true; if(hit) res=iv;
+  }
+  return any ? (res||[]) : null;
+}
+const ohDow = dn => new Date(DAYS[dn-1].date+'T12:00:00Z').getUTCDay();
+const ohTxt = iv => !iv.length ? 'ปิดทั้งวัน' : iv.length===1&&iv[0][0]===0&&iv[0][1]>=1440 ? 'เปิด 24 ชม.' : 'เปิด '+iv.map(([a,b])=>hhmm(a)+'–'+(b===1440?'24:00':hhmm(b))).join(', ');
+// what to say about being there from minute t to minute e on trip day dn: {txt, warn}
+function ohCheck(src, dn, t, e){
+  const iv=ohFor(src, ohDow(dn)); if(!iv) return src ? {txt:'เวลาเปิด: '+String(src).slice(0,80), warn:null} : null;
+  const D=DAYS[dn-1], txt=ohTxt(iv)+' ('+D.dow+' '+D.d+')';
+  if(t==null || isNaN(t)) return {txt, warn:null};
+  if(!iv.length) return {txt, warn:'วัน'+D.dow+' '+D.d+' ที่นี่ปิด'};
+  if(t>=1440 && !iv.some(([a,b])=>b>1440)) t-=1440;   // after midnight on the same plan day
+  const inn=iv.find(([a,b])=>t>=a && t<b);
+  if(!inn){ const next=iv.find(([a])=>a>t);
+    return {txt, warn: next ? 'ไปถึง '+hhmm(t)+' ยังไม่เปิด (เปิด '+hhmm(next[0])+')' : 'ไปถึง '+hhmm(t)+' ปิดแล้ว (ปิด '+hhmm(iv[iv.length-1][1])+')'} }
+  const left=inn[1]-t;
+  if(left<30) return {txt, warn:'ไปถึง '+hhmm(t)+' อีก '+left+' นาทีก็ปิด ('+hhmm(inn[1])+')'};
+  if(e!=null && !isNaN(e) && e>t && e>inn[1]) return {txt, warn:'ปิด '+hhmm(inn[1])+' อยู่ได้ราว '+left+' นาที ไม่ถึง '+hhmm(e)+' ตามแผน'};
+  return {txt, warn:null};
+}
+// a stop's opening hours: saved when it was picked from the search, else the same place in the search data (same name, within 300 m)
+const OH_MEMO=new Map();
+function itemOH(it){
+  if(!it) return ''; if(it.oh) return it.oh; if(!PL || !it.ll) return '';
+  const key=it.id+'|'+(it.map||it.h); if(OH_MEMO.has(key)) return OH_MEMO.get(key);
+  const nm=String(it.map||it.h).toLowerCase(), alt=String(it.h).toLowerCase();
+  const p=PL.p.find(p=>p[9] && (p[0].toLowerCase()===nm || p[0].toLowerCase()===alt || (p[2] && p[2].toLowerCase()===alt)) && metres(it.ll,[p[3]/1e5,p[4]/1e5])<300);
+  const v=p?p[9]:''; OH_MEMO.set(key,v); return v;
+}
+function ohSheetHTML(d){
+  const src = d.oh || '';
+  if(!src) return d.preview ? '<div class="ohl">🕒 ไม่มีข้อมูลเวลาเปิดปิดที่นี่ เช็คในแผนที่ก่อนไป</div>' : '';
+  const c=ohCheck(src, d.day, d.t?toMin(d.t):null, d.e?toMin(d.e):null); if(!c) return '';
+  return '<div class="ohl">🕒 '+esc(c.txt)+'</div>'+(c.warn?'<div class="ohl warn">⚠️ '+esc(c.warn)+'</div>':'');
+}
+function ohCardHTML(it, dn, r){
+  const src=itemOH(it); if(!src) return '';
+  const t = r ? r.t : toMin(it.t), e = r ? (r.e!=null?r.e:null) : (it.e?toMin(it.e):null);
+  const c=ohCheck(src, dn, t, e); if(!c) return '';
+  return '<div class="mini ohc'+(c.warn?' warn':'')+'">'+(c.warn?'⚠️ '+esc(c.warn)+' · ':'🕒 ')+esc(c.txt)+'</div>';
+}
 const PCAT = {temple:['วัด/ศาลเจ้า',60], museum:['พิพิธภัณฑ์',120], view:['จุดชมวิว',45], theme:['สวนสนุก',480], zoo:['สวนสัตว์/อควาเรียม',150],
   mall:['ห้าง',120], market:['ตลาด',90], beach:['ชายหาด',120], park:['สวน',60], historic:['สถานที่ประวัติศาสตร์',45], sight:['ที่เที่ยว',60],
   food:['ร้านอาหาร',60], cafe:['คาเฟ่',45]};
@@ -1253,7 +1330,7 @@ function pickPlace(i){
   const p=PL.p[i], d=S.sheet; readItemForm();
   d.h = p[2] || p[0]; d.map = p[0]; d.ll = [p[3]/1e5, p[4]/1e5]; d.sugQ = '';
   const ns = nearestStation(d.ll); d.st = ns ? ns.c : ''; d.ex = '';
-  d.cat = p[5]; d.dur = PCAT[p[5]] ? PCAT[p[5]][1] : 60; d.fee = feeOf(p[7]); d.tip=''; d.ai=false;
+  d.cat = p[5]; d.dur = PCAT[p[5]] ? PCAT[p[5]][1] : 60; d.fee = feeOf(p[7]); d.tip=''; d.ai=false; d.oh = p[9] || '';
   planPick(d); drawSheet(); enrichPlace(p);
 }
 async function enrichPlace(p){
@@ -1982,6 +2059,7 @@ function renderPlan(){
           ${r?`<span class="nowtag" style="background:var(--sun);color:var(--ink)">≈ ${hhmm(r.t)}${r.e!=null?'–'+hhmm(r.e):''}</span>`:''}
           ${cur===it.id?'<span class="nowtag">ถัดไป</span>':''}</div>
         ${r?`<div class="mini" style="color:${r.miss||r.leave?'var(--danger)':'var(--muted)'}">${movedNote(r)}</div>`:''}
+        ${!done?ohCardHTML(it, S.day, r):''}
         ${done&&hereNote(RP[it.id])?`<div class="mini" style="color:${RP[it.id].leave?'var(--danger)':'var(--muted)'}">${hereNote(RP[it.id])}</div>`:''}
         ${it.st&&NET?(()=>{ const x=exitFor(it); return `<div class="mini">MTR ${esc(codeName(it.st))}${x?` · ออก <span class="exit">Exit ${esc(x.ref)}</span>${x.name?' '+esc(x.name):''}${x.d!=null?` (~${x.d} ม.)`:''}`:''}
           ${x&&x.planRef?`<span class="tag" style="background:var(--sun-soft)">แผนเดิมเขียน Exit ${esc(x.planRef)} · ปรับตามข้อมูลจริงแล้ว</span>`:''}</div>` })():''}
@@ -3092,7 +3170,7 @@ function openExpense(pre={}){ if(S.me==null) return openSheet({kind:'who'}); con
 const EXP_TYPES = {own:{type:'own',mine:true}, split:{type:'split',mine:true}, 'split-them':{type:'split',mine:false}, 'adv-me':{type:'adv',mine:true}, 'adv-them':{type:'adv',mine:false}};
 function openItem(dn, it){
   const x=exitFor(it);
-  openSheet({kind:'item', id:it?it.id:null, fromDay:dn, day:dn, t:it?it.t:'', e:it&&it.e||'', h:it?it.h:'', p:it&&it.p?it.p.replace(/<[^>]+>/g,''):'', st:it&&it.st||'', ex:x?x.ref:'', map:it&&it.map||'', sure:false});
+  openSheet({kind:'item', id:it?it.id:null, fromDay:dn, day:dn, oh:itemOH(it), t:it?it.t:'', e:it&&it.e||'', h:it?it.h:'', p:it&&it.p?it.p.replace(/<[^>]+>/g,''):'', st:it&&it.st||'', ex:x?x.ref:'', map:it&&it.map||'', sure:false});
 }
 function expHint(d){
   const a=Number(d.amt)||0, me=S.me, o=other(me), N=i=>(S.settings.names||DEFAULTS.names)[i];
@@ -3201,6 +3279,7 @@ function drawSheet(){
     <div class="grid2"><div><label class="fl" for="i-t">เวลาเริ่ม</label><input class="txt num" id="i-t" type="time" value="${esc(d.t)}"></div>
       <div><label class="fl" for="i-e">ถึงเวลา (ไม่ใส่ก็ได้)</label><input class="txt num" id="i-e" type="time" value="${esc(d.e)}"></div></div>
     <div class="fl">วันที่ (ย้ายวันได้)</div><div class="chips">${DAYS.map(x=>chip('day',x.n,`${x.dow} ${x.d} พ.ย.`)).join('')}</div>
+    <div id="i-oh">${ohSheetHTML(d)}</div>
     <div class="grid2"><div><div class="fl">สถานี MTR ที่ใกล้ที่สุด</div>${NET?stBtn(d.st,'item',''):''}</div>
       <div><label class="fl" for="i-ex">Exit (เว้นว่าง = เลือกให้อัตโนมัติ)</label><input class="txt" id="i-ex" maxlength="6" value="${esc(d.ex)}" placeholder="เช่น B2" autocapitalize="characters"></div></div>
     <label class="fl" for="i-p">โน้ต</label><input class="txt" id="i-p" maxlength="200" value="${esc(d.p)}" placeholder="เช่น ออก Exit E2">
@@ -3343,6 +3422,7 @@ async function saveItem(){
     const fd=d.cat==='food'||d.cat==='cafe';
     if(d.fee>0) it.cost={amt:d.fee, note:(fd?'ค่าอาหาร ':'ค่าเข้า ')+it.h.slice(0,30), cat:fd?'food':'ticket'}; else delete it.cost;
     if(d.tip) it.tip=d.tip;
+    if(d.oh) it.oh=String(d.oh).slice(0,200); else delete it.oh;
   }
   const ex=d.ex.trim().toUpperCase().slice(0,6);
   const auto = it.st ? nearestExit(it.st, it.ll || DEF_LL[it.id]) : null;
@@ -3577,7 +3657,8 @@ document.addEventListener('input', e=>{
   if(d.kind==='item'){
     if(e.target.id==='i-h'){ d.h=e.target.value; d.sugQ=e.target.value; clearTimeout(sugT); sugT=setTimeout(()=>{ const el=document.getElementById('i-sug'); if(el) el.innerHTML=sugHTML(d.sugQ) },150) }
     if(e.target.id==='i-t'){ d.tTouched=true; d.t=e.target.value; if(!d.eTouched&&d.dur){ d.e=hhmm(toMin(d.t)+d.dur); const ee=document.getElementById('i-e'); if(ee) ee.value=d.e } }
-    if(e.target.id==='i-e') d.eTouched=true;
+    if(e.target.id==='i-e'){ d.eTouched=true; d.e=e.target.value }
+    if(e.target.id==='i-t'||e.target.id==='i-e'){ const o=document.getElementById('i-oh'); if(o) o.innerHTML=ohSheetHTML(d) }
     return;
   }
   if(d.kind!=='exp') return;
