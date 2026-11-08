@@ -603,6 +603,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 .dznext.inq{background:var(--sky-soft);border-color:var(--sky)}
 .dznext.inq .dzn-top>span{color:var(--sky);opacity:1}
 .ohl{font-size:13px;color:var(--muted);margin:8px 2px 0;line-height:1.4}.ohl.warn,.ohc.warn{color:var(--danger);font-weight:600}
+.tundo{margin-left:8px;background:var(--bg);color:var(--ink);border:0;border-radius:99px;padding:3px 10px;font:inherit;font-weight:700;cursor:pointer}
 </style>
 
 <header class="top">
@@ -1148,7 +1149,126 @@ function movedNote(r){
   if(!moved(r)) return '';
   return r.miss ? '⚠️ เวลาไม่พอแล้ว แนะนำข้ามจุดนี้' : r.leave ? `⚠️ ต้องออกภายใน ${hhmm(r.e)} น. ให้ทันจุดถัดไป` : r.cut>=10 ? `อยู่สั้นลง ${r.cut} นาที เพื่อให้ทันแผนที่เหลือ` : `เลื่อนตามเวลาที่ถึงจริง`;
 }
-let toastT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2800) }
+/* ---------- arranging a day while planning ----------
+   After a stop is added, re-timed or removed, the stops after it follow on: each starts when we can get there, so the
+   day has no long idle gaps. Rules: a pair of stops that were already next to each other keeps the gap it had (the plan's
+   blocks often include the ride), shrunk to the ride + 5 min when it was longer than that by over 15 min; a pair that is
+   new (something inserted, moved or removed between them) gets the ride + 5 min. Nothing starts before it opens, lunch
+   before 11:00, dinner before 17:30, or a sunset stop too early for the sunset (~17:40 mid-November). Flights, the airport,
+   Disney's park day and fireworks, stops already reached, and a time the person typed themselves don't move; the arranging
+   stops at the next fixed stop and lets the stop before it run on to fill the time, never past closing. */
+const PIN_STOP = new Set([...FIXED_STOP, '1a', '3b']);
+const pinnedStop = it => PIN_STOP.has(it.id) || INSIDE_STOP.has(it.id) || !!it.flight || it.tz==='TH';
+const hm = m => m>=1440 ? String(Math.floor(m/60))+':'+String(m%60).padStart(2,'0') : hhmm(m);   // the last day runs past midnight ("24:15")
+function travelMins(dn, prev, it){
+  if(!prev) return 0;
+  const a=locOf(prev), b=locOf(it), m=a&&b ? metres(a,b) : null;
+  if(m!=null && m<700) return Math.max(5, Math.ceil(m/65));   // a short walk
+  const {opts}=optionsBetween(dn, prev, it), priced=opts.filter(o=>o.mins && !o.manual && o.fare!=null);
+  const best = priced.sort((x,y)=>x.mins-y.mins)[0];   // planning time: the quickest usual way
+  return best ? best.mins : m!=null && m<1500 ? Math.ceil(m/65) : 25;
+}
+function notBefore(it, dur){
+  const h=String(it.h||''); let m=0;
+  if(/มื้อเที่ยง|ข้าวเที่ยง|lunch/i.test(h)) m=11*60;
+  if(/มื้อค่ำ|มื้อเย็น|dinner/i.test(h)) m=17*60+30;
+  if(/sunset|พระอาทิตย์ตก/i.test(h)) m=Math.max(m, 17*60+45-dur);
+  return m;
+}
+const up5 = m => Math.ceil(m/5)*5;
+// list: the day's stops in their new order; from: index of the last stop that stays as it is; keep: ids whose time stays;
+// was: the day's order before the change (to know which neighbours are new). Returns {ch:[{it,t,e}], warn:[text]} without changing anything.
+function arrange(dn, list, from, keep, was){
+  const ch=[], warn=[], wasNext=new Map(); (was||list).forEach((x,k,a)=>{ if(a[k+1]) wasNext.set(x.id, a[k+1].id) });
+  const orig=new Map(list.map(x=>[x.id,{t:toMin(x.t), e:x.e?toMin(x.e):null}]));
+  let prev=from>=0 ? list[from] : null, end=prev ? toMin(prev.e||prev.t)+(prev.e?0:30) : null, prevCh=null;
+  for(let k=from+1;k<list.length;k++){
+    const it=list[k], o=orig.get(it.id), dur=o.e!=null ? o.e-o.t : 60;
+    if(prev==null || S.done[it.id] || keep.has(it.id)){ if(prev && end+travelMins(dn,prev,it)>o.t && !S.done[it.id]) warn.push(prev.h+' ยังไม่จบตอน '+it.h+' เริ่ม ('+hm(o.t)+')');
+      prev=it; end=o.e!=null?o.e:o.t+30; prevCh=null; continue }
+    const ride=travelMins(dn, prev, it);
+    if(pinnedStop(it)){
+      const free=o.t-(end+ride);
+      if(free<0 && prevCh && prevCh.e!=null && prevCh.e+free-prevCh.t>=30){ prevCh.e=Math.floor((prevCh.e+free)/5)*5; prevCh.cut=-free }   // leave the stop before earlier to make it
+      else if(free<0) warn.push('ไปไม่ทัน '+it.h+' ('+hm(o.t)+') ช้าไป ~'+(-free)+' นาที');
+      else if(free>15 && prevCh && prevCh.e!=null){   // stay longer at the stop before, up to 90 min, never past its closing
+        const iv=ohFor(itemOH(prevCh.it), ohDow(dn)), shut=iv&&iv.length ? (iv.find(([a,b])=>prevCh.t>=a&&prevCh.t<b)||[0,1e9])[1] : 1e9;
+        prevCh.e=Math.min(prevCh.e+Math.min(free-5,90), shut) }
+      break;
+    }
+    const og = o.t-(orig.get(prev.id).e ?? orig.get(prev.id).t+30);   // the gap these two had
+    const gap = wasNext.get(prev.id)===it.id && og>=0 ? (og>ride+15 ? ride+5 : og) : ride+5;
+    let t=up5(Math.max(end+gap, notBefore(it,dur)));
+    const iv=ohFor(itemOH(it), ohDow(dn));
+    if(iv && iv.length && !iv.some(([a,b])=>t>=a&&t<b)){ const nx=iv.find(([a])=>a>t); if(nx) t=nx[0] }
+    const c={it, t, e:o.e!=null ? t+dur : null};
+    if(t!==o.t) ch.push(c);
+    if(t>=24*60 && !/^4/.test(it.id)) warn.push(it.h+' ดึกเกินเที่ยงคืน');
+    prev=it; end=c.e??t+30; prevCh=c;
+  }
+  return {ch, warn};
+}
+// a change to day dn: newList is the day after it, oldList before it, anchorId the first stop affected (or the new/edited one)
+function arrangeAfter(dn, newList, oldList, anchorId, keepId){
+  const L=newList.filter(i=>!INSIDE_STOP.has(i.id)), O=oldList.filter(i=>!INSIDE_STOP.has(i.id));
+  let from=L.findIndex(i=>i.id===anchorId); if(keepId!=null){
+    const k0=O.findIndex(i=>i.id===keepId), before=k0>0 ? O[k0-1].id : null, kb=before ? L.findIndex(i=>i.id===before) : -1;
+    if(kb>=0 && kb<from) from=kb; }
+  return arrange(dn, L, Math.max(from,0) - (L.length && from<0 ? 1 : 0), new Set(keepId!=null?[keepId]:[]), O);
+}
+// where a new place fits best: next to the stops closest to it, between the arrival and the airport, without making a fixed stop late
+function bestSlot(dn, cand){
+  const L=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)), at=cand.ll; if(!at || !L.length) return null;
+  const D=(a,b)=>{ const p=locOf(a), q=locOf(b); return p&&q ? metres(p,q) : 8000 };
+  const startK = dn===1 ? Math.max(0, L.findIndex(i=>i.id==='1a')) : 0;
+  let best=null;
+  for(let k=startK-(dn>1?1:0); k<L.length; k++){
+    const A=k>=0 ? L[k] : {id:'hotel', h:'ที่พัก', st:'MOK', ll:HOTEL_LL, e:'07:00'}, B=L[k+1];
+    if(k>=0 && (S.done[A.id]&&B&&S.done[B.id] || A.flight || A.tz==='TH' || (FIXED_STOP.has(A.id) && A.id!=='3c'))) continue;
+    if(k>=0 && (A.id==='3b' || A.id==='1a')) continue;   // not inside Disney's park day, not between landing and checking in with the bags
+    const cost = D(A,cand) + (B ? D(cand,B) - D(A,B) : 0);
+    // simulate: the new stop right after A, the rest following on
+    const ride=travelMins(dn, A, cand), t0=k>=0 ? toMin(A.e||A.t)+(A.e?0:30) : toMin('08:00');
+    let t=up5(Math.max(t0+ride+5, notBefore(cand, cand.dur||60)));
+    const iv=ohFor(cand.oh, ohDow(dn)); if(iv && iv.length && !iv.some(([a,b])=>t>=a&&t<b)){ const nx=iv.find(([a])=>a>t); if(nx) t=nx[0] }
+    if(iv && !iv.length) return null;
+    const tmp={...cand, id:'tmp', t:hm(t), e:hm(t+(cand.dur||60))}, NL=[...L.slice(0,k+1), tmp, ...L.slice(k+1)];
+    const r=arrange(dn, NL, k+1, new Set(), L), closed=iv && !iv.some(([a,b])=>t>=a&&t<b) ? 1 : 0;
+    const score = cost + r.warn.length*5000 + closed*5000 + (t>=23*60?3000:0);
+    if(!best || score<best.score) best={score, k, prev:k>=0?A:null, next:B||null, t, near:Math.round(Math.min(D(A,cand), B?D(cand,B):1e9))};
+  }
+  return best;
+}
+function arrangeText(r, limit){
+  if(!r) return '';
+  const rows=r.ch.slice(0,limit||4).map(c=>esc(c.it.h.slice(0,26))+' '+hm(toMin(c.it.t))+' → '+hm(c.t)).join('<br>');
+  return (r.ch.length?'<div class="ohl">🔄 ที่ถัดไปจะจัดเวลาให้ต่อกันเอง ('+r.ch.length+' ที่)<br>'+rows+(r.ch.length>(limit||4)?'<br>…':'')+'</div>':'')
+    + r.warn.slice(0,2).map(w=>'<div class="ohl warn">⚠️ '+esc(w)+'</div>').join('');
+}
+// the item sheet's preview of what saving would do to the rest of the day
+function sheetArrange(d){
+  if(!d.t) return null;
+  const old=d.id ? findItem(d.id) : null, base=dayItems(d.day), tmp={...(old?old.it:{}), id:d.id||'tmp', h:d.h||'ที่ใหม่', t:d.t, e:d.e||undefined, ll:d.ll||(old&&old.it.ll), st:d.st||null, oh:d.oh||''};
+  if(!tmp.e) delete tmp.e;
+  const timeChanged = !old || old.dn!==d.day || old.it.t!==d.t || (old.it.e||'')!==(d.e||'');
+  if(!timeChanged) return null;
+  const sl=slotOf(d);
+  const r = sl ? arrangeAfter(d.day, withAt(base, tmp, sl.prevId), base, sl.prevId||tmp.id, null)
+    : arrangeAfter(d.day, [...base.filter(i=>i.id!==tmp.id), tmp].sort((a,b)=>toMin(a.t)-toMin(b.t)), base, tmp.id, tmp.id);
+  // the day is already full: say so rather than squeezing the new place in at midnight
+  if(d.day<4 && toMin(d.t)>=23*60) r.warn.unshift('เริ่ม '+hm(toMin(d.t))+' ดึกมาก วันนี้แน่นแล้ว ลองเลือกวันอื่น หรือตั้งเวลาเอง');
+  return r;
+}
+// a new place put next to the nearest stops (its time not typed by hand): placed right after that stop, whatever the clock says
+const slotOf = d => !d.id && !d.tTouched && d.preview && d.preview.slot && d.preview.slot.day===d.day ? d.preview.slot : null;
+function withAt(list, it, prevId){ const L=list.filter(i=>i.id!==it.id), k=prevId ? L.findIndex(i=>i.id===prevId) : -1; L.splice(k+1, 0, it); return L }
+function applyArrange(r){ for(const c of r.ch){ c.it.t=hm(c.t); if(c.e!=null) c.it.e=hm(c.e) } return r.ch.length }
+// keep a copy of the days a change touches, for the toast's undo
+let UNDO=null;
+function toastUndo(m, days){ const t=document.getElementById('toast'); t.innerHTML=esc(m)+(days?' <button type="button" class="tundo" data-undo="1">ย้อนกลับ</button>':''); t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{ t.hidden=true; UNDO=null },days?8000:2800) }
+async function undoArrange(){ if(!UNDO) return; const u=UNDO; UNDO=null; for(const [dn,items] of u) S.plan[dn-1]=items; renderAll(); document.getElementById('toast').hidden=true;
+  try{ for(const [dn] of u) await savePlanDay(dn); toast('ย้อนกลับแล้ว') }catch(e){} }
+let toastT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.hidden=false; UNDO=null; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2800) }
 
 /* ---------- getting here: options for one stop ---------- */
 function prevStop(dn,id){
@@ -1203,7 +1323,7 @@ function ohFor(src, dow){
   const DAY='(?:Mo|Tu|We|Th|Fr|Sa|Su|PH)(?:-(?:Mo|Tu|We|Th|Fr|Sa|Su))?', reDays=new RegExp('^('+DAY+'(?:\\s*,\\s*'+DAY+')*)\\s+');
   let res=null, any=false;
   // rules end at ";" (or at a time followed by ", " and more days); rules only for public or school holidays are not ours
-  for(let rule of s.split(/;|(?<=\d)\s*,\s*(?=(?:Mo|Tu|We|Th|Fr|Sa|Su|PH)\b)/)){
+  for(let rule of s.split(/;|(?<=\d)\s*,?\s+(?=(?:Mo|Tu|We|Th|Fr|Sa|Su|PH)\b)|(?<=\d)\s*,\s*(?=(?:Mo|Tu|We|Th|Fr|Sa|Su|PH)\b)/)){
     rule=rule.trim(); if(!rule || /^(PH|SH)\b(?![-,])/.test(rule)) continue;
     // a month range in front: use the rule only if November is inside it; a single date (e.g. "Dec 24") is a special day, not ours unless in November
     const mm=rule.match(/^([A-Z][a-z]{2})(?:-([A-Z][a-z]{2}))?(\s+\d{1,2})?\s+/);
@@ -1250,12 +1370,15 @@ function ohCheck(src, dn, t, e){
 }
 // a stop's opening hours: saved when it was picked from the search, else the same place in the search data (same name, within 300 m)
 const OH_MEMO=new Map();
+// places in our plan that OpenStreetMap has no hours for, from the Chinese Temples Committee (checked 8 Nov 2026)
+const KNOWN_OH={'lin fa temple':'Mo-Su 07:30-17:00', 'lin fa kung':'Mo-Su 07:30-17:00', 'che kung temple':'Mo-Su 07:00-18:00'};
 function itemOH(it){
   if(!it) return ''; if(it.oh) return it.oh; if(!PL || !it.ll) return '';
   const key=it.id+'|'+(it.map||it.h); if(OH_MEMO.has(key)) return OH_MEMO.get(key);
   const nm=String(it.map||it.h).toLowerCase(), alt=String(it.h).toLowerCase();
   const p=PL.p.find(p=>p[9] && (p[0].toLowerCase()===nm || p[0].toLowerCase()===alt || (p[2] && p[2].toLowerCase()===alt)) && metres(it.ll,[p[3]/1e5,p[4]/1e5])<300);
-  const v=p?p[9]:''; OH_MEMO.set(key,v); return v;
+  const known=Object.keys(KNOWN_OH).find(k=>nm.includes(k)||alt.includes(k));
+  const v=p?p[9]:known?KNOWN_OH[known]:''; OH_MEMO.set(key,v); return v;
 }
 function ohSheetHTML(d){
   const src = d.oh || '';
@@ -1304,19 +1427,21 @@ const feeOf = s => { const m=String(s||'').match(/(\d+(?:\.\d+)?)/); return s===
 // time, travel and cost for a stop picked from search, slotted after the day's previous stop
 function planPick(d){
   const list=dayItems(d.day).filter(i=>i.id!==d.id);
-  const before = d.tTouched && d.t ? list.filter(i=>toMin(i.t)<=toMin(d.t)) : list;
-  const prev = before.length ? before[before.length-1] : (d.day>1 ? {id:'hotel', h:'ที่พัก (Sun Hing Building)', st:'MOK', ll:HOTEL_LL} : null);
+  const slot = !d.tTouched && !d.id && d.ll ? bestSlot(d.day, {h:d.h, ll:d.ll, st:d.st||null, oh:d.oh||'', dur:d.dur||60}) : null;
+  const before = d.tTouched && d.t ? list.filter(i=>toMin(i.t)<=toMin(d.t)) : slot ? list.filter(i=>slot.prev && toMin(i.t)<=toMin(slot.prev.t)) : list;
+  const prev = slot ? (slot.prev || (d.day>1 ? {id:'hotel', h:'ที่พัก (Sun Hing Building)', st:'MOK', ll:HOTEL_LL} : null)) : before.length ? before[before.length-1] : (d.day>1 ? {id:'hotel', h:'ที่พัก (Sun Hing Building)', st:'MOK', ll:HOTEL_LL} : null);
   const tmp={id:'tmp', h:d.h, st:d.st||null, ll:d.ll, t:d.t||'12:00'};
   const {opts}=optionsBetween(d.day, prev, tmp);
   const priced=opts.filter(o=>o.fare!=null && !o.manual);
   const best = priced.find(o=>o.mode==='walk'&&o.mins) || priced.filter(o=>o.mode!=='walk').sort((a,b)=>(a.fare-b.fare)||((a.mins||99)-(b.mins||99)))[0] || null;
   const travel = best&&best.mins ? best.mins : 25;
   if(!d.tTouched){
-    const prevEnd = prev && prev.id!=='hotel' ? toMin(prev.e||prev.t)+(prev.e?0:60) : toMin('09:00');
-    d.t = hhmm(Math.ceil((prevEnd+travel)/5)*5);
+    if(slot) d.t = hm(slot.t);
+    else { const prevEnd = prev && prev.id!=='hotel' ? toMin(prev.e||prev.t)+(prev.e?0:60) : toMin('09:00');
+      d.t = hhmm(Math.ceil((prevEnd+travel)/5)*5) }
   }
-  if(!d.eTouched) d.e = hhmm(toMin(d.t)+(d.dur||60));
-  d.preview = {prev: prev?prev.h:null, best, travel};
+  if(!d.eTouched) d.e = hm(toMin(d.t)+(d.dur||60));
+  d.preview = {prev: prev?prev.h:null, best, travel, slot: slot ? {day: d.day, prevId: slot.prev?slot.prev.id:null, after: slot.prev?slot.prev.h:null, before: slot.next?slot.next.h:null, near: slot.near} : null};
 }
 function pickPlace(i){
   const p=PL.p[i], d=S.sheet; readItemForm();
@@ -3267,11 +3392,11 @@ function drawSheet(){
       ${d.preview.prev?`<div>${ic(d.preview.best?MODES[d.preview.best.mode].i:'pin')}จาก ${esc(d.preview.prev)}: ${d.preview.best?`${esc(d.preview.best.n)} ${d.preview.best.fare?hk(d.preview.best.fare)+'/คน':'ฟรี'} · ~${d.preview.travel} นาที`:'ไม่พบเส้นทางสายตรง เลือกวิธีเดินทางได้ในแผน'}</div>`:''}
       <div>${ic('info')}${d.cat==='food'||d.cat==='cafe'?'นั่งประมาณ':'เที่ยวประมาณ'} ${d.dur||60} นาที · ${d.cat==='food'||d.cat==='cafe'?'ค่าอาหาร/คน':'ค่าเข้า'} ${d.fee==null?'ไม่ทราบ':d.fee?hk(d.fee):'ฟรี'}${d.thinking?' · กำลังถาม Claude…':d.ai?' · ประเมินโดย Claude':''}</div>
       ${d.tip?`<div class="mini">${esc(d.tip)}</div>`:''}
-      <div class="mini">แอปตั้งเวลาให้ต่อจากที่เที่ยวก่อนหน้า ถ้าชนกับรายการถัดไปจะเลื่อนให้อัตโนมัติ</div></div>`:''}
+      <div class="mini">${d.preview.slot&&d.preview.slot.before?`📍 แทรกไว้ระหว่าง ${esc(d.preview.slot.after||'ที่พัก')} กับ ${esc(d.preview.slot.before)} เพราะอยู่ทางผ่าน ไม่ต้องเดินทางย้อนไปมา (ห่างจุดใกล้สุด ~${d.preview.slot.near<1000?d.preview.slot.near+' ม.':(d.preview.slot.near/1000).toFixed(1)+' กม.'})`:'แอปตั้งเวลาให้ต่อจากที่เที่ยวก่อนหน้า'} · ที่ถัดไปจะจัดเวลาให้ต่อกันเอง</div></div>`:''}
     <div class="grid2"><div><label class="fl" for="i-t">เวลาเริ่ม</label><input class="txt num" id="i-t" type="time" value="${esc(d.t)}"></div>
       <div><label class="fl" for="i-e">ถึงเวลา (ไม่ใส่ก็ได้)</label><input class="txt num" id="i-e" type="time" value="${esc(d.e)}"></div></div>
     <div class="fl">วันที่ (ย้ายวันได้)</div><div class="chips">${DAYS.map(x=>chip('day',x.n,`${x.dow} ${x.d} พ.ย.`)).join('')}</div>
-    <div id="i-oh">${ohSheetHTML(d)}</div>
+    <div id="i-oh">${ohSheetHTML(d)}</div><div id="i-arr">${arrangeText(sheetArrange(d))}</div>
     <div class="grid2"><div><div class="fl">สถานี MTR ที่ใกล้ที่สุด</div>${NET?stBtn(d.st,'item',''):''}</div>
       <div><label class="fl" for="i-ex">Exit (เว้นว่าง = เลือกให้อัตโนมัติ)</label><input class="txt" id="i-ex" maxlength="6" value="${esc(d.ex)}" placeholder="เช่น B2" autocapitalize="characters"></div></div>
     <label class="fl" for="i-p">โน้ต</label><input class="txt" id="i-p" maxlength="200" value="${esc(d.p)}" placeholder="เช่น ออก Exit E2">
@@ -3426,26 +3551,34 @@ async function saveItem(){
   if(!d.p.trim()) delete it.p;
   // edited by hand: later data updates leave this item's notes and place alone
   if(old && (d.h.trim()!==old.it.h || d.p.trim()!==plain || d.map.trim()!==(old.it.map||'') || (d.st||null)!==(old.it.st||null) || d.preview)) it.custom=true;
+  const undo=[[d.day, S.plan[d.day-1].map(x=>({...x}))]]; if(old && old.dn!==d.day) undo.push([old.dn, S.plan[old.dn-1].map(x=>({...x}))]);
+  const before=dayItems(d.day), beforeOld=old && old.dn!==d.day ? dayItems(old.dn) : null;
+  const timeChanged = !old || old.dn!==d.day || old.it.t!==it.t || (old.it.e||'')!==(it.e||'');
   if(old && old.dn!==d.day) S.plan[old.dn-1]=S.plan[old.dn-1].filter(x=>x.id!==it.id);
   const arr=S.plan[d.day-1], k=arr.findIndex(x=>x.id===it.id);
   if(k>=0) arr[k]=it; else arr.push(it);
-  // push later stops of that day back if this one now runs into them
-  let shifted=0, delta=0;
-  const later=dayItems(d.day).filter(x=>x.id!==it.id && toMin(x.t)>=toMin(it.t) && !S.done[x.id]);
-  const end=toMin(it.e||it.t)+(it.e?0:30);
-  if(later.length && end>toMin(later[0].t)){
-    delta=end-toMin(later[0].t);
-    for(const x of later){ x.t=hhmm(toMin(x.t)+delta); if(x.e) x.e=hhmm(toMin(x.e)+delta); shifted++ }
+  // the stops after it follow on (and on the day it left, the stops after the gap close up)
+  let shifted=0;
+  if(timeChanged){
+    const sl=slotOf(d);
+    if(sl){ const r=arrangeAfter(d.day, withAt(before, it, sl.prevId), before, sl.prevId||it.id, null); shifted+=applyArrange(r) - r.ch.filter(c=>c.it===it).length }
+    else shifted+=applyArrange(arrangeAfter(d.day, dayItems(d.day), before, it.id, it.id));
+    if(beforeOld){ const k=beforeOld.findIndex(x=>x.id===it.id), p=k>0?beforeOld[k-1].id:null; const NL=dayItems(old.dn);
+      if(p) shifted+=applyArrange(arrangeAfter(old.dn, NL, beforeOld, p, null)) }
   }
   closeSheet(); S.day=Number(d.day); renderAll();
   try{ await savePlanDay(d.day); if(old && old.dn!==d.day) await savePlanDay(old.dn);
-    toast((old?(old.dn!==d.day?'ย้ายวันแล้ว':'แก้ไขแล้ว'):'เพิ่มลงแผนแล้ว')+(shifted?` · เลื่อน ${shifted} รายการถัดไป +${delta} นาที`:'')) }catch(e){}
+    const msg=(old?(old.dn!==d.day?'ย้ายวันแล้ว':'แก้ไขแล้ว'):'เพิ่มลงแผนแล้ว')+(shifted?` · จัดเวลาให้ ${shifted} ที่ถัดไปแล้ว`:'');
+    if(shifted){ UNDO=undo; toastUndo(msg, true) } else toast(msg) }catch(e){}
 }
 async function deleteItem(){
   const d=S.sheet; if(!d.sure){ d.sure=true; readItemForm(); drawSheet(); return }
   const f=findItem(d.id); if(!f) return closeSheet();
-  S.plan[f.dn-1]=S.plan[f.dn-1].filter(x=>x.id!==d.id); closeSheet(); renderAll();
-  try{ await savePlanDay(f.dn); toast('ลบออกจากแผนแล้ว') }catch(e){}
+  const undo=[[f.dn, S.plan[f.dn-1].map(x=>({...x}))]], before=dayItems(f.dn), k=before.findIndex(x=>x.id===d.id), p=k>0?before[k-1].id:null;
+  S.plan[f.dn-1]=S.plan[f.dn-1].filter(x=>x.id!==d.id);
+  const shifted = p ? applyArrange(arrangeAfter(f.dn, dayItems(f.dn), before, p, null)) : 0;
+  closeSheet(); renderAll();
+  try{ await savePlanDay(f.dn); if(shifted){ UNDO=undo; toastUndo('ลบออกจากแผนแล้ว · จัดเวลาให้ '+shifted+' ที่ถัดไปแล้ว', true) } else toast('ลบออกจากแผนแล้ว') }catch(e){}
 }
 async function deleteExpense(id){
   S.openEx=null;
@@ -3506,6 +3639,7 @@ function mapGo(v){ const [d,id]=v.split(':'); S.day=Number(d); setTab('plan');
     el.scrollIntoView({block:'center',behavior:'smooth'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),1800) }) }
 document.addEventListener('keydown', e=>{ const mg=e.target.closest&&e.target.closest('[data-mapgo]'); if(mg&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); mapGo(mg.dataset.mapgo) } });
 document.addEventListener('click', e=>{
+  if(e.target.closest && e.target.closest('[data-undo]')){ undoArrange(); return }
   const mg=e.target.closest('[data-mapgo]'); if(mg) return mapGo(mg.dataset.mapgo);
   const t=e.target.closest('button'); if(!t) return;
   const ds=t.dataset;
@@ -3650,7 +3784,7 @@ document.addEventListener('input', e=>{
     if(e.target.id==='i-h'){ d.h=e.target.value; d.sugQ=e.target.value; clearTimeout(sugT); sugT=setTimeout(()=>{ const el=document.getElementById('i-sug'); if(el) el.innerHTML=sugHTML(d.sugQ) },150) }
     if(e.target.id==='i-t'){ d.tTouched=true; d.t=e.target.value; if(!d.eTouched&&d.dur){ d.e=hhmm(toMin(d.t)+d.dur); const ee=document.getElementById('i-e'); if(ee) ee.value=d.e } }
     if(e.target.id==='i-e'){ d.eTouched=true; d.e=e.target.value }
-    if(e.target.id==='i-t'||e.target.id==='i-e'){ const o=document.getElementById('i-oh'); if(o) o.innerHTML=ohSheetHTML(d) }
+    if(e.target.id==='i-t'||e.target.id==='i-e'){ const o=document.getElementById('i-oh'); if(o) o.innerHTML=ohSheetHTML(d); const a=document.getElementById('i-arr'); if(a) a.innerHTML=arrangeText(sheetArrange(d)) }
     return;
   }
   if(d.kind!=='exp') return;
