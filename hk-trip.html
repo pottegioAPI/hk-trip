@@ -1202,7 +1202,10 @@ function arrange(dn, list, from, keep, was){
     let t=up5(Math.max(end+gap, notBefore(it,dur)));
     const iv=ohFor(itemOH(it), ohDow(dn));
     if(iv && iv.length && !iv.some(([a,b])=>t>=a&&t<b)){ const nx=iv.find(([a])=>a>t); if(nx) t=nx[0] }
-    const c={it, t, e:o.e!=null ? t+dur : null};
+    let e=o.e!=null ? t+dur : null;
+    if(e!=null && /sunset|พระอาทิตย์ตก/i.test(it.h) && e>18*60+30) e=Math.max(t+60, 18*60+30);   // reached late: the sunset is at ~17:40, no need to stay on
+    if(e!=null && iv){ const inn=iv.find(([a,b])=>t>=a&&t<b); if(inn && e>inn[1] && inn[1]-t>=30) e=inn[1] }   // leave by closing time
+    const c={it, t, e};
     if(t!==o.t) ch.push(c);
     if(t>=24*60 && !/^4/.test(it.id)) warn.push(it.h+' ดึกเกินเที่ยงคืน');
     prev=it; end=c.e??t+30; prevCh=c;
@@ -1265,18 +1268,41 @@ const slotOf = d => !d.id && !d.tTouched && d.preview && d.preview.slot && d.pre
 function withAt(list, it, prevId){ const L=list.filter(i=>i.id!==it.id), k=prevId ? L.findIndex(i=>i.id===prevId) : -1; L.splice(k+1, 0, it); return L }
 // the whole day from its first own stop (after any flights): offered as a button when it would close gaps or fix overlaps;
 // not once the day has started (then the live re-timing takes over)
+// A stop that would be closed at its time (e.g. a temple at 22:20) is moved to where it's open, choosing the spot
+// with the smallest detour among those that keep everything else open and on time.
+function arrangedTimes(r, list){ const m=new Map(list.map(i=>[i.id,{t:toMin(i.t), e:i.e?toMin(i.e):null}])); for(const c of r.ch) m.set(c.it.id,{t:c.t,e:c.e}); return m }
+function closedAt(it, dn, t){ const iv=ohFor(itemOH(it), ohDow(dn)); return !!iv && !iv.some(([a,b])=>t>=a && t<b) }
 function dayArrange(dn){
-  const L=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)); if(L.some(i=>S.done[i.id])) return null;
-  const a=L.find(i=>!pinnedStop(i)); if(!a) return null;
-  const r=arrangeAfter(dn, L, L, a.id, null);
-  return r.ch.some(c=>Math.abs(c.t-toMin(c.it.t))>=10) ? r : null;
+  const L0=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)); if(L0.some(i=>S.done[i.id])) return null;
+  const a=L0.find(i=>!pinnedStop(i)); if(!a) return null;
+  const D=(x,y)=>{ const p=locOf(x), q=locOf(y); return p&&q ? metres(p,q) : 8000 };
+  let L=L0, r=arrangeAfter(dn, L, L0, a.id, null); const moved=[];
+  for(let pass=0; pass<3; pass++){
+    const T=arrangedTimes(r, L), bad=L.find(i=>!pinnedStop(i) && i!==a && closedAt(i, dn, T.get(i.id).t)); if(!bad) break;
+    const rest=L.filter(i=>i!==bad), ka=rest.indexOf(a); let best=null;
+    for(let k=ka; k<rest.length; k++){
+      const A=rest[k], B=rest[k+1];
+      if(A.flight || A.tz==='TH' || A.id==='1a' || A.id==='3b' || (FIXED_STOP.has(A.id) && A.id!=='3c')) continue;
+      const trial=[...rest.slice(0,k+1), bad, ...rest.slice(k+1)], tr=arrangeAfter(dn, trial, L0, a.id, null), TT=arrangedTimes(tr, trial);
+      if(closedAt(bad, dn, TT.get(bad.id).t)) continue;
+      const shut=trial.filter(i=>!pinnedStop(i) && i!==bad && closedAt(i, dn, TT.get(i.id).t)).length;
+      const score = D(A,bad) + (B ? D(bad,B) - D(A,B) : 0) + tr.warn.length*5000 + shut*5000;
+      if(!best || score<best.score) best={score, list:trial, r:tr, after:A};
+    }
+    if(!best) break;
+    moved.push({it:bad, after:best.after}); L=best.list; r=best.r;
+  }
+  r.moved=moved;
+  return moved.length || r.ch.some(c=>Math.abs(c.t-toMin(c.it.t))>=10) ? r : null;
 }
 function dayArrangeHTML(dn){
   const r=dayArrange(dn); if(!r) return '';
-  const L=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)&&!pinnedStop(i)), last=L[L.length-1], lc=r.ch.find(c=>c.it===last);
-  const shift = lc ? (lc.e??lc.t)-toMin(last.e||last.t) : 0;
-  return `<div class="arrbox"><div><b>✨ จัดเวลาให้ต่อกัน</b><span>ขยับ ${r.ch.length} ที่ ให้แต่ละที่เริ่มเมื่อเดินทางไปถึง ไม่มีช่วงว่างนาน${shift<-9?` · วันนี้จบเร็วขึ้น ~${-shift} นาที`:shift>9?` · วันนี้จบช้าลง ~${shift} นาที`:''}</span>
-    <details><summary>ดูเวลาที่จะเปลี่ยน</summary>${r.ch.map(c=>`<div>${esc(c.it.h.slice(0,32))} <span class="num">${hm(toMin(c.it.t))} → ${hm(c.t)}</span></div>`).join('')}${r.warn.map(w=>`<div class="warn">⚠️ ${esc(w)}</div>`).join('')}</details></div>
+  const L=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)&&!pinnedStop(i)), T=arrangedTimes(r, L);
+  const endOf=f=>Math.max(...L.map(i=>{ const x=f(i); return x.e??x.t }));
+  const shift = L.length ? endOf(i=>T.get(i.id)) - endOf(i=>({t:toMin(i.t), e:i.e?toMin(i.e):null})) : 0;
+  const mv=r.moved||[];
+  return `<div class="arrbox"><div><b>✨ จัดเวลาให้ต่อกัน</b><span>${mv.map(m=>`ย้าย ${esc(m.it.h.slice(0,30))} ไปต่อจาก ${esc(m.after.h.slice(0,30))} เพราะเวลาเดิมที่นี่ปิดแล้ว · `).join('')}ขยับ ${r.ch.length} ที่ ให้แต่ละที่เริ่มเมื่อเดินทางไปถึง ไม่มีช่วงว่างนาน${shift<-9?` · วันนี้จบเร็วขึ้น ~${-shift} นาที`:shift>9?` · วันนี้จบช้าลง ~${shift} นาที`:''}</span>
+    <details${mv.length?' open':''}><summary>ดูเวลาที่จะเปลี่ยน</summary>${r.ch.map(c=>`<div>${mv.some(m=>m.it===c.it)?'📍 ':''}${esc(c.it.h.slice(0,32))} <span class="num">${hm(toMin(c.it.t))} → ${hm(c.t)}</span></div>`).join('')}${r.warn.map(w=>`<div class="warn">⚠️ ${esc(w)}</div>`).join('')}</details></div>
     <button type="button" class="btn-s pay" data-arrday="${dn}">จัดให้เลย</button></div>`;
 }
 async function arrangeDay(dn){
