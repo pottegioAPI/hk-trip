@@ -1124,9 +1124,9 @@ function replan(dn, list){
   if(a<0) return {map, delay:null};
   const stay=it=>it.e?T(it.e)-T(it.t):0;
   const minStay=(it,mins)=>Math.max(Math.round(stay(it)*.65), Math.min(stay(it), (mins||0)+15));
-  const A=L[a]; let end = A.e && !FIXED_STOP.has(A.id) ? Math.max(at+minStay(A), T(A.e)) : at, plannedEnd=T(A.e||A.t), prev=A;
+  const A=L[a], left=S.done[A.id]&&S.done[A.id].left; let end = left ? T(left) : A.e && !FIXED_STOP.has(A.id) ? Math.max(at+minStay(A), T(A.e)) : at, plannedEnd=T(A.e||A.t), prev=A;
   // where we are now: when to move on (cut further below if a flight or the airport is coming)
-  map[A.id]={t:at, e:A.e?end:null, late:at-T(A.t), cut:A.e?stay(A)-(end-at):0, here:A.id!=='3b'};   // Disney's own day is planned in the Disney tab
+  map[A.id]={t:at, e:A.e?end:null, late:at-T(A.t), cut:A.e&&!left?stay(A)-(end-at):0, here:A.id!=='3b' && !left};   // Disney's own day is planned in the Disney tab
   for(let k=a+1;k<L.length;k++){
     const it=L[k]; if(S.done[it.id]) continue;
     const g=Math.max(0, T(it.t)-plannedEnd), gap = end>plannedEnd ? Math.round(g*.75) : g;
@@ -1146,11 +1146,12 @@ function replan(dn, list){
   return {map, delay: r ? r.late : null};
 }
 // what the plan shows for a re-timed stop: the new time, and why it changed
-const moved = r => r && !r.fixed && !r.here && (r.late>=10 || r.cut>=10 || r.tight || r.miss);
+const moved = r => r && !r.fixed && !r.here && (r.pv ? Math.abs(r.late)>=5 : (r.late>=10 || r.cut>=10 || r.tight || r.miss));
 // the stop we're at, reached late: when to leave so the rest still works
 const hereNote = r => r && r.here && r.e!=null && (r.cut>=10 || r.leave) ? (r.leave ? `⚠️ ต้องออกจากที่นี่ภายใน ${hhmm(r.e)} น. ให้ทันจุดถัดไป` : `ถึงช้า ${r.late} นาที ควรออกจากที่นี่ประมาณ ${hhmm(r.e)} น.`) : '';
 function movedNote(r){
   if(!moved(r)) return '';
+  if(r.pv) return `ลองกดดู: ถ้าเป็นวันเที่ยวจริง แอปจะเลื่อนที่นี่เป็น ${hhmm(r.t)} น. ให้เองทันที (${r.late<0?'เร็วขึ้น '+(-r.late):'ช้าลง '+r.late} นาที)`;
   return r.miss ? '⚠️ เวลาไม่พอแล้ว แนะนำข้ามจุดนี้' : r.leave ? `⚠️ ต้องออกภายใน ${hhmm(r.e)} น. ให้ทันจุดถัดไป` : r.cut>=10 ? `อยู่สั้นลง ${r.cut} นาที เพื่อให้ทันแผนที่เหลือ` : `เลื่อนตามเวลาที่ถึงจริง`;
 }
 /* ---------- arranging a day while planning ----------
@@ -1283,16 +1284,16 @@ function closedAt(it, dn, t){ const iv=ohFor(itemOH(it), ohDow(dn)); return !!iv
 const planMin = (dn, hhmmStr) => { const m=toMin(hhmmStr); return m<4*60 ? m+1440 : m };
 const nowPlanMin = dn => { const n=hkNow(); return n.date===DAYS[dn-1].date ? n.min : n.min+1440 };
 // where the day stands on the trip day: the latest stop ticked, and when we leave it (tapped "เที่ยวเสร็จ", or arrival + the planned stay, not before now)
-function liveAnchor(dn, L0){
-  if(tripDay()!==dn) return null;
+function liveAnchor(dn, L0, tryOut){
+  if(tripDay()!==dn && !(tryOut && DAYS[0].date>hkNow().date)) return null;
   const a=[...L0].reverse().find(i=>S.done[i.id]); if(!a) return null;
   const v=S.done[a.id]||{}, now=nowPlanMin(dn), at=v.at ? planMin(dn, v.at) : null;
   const stay = a.e ? toMin(a.e)-toMin(a.t) : 30;
   const end = v.left ? planMin(dn, v.left) : at!=null ? Math.max(at+stay, now) : Math.max(toMin(a.e||a.t), now);
   return {it:a, at, end, left:!!v.left};
 }
-function dayArrange(dn){
-  const L0=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)), live=liveAnchor(dn, L0);
+function dayArrange(dn, tryOut){
+  const L0=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)), live=liveAnchor(dn, L0, tryOut);
   if(!live && L0.some(i=>S.done[i.id])) return null;   // ticks from trying the app out before the trip: leave the plan alone
   const a=live ? live.it : L0.find(i=>!pinnedStop(i)); if(!a) return null;
   const aEnd=live ? live.end : null, after=i=>L0.indexOf(i)>L0.indexOf(a);
@@ -2246,6 +2247,8 @@ const routeIsOpen = (id,cur) => !S.routeShut.has(id) && (S.routeOn.has(id) || cu
 function routeToggle(id){ const open=routeIsOpen(id, nextItem(S.day)); if(open){ S.routeShut.add(id); S.routeOn.delete(id) } else { S.routeShut.delete(id); S.routeOn.add(id) } renderPlan() }
 function renderPlan(){
   const d=DAYS[S.day-1], cur=nextItem(S.day), list=dayItems(S.day), {map:RP, delay:RPd}=replan(S.day, list);
+  if(DAYS[0].date>hkNow().date && list.some(i=>S.done[i.id])){ const pv=dayArrange(S.day, true);   // trying it out before the trip: show what the trip day would do
+    if(pv) for(const c of pv.ch) if(!S.done[c.it.id]) RP[c.it.id]={t:c.t, e:c.e, late:c.t-toMin(c.it.t), cut:0, pv:true} }
   const dayChips = DAYS.map(x=>`<button class="day" type="button" data-day="${x.n}" aria-pressed="${x.n===S.day}"><small>${x.dow}</small><b>${x.d}</b><small>วันที่ ${x.n}</small></button>`).join('');
   const doneCount=list.filter(i=>S.done[i.id]).length;
   const items = list.map((it,k)=>{
