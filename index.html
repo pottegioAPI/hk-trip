@@ -480,14 +480,14 @@ nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding-
 .ct{font-size:14px;line-height:1.35;min-width:0}
 .ct small{display:block;font-size:11.5px;color:var(--mint)}
 .clist .x{width:28px;height:28px}
-.wx4{display:block}
+.wx.wx4{display:block}
 .wxh{display:grid;grid-template-columns:48px 1fr;gap:10px;align-items:center}
 .wxh svg{width:48px;height:48px}
 .wxd{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
 .wxd div{background:var(--surface);border-radius:12px;padding:6px 4px;text-align:center;display:flex;flex-direction:column;gap:1px;min-width:0}
 .wxd div.on{outline:2px solid var(--sky)}
 .wxd small{font-size:11.5px;color:var(--muted)}
-.wxd b{font-family:var(--display);font-weight:500;font-size:15px}
+.wx .wxd b{font-family:var(--display);font-weight:500;font-size:clamp(13px,4vw,15px);white-space:nowrap}
 .wxd span{font-size:11px;line-height:1.25}
 .dsum{padding:12px 14px}
 .wbtn.hbtn2{background:var(--sun-soft);color:var(--sun)}
@@ -999,7 +999,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('9609092411|8 พ.ย. 05:53|1.13');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('840faaac10|8 พ.ย. 09:52|1.14');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -2941,7 +2941,7 @@ function weatherHTML(td){
   const tip = esc(DAYS[(td||1)-1].wx), link='<a href="https://www.hko.gov.hk/en/wxinfo/currwx/fnd.htm" target="_blank" rel="noopener">หอดูดาวฮ่องกง →</a>';
   if(!fc.some(Boolean)) return `<div class="wx" style="margin:0 0 12px">${WX_ICON}<div><b>20–25°C แดดสลับเมฆ</b><p>อากาศปกติช่วงกลาง พ.ย. ${tip}</p>
       <p class="mini">พยากรณ์จริงของวันเที่ยวจะขึ้นเองเมื่อเหลือไม่ถึง 9 วัน (อัปเดตทุกเช้า) · ${link}</p></div></div>`;
-  return `<div class="wx wx4" style="margin:0 0 12px"><div class="wxh">${WX_ICON}<div><b>พยากรณ์อากาศวันเที่ยว</b><p class="mini">หอดูดาวฮ่องกง อัปเดต ${esc(String(WEATHER.updated).slice(0,10))} · ${link}</p></div></div>
+  return `<div class="wx wx4" style="margin:0 0 12px"><div class="wxh">${WX_ICON}<div><b>พยากรณ์อากาศวันเที่ยว</b><p class="mini">อัปเดต ${Number(String(WEATHER.updated).slice(8,10))} พ.ย. · <a href="https://www.hko.gov.hk/en/wxinfo/currwx/fnd.htm" target="_blank" rel="noopener">จากหอดูดาวฮ่องกง →</a></p></div></div>
     <div class="wxd">${DAYS.map((d,i)=>{ const w=fc[i]; return `<div class="${td===d.n?'on':''}"><small>${d.dow} ${d.d}</small>${w?`<b class="num">${w.min}–${w.max}°</b><span>${esc(HKO_ICON[w.icon]||'')}</span><span>${esc(PSR_TH[w.psr]||'')}</span>`:'<span>ยังไม่มี</span>'}</div>` }).join('')}</div>
     <p style="margin:8px 0 0">${tip}</p></div>`;
 }
