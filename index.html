@@ -612,6 +612,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 .dznext.inq .dzn-top>span{color:var(--sky);opacity:1}
 .ohl{font-size:13px;color:var(--muted);margin:8px 2px 0;line-height:1.4}.ohl.warn,.ohc.warn{color:var(--danger);font-weight:600}
 .tundo{margin-left:8px;background:var(--bg);color:var(--ink);border:0;border-radius:99px;padding:3px 10px;font:inherit;font-weight:700;cursor:pointer}
+.arrbox{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;background:var(--sun-soft);border-radius:16px;padding:12px 14px;margin:0 0 12px}.arrbox b{display:block;font-size:15px}.arrbox span{font-size:13px;color:var(--muted)}.arrbox details{margin-top:6px;font-size:13px}.arrbox summary{cursor:pointer;font-weight:600}.arrbox .warn{color:var(--danger)}.arrbox .btn-s{flex:none}
 </style>
 
 <header class="top">
@@ -1000,7 +1001,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('2932a2f7b3|8 พ.ย. 10:30|1.15');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('d32e393d02|8 พ.ย. 10:33|1.16');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1270,6 +1271,27 @@ function sheetArrange(d){
 // a new place put next to the nearest stops (its time not typed by hand): placed right after that stop, whatever the clock says
 const slotOf = d => !d.id && !d.tTouched && d.preview && d.preview.slot && d.preview.slot.day===d.day ? d.preview.slot : null;
 function withAt(list, it, prevId){ const L=list.filter(i=>i.id!==it.id), k=prevId ? L.findIndex(i=>i.id===prevId) : -1; L.splice(k+1, 0, it); return L }
+// the whole day from its first own stop (after any flights): offered as a button when it would close gaps or fix overlaps;
+// not once the day has started (then the live re-timing takes over)
+function dayArrange(dn){
+  const L=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)); if(L.some(i=>S.done[i.id])) return null;
+  const a=L.find(i=>!pinnedStop(i)); if(!a) return null;
+  const r=arrangeAfter(dn, L, L, a.id, null);
+  return r.ch.some(c=>Math.abs(c.t-toMin(c.it.t))>=10) ? r : null;
+}
+function dayArrangeHTML(dn){
+  const r=dayArrange(dn); if(!r) return '';
+  const L=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)&&!pinnedStop(i)), last=L[L.length-1], lc=r.ch.find(c=>c.it===last);
+  const shift = lc ? (lc.e??lc.t)-toMin(last.e||last.t) : 0;
+  return `<div class="arrbox"><div><b>✨ จัดเวลาให้ต่อกัน</b><span>ขยับ ${r.ch.length} ที่ ให้แต่ละที่เริ่มเมื่อเดินทางไปถึง ไม่มีช่วงว่างนาน${shift<-9?` · วันนี้จบเร็วขึ้น ~${-shift} นาที`:shift>9?` · วันนี้จบช้าลง ~${shift} นาที`:''}</span>
+    <details><summary>ดูเวลาที่จะเปลี่ยน</summary>${r.ch.map(c=>`<div>${esc(c.it.h.slice(0,32))} <span class="num">${hm(toMin(c.it.t))} → ${hm(c.t)}</span></div>`).join('')}${r.warn.map(w=>`<div class="warn">⚠️ ${esc(w)}</div>`).join('')}</details></div>
+    <button type="button" class="btn-s pay" data-arrday="${dn}">จัดให้เลย</button></div>`;
+}
+async function arrangeDay(dn){
+  const r=dayArrange(dn); if(!r) return;
+  const undo=[[dn, S.plan[dn-1].map(x=>({...x}))]], n=applyArrange(r); renderAll();
+  try{ await savePlanDay(dn); UNDO=undo; toastUndo('จัดเวลาให้ '+n+' ที่แล้ว', true) }catch(e){}
+}
 function applyArrange(r){ for(const c of r.ch){ c.it.t=hm(c.t); if(c.e!=null) c.it.e=hm(c.e) } return r.ch.length }
 // keep a copy of the days a change touches, for the toast's undo
 let UNDO=null;
@@ -2213,6 +2235,7 @@ function renderPlan(){
       <h2>${esc(d.title)}</h2>
       <div class="pillrow"><span class="pill mint num">ถึงแล้ว ${doneCount}/${list.length}</span>${(()=>{ const n=list.filter(i=>{ const x=exitFor(i); return x&&x.planRef }).length; return n?`<span class="pill sun num">ปรับ Exit ตามข้อมูลจริง ${n} จุด</span>`:'' })()}${RPd!=null&&RPd>=10?`<span class="pill sun num">ช้ากว่าแผน ${RPd} นาที · ปรับเวลาที่เหลือให้แล้ว</span>`:''}<span class="pill sky num">ค่าเดินทางที่จดวันนี้ ${hk(transportToday(d.n))}/คน</span></div>
     </div>
+    ${dayArrangeHTML(S.day)}
     <div class="viewsw" role="group" aria-label="มุมมองแผน">${[[false,'แบบเต็ม'],[true,'ดูภาพรวม']].map(([v,l])=>`<button type="button" data-compact="${v?1:0}" aria-pressed="${S.compact===v}">${l}</button>`).join('')}</div>
     ${list.length?`<ol class="tl${S.compact?' compact':''}">${items}</ol>`:`<div class="empty">${ic('pin',1.6)}<div>วันนี้ยังไม่มีที่เที่ยว</div></div>`}
     <button class="addit" type="button" data-additem="${d.n}">${ic('plus',2.2)}เพิ่มที่เที่ยววันนี้</button>`;
@@ -3648,6 +3671,7 @@ function mapGo(v){ const [d,id]=v.split(':'); S.day=Number(d); setTab('plan');
 document.addEventListener('keydown', e=>{ const mg=e.target.closest&&e.target.closest('[data-mapgo]'); if(mg&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); mapGo(mg.dataset.mapgo) } });
 document.addEventListener('click', e=>{
   if(e.target.closest && e.target.closest('[data-undo]')){ undoArrange(); return }
+  if(e.target.closest && e.target.closest('[data-arrday]')){ arrangeDay(Number(e.target.closest('[data-arrday]').dataset.arrday)); return }
   const mg=e.target.closest('[data-mapgo]'); if(mg) return mapGo(mg.dataset.mapgo);
   const t=e.target.closest('button'); if(!t) return;
   const ds=t.dataset;
