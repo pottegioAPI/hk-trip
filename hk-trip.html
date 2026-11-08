@@ -1338,7 +1338,7 @@ async function arrangeDay(dn, lead){
   try{ await savePlanDay(dn); UNDO=undo; toastUndo((lead?lead+' · ':'')+(n?'จัดเวลาที่เหลือให้ '+n+' ที่':'ปรับแผนแล้ว')+mv, true) }catch(e){}
 }
 // on the trip day the plan follows what really happened: after "ถึงแล้ว" or "เที่ยวเสร็จ" the rest of the day is re-timed at once
-function liveRearrange(dn, msg){ if(tripDay()===dn) return arrangeDay(dn, msg); toast(msg) }
+function liveRearrange(dn, msg){ if(tripDay()===dn) return arrangeDay(dn, msg); toast(msg+(DAYS[0].date>hkNow().date?" (ลองกดดู: วันเที่ยวจริงแอปจะจัดเวลาที่เหลือให้ทันที)":"")) }
 async function leaveStop(id){
   const f=findItem(id), v=S.done[id]; if(!f || !v) return;
   S.done={...S.done,[id]:{...v, left:hhmm(hkNow().min)}}; saveProgress();
@@ -1346,7 +1346,7 @@ async function leaveStop(id){
   await liveRearrange(f.dn, 'เที่ยวเสร็จแล้ว'+(nx?' ไปต่อ '+nx.h.slice(0,24):'')); renderAll();
 }
 // "เที่ยวเสร็จ ไปต่อ": on the stop we're at now (the latest ticked today), until it's tapped
-const canLeave = (it, L) => { const v=S.done[it.id]; if(!v || v.left || v.noTime || FLIGHT_OUT.has(it.id) || INSIDE_STOP.has(it.id) || tripDay()!==S.day) return false;
+const canLeave = (it, L) => { const v=S.done[it.id]; if(!v || v.left || v.noTime || FLIGHT_OUT.has(it.id) || INSIDE_STOP.has(it.id) || (tripDay() && tripDay()!==S.day)) return false;   // before the trip it can be tried out on any day
   const k=L.findIndex(i=>i.id===it.id); return k===lastDoneIdx(L) && L.slice(k+1).some(i=>!S.done[i.id]) };
 function applyArrange(r){ for(const c of r.ch){ c.it.t=hm(c.t); if(c.e!=null) c.it.e=hm(c.e); if(c.dur0 && !c.it.dur0) c.it.dur0=c.dur0 } return r.ch.length }
 // keep a copy of the days a change touches, for the toast's undo
