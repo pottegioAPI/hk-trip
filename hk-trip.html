@@ -606,6 +606,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 .tundo{margin-left:8px;background:var(--bg);color:var(--ink);border:0;border-radius:99px;padding:3px 10px;font:inherit;font-weight:700;cursor:pointer}
 .arrbox{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;background:var(--sun-soft);border-radius:16px;padding:12px 14px;margin:0 0 12px}.arrbox b{display:block;font-size:15px}.arrbox span{font-size:13px;color:var(--muted)}.arrbox details{margin-top:6px;font-size:13px}.arrbox summary{cursor:pointer;font-weight:600}.arrbox .warn{color:var(--danger)}.arrbox .btn-s{flex:none}
 .smartbtn{display:block;width:100%;margin:0 0 12px;padding:11px 14px;border:1.5px dashed var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}.arrive.leave{background:var(--sky-soft);color:var(--ink)}
+.time .edit.top{margin-left:auto;padding:5px 11px;font-size:12.5px;font-family:inherit;min-height:0}
 </style>
 
 <header class="top">
@@ -2260,7 +2261,8 @@ function renderPlan(){
         <div class="time num"><span${r?' style="text-decoration:line-through;opacity:.6"':''}>${esc(tShow(it.t,it))}${it.e?' – '+esc(tShow(it.e,it)):''} น.${tzTag(it)}</span>
           ${done&&arrivedAt(it.id)?`<span class="nowtag" style="background:var(--mint)">${FLIGHT_OUT.has(it.id)?'ขึ้นเครื่อง':'ถึงจริง'} ${tShow(arrivedAt(it.id),it)}</span>`:skippedStop(list,k)?'<span class="nowtag" style="background:var(--line);color:var(--muted)">ข้ามไป</span>':''}
           ${r?`<span class="nowtag" style="background:var(--sun);color:var(--ink)">≈ ${hhmm(r.t)}${r.e!=null?'–'+hhmm(r.e):''}</span>`:''}
-          ${cur===it.id?'<span class="nowtag">ถัดไป</span>':''}</div>
+          ${cur===it.id?'<span class="nowtag">ถัดไป</span>':''}
+          <button class="btn-s edit top" type="button" data-edit="${it.id}" aria-label="แก้ไข ${esc(it.h)}">${ic('pen')}แก้ไข</button></div>
         ${r?`<div class="mini" style="color:${r.miss||r.leave?'var(--danger)':'var(--muted)'}">${movedNote(r)}</div>`:''}
         ${!done?ohCardHTML(it, S.day, r):''}
         ${done&&hereNote(RP[it.id])?`<div class="mini" style="color:${RP[it.id].leave?'var(--danger)':'var(--muted)'}">${hereNote(RP[it.id])}</div>`:''}
@@ -2280,7 +2282,6 @@ function renderPlan(){
           ${it.cost?(allExp().some(e=>e.planId===it.id)?`<span class="btn-s paid">${ic('check')}จด ${hk(it.cost.amt)} แล้ว</span>`:`<button class="btn-s pay" type="button" data-cost="${it.id}">${ic('plus')}จด ${esc(it.cost.note)} ${hk(it.cost.amt)}</button>`):''}
           ${/disney/i.test((it.map||'')+it.h)&&it.id!=='3b'?`<button class="btn-s pay" type="button" data-tab="dz">${ic('ticket')}แผนเครื่องเล่น</button>`:''}
           ${locOf(it)&&WATER?`<button class="btn-s" type="button" data-wnear="${it.id}" aria-expanded="${S.wOpen.has(it.id)}">${ic('drop')}น้ำดื่มใกล้ที่นี่</button>`:''}
-          <button class="btn-s edit" type="button" data-edit="${it.id}" aria-label="แก้ไข ${esc(it.h)}">${ic('pen')}แก้ไข</button>
         </div>
         ${S.wOpen.has(it.id)&&WATER?`<div class="route water">${waterRows(nearWater(locOf(it),3), it.id)}</div>`:''}
       </div></li>`;
