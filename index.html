@@ -615,6 +615,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 .arrbox{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;background:var(--sun-soft);border-radius:16px;padding:12px 14px;margin:0 0 12px}.arrbox b{display:block;font-size:15px}.arrbox span{font-size:13px;color:var(--muted)}.arrbox details{margin-top:6px;font-size:13px}.arrbox summary{cursor:pointer;font-weight:600}.arrbox .warn{color:var(--danger)}.arrbox .btn-s{flex:none}
 .smartbtn{display:block;width:100%;margin:0 0 12px;padding:11px 14px;border:1.5px dashed var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}.arrive.leave{background:var(--sky-soft);color:var(--ink)}
 .time .edit.top{margin-left:auto;padding:5px 11px;font-size:12.5px;font-family:inherit;min-height:0}
+.chips.stay{align-items:center}.stayn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}.stayn input{width:86px;padding:7px 10px;margin:0}
 </style>
 
 <header class="top">
@@ -1003,7 +1004,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('0df74dbc0d|8 พ.ย. 11:08|1.20');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('505789c767|8 พ.ย. 11:16|1.21');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1195,7 +1196,7 @@ function arrange(dn, list, from, keep, was, anchorEnd){
   let prev=from>=0 ? list[from] : null, end=prev ? (anchorEnd!=null ? anchorEnd : toMin(prev.e||prev.t)+(prev.e?0:30)) : null, prevCh=null;
   for(let k=from+1;k<list.length;k++){
     const it=list[k], o=orig.get(it.id), dur=o.e!=null ? o.e-o.t : 60;
-    if(prev==null || S.done[it.id] || keep.has(it.id)){ if(prev && end+travelMins(dn,prev,it)>o.t && !S.done[it.id]) warn.push(prev.h+' ยังไม่จบตอน '+it.h+' เริ่ม ('+hm(o.t)+')');
+    if(prev==null || S.done[it.id] || keep.has(it.id)){ if(prev && end>o.t && !S.done[it.id]) warn.push(prev.h+' ยังไม่จบตอน '+it.h+' เริ่ม ('+hm(o.t)+')');
       prev=it; end=o.e!=null?o.e:o.t+30; prevCh=null; continue }
     const ride=travelMins(dn, prev, it);
     if(pinnedStop(it)){
@@ -1474,6 +1475,14 @@ function itemOH(it){
   const p=PL.p.find(p=>p[9] && (p[0].toLowerCase()===nm || p[0].toLowerCase()===alt || (p[2] && p[2].toLowerCase()===alt)) && metres(it.ll,[p[3]/1e5,p[4]/1e5])<300);
   const known=Object.keys(KNOWN_OH).find(k=>nm.includes(k)||alt.includes(k));
   const v=p?p[9]:known?KNOWN_OH[known]:''; OH_MEMO.set(key,v); return v;
+}
+// how long to spend here: tap a length (or type minutes) and the end time follows; the stops after it are arranged on saving
+function staySheetHTML(d){
+  const cur = d.t && d.e ? ((toMin(d.e)-toMin(d.t))+1440)%1440 : null, L=[15,30,45,60,90,120,180];
+  const lab = m => m<60 ? m+' นาที' : m%30===0 ? (m/60)+' ชม.' : Math.floor(m/60)+' ชม. '+(m%60)+' นาที';
+  return `<div class="fl">ใช้เวลาที่นี่${cur?` <small style="font-weight:400">ตอนนี้ ${lab(cur)}</small>`:''}</div>
+    <div class="chips stay">${L.map(m=>`<button class="chip" type="button" data-stay="${m}" aria-pressed="${cur===m}">${lab(m)}</button>`).join('')}
+      <label class="stayn"><input id="i-stay-n" class="txt num" type="number" inputmode="numeric" min="5" max="720" step="5" placeholder="อื่นๆ" value="${cur&&!L.includes(cur)?cur:''}" aria-label="ใช้เวลากี่นาที"> นาที</label></div>`;
 }
 function ohSheetHTML(d){
   const src = d.oh || '';
@@ -3492,6 +3501,7 @@ function drawSheet(){
       <div class="mini">${d.preview.slot&&d.preview.slot.before?`📍 แทรกไว้ระหว่าง ${esc(d.preview.slot.after||'ที่พัก')} กับ ${esc(d.preview.slot.before)} เพราะอยู่ทางผ่าน ไม่ต้องเดินทางย้อนไปมา (ห่างจุดใกล้สุด ~${d.preview.slot.near<1000?d.preview.slot.near+' ม.':(d.preview.slot.near/1000).toFixed(1)+' กม.'})`:'แอปตั้งเวลาให้ต่อจากที่เที่ยวก่อนหน้า'} · ที่ถัดไปจะจัดเวลาให้ต่อกันเอง</div></div>`:''}
     <div class="grid2"><div><label class="fl" for="i-t">เวลาเริ่ม</label><input class="txt num" id="i-t" type="time" value="${esc(d.t)}"></div>
       <div><label class="fl" for="i-e">ถึงเวลา (ไม่ใส่ก็ได้)</label><input class="txt num" id="i-e" type="time" value="${esc(d.e)}"></div></div>
+    <div id="i-stay">${staySheetHTML(d)}</div>
     <div class="fl">วันที่ (ย้ายวันได้)</div><div class="chips">${DAYS.map(x=>chip('day',x.n,`${x.dow} ${x.d} พ.ย.`)).join('')}</div>
     <div id="i-oh">${ohSheetHTML(d)}</div><div id="i-arr">${arrangeText(sheetArrange(d))}</div>
     <div class="grid2"><div><div class="fl">สถานี MTR ที่ใกล้ที่สุด</div>${NET?stBtn(d.st,'item',''):''}</div>
@@ -3630,6 +3640,7 @@ async function saveItem(){
   const it = old ? {...old.it} : {id:uid()};
   Object.assign(it,{t:d.t, h:d.h.trim().slice(0,60), st:d.st||null});
   if(d.e) it.e=d.e; else delete it.e;
+  if(old && (old.it.e||'')!==(it.e||'')) delete it.dur0;   // a new length of stay chosen: that is the plan from now on
   if(d.preview){ // picked from place search: keep coordinates, cheapest way there, entry fee and Claude's tip
     it.ll=d.ll;
     if(d.preview.best) it.go={mode:d.preview.best.key};
@@ -3844,6 +3855,8 @@ document.addEventListener('click', e=>{
   if(ds.stpick) return openStPick(ds.stpick);
   if(ds.stline && S.sheet){ S.sheet.line=ds.stline; drawSheet(); return }
   if(ds.stset!=null && S.sheet && S.sheet.kind==='stpick') return applyStPick(ds.stset);
+  if(ds.stay && S.sheet && S.sheet.kind==='item'){ const d=S.sheet; readItemForm(); if(!d.t) return toast('ใส่เวลาเริ่มก่อน');
+    const m=Number(ds.stay); d.stay=m; d.eTouched=true; d.e=hm(toMin(d.t)+m); drawSheet(); return }
   if(ds.f && S.sheet){
     if(S.sheet.kind==='exp'){ S.sheet.amt=document.getElementById('f-amt').value; S.sheet.note=document.getElementById('f-note').value } else readItemForm();
     S.sheet[ds.f] = ['day','payer'].includes(ds.f) ? Number(ds.v) : ds.v;
@@ -3881,9 +3894,13 @@ document.addEventListener('input', e=>{
   if(d.kind==='navpick' && e.target.id==='n-q'){ d.q=e.target.value; clearTimeout(sugT); sugT=setTimeout(()=>{ const el=document.getElementById('n-sug'); if(el) el.innerHTML=navSugHTML(searchPlaces(d.q,(S.nav.from||planSpot()).ll)) },150); return }
   if(d.kind==='item'){
     if(e.target.id==='i-h'){ d.h=e.target.value; d.sugQ=e.target.value; clearTimeout(sugT); sugT=setTimeout(()=>{ const el=document.getElementById('i-sug'); if(el) el.innerHTML=sugHTML(d.sugQ) },150) }
-    if(e.target.id==='i-t'){ d.tTouched=true; d.t=e.target.value; if(!d.eTouched&&d.dur){ d.e=hhmm(toMin(d.t)+d.dur); const ee=document.getElementById('i-e'); if(ee) ee.value=d.e } }
-    if(e.target.id==='i-e'){ d.eTouched=true; d.e=e.target.value }
-    if(e.target.id==='i-t'||e.target.id==='i-e'){ const o=document.getElementById('i-oh'); if(o) o.innerHTML=ohSheetHTML(d); const a=document.getElementById('i-arr'); if(a) a.innerHTML=arrangeText(sheetArrange(d)) }
+    if(e.target.id==='i-t'){ d.tTouched=true; d.t=e.target.value; const keep=d.stay || (!d.eTouched && d.dur);   // the time spent here stays the same when the start moves
+      if(keep && d.t){ d.e=hm(toMin(d.t)+keep); const ee=document.getElementById('i-e'); if(ee) ee.value=d.e } }
+    if(e.target.id==='i-e'){ d.eTouched=true; d.e=e.target.value; d.stay=null }
+    if(e.target.id==='i-stay-n'){ const m=Math.round(Number(e.target.value)); if(m>=5 && m<=720 && d.t){ d.stay=m; d.eTouched=true; d.e=hm(toMin(d.t)+m); const ee=document.getElementById('i-e'); if(ee) ee.value=d.e;
+      document.querySelectorAll('[data-stay]').forEach(b=>b.setAttribute('aria-pressed', String(Number(b.dataset.stay)===m))) } }
+    if(e.target.id==='i-t'||e.target.id==='i-e'){ const st=document.getElementById('i-stay'); if(st) st.innerHTML=staySheetHTML(d) }
+    if(e.target.id==='i-t'||e.target.id==='i-e'||e.target.id==='i-stay-n'){ const o=document.getElementById('i-oh'); if(o) o.innerHTML=ohSheetHTML(d); const a=document.getElementById('i-arr'); if(a) a.innerHTML=arrangeText(sheetArrange(d)) }
     return;
   }
   if(d.kind!=='exp') return;
