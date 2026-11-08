@@ -625,6 +625,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 .leavebar{position:fixed;z-index:7;left:max(12px,calc(env(safe-area-inset-left,0px) + 12px));right:72px;bottom:calc(86px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:6px 6px 6px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .leavebar span{flex:1;min-width:0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .leavebar .leavebig{flex:none;font-size:14px;padding:10px 12px;box-shadow:none;animation:none}
+.gapli{list-style:none;margin:0 0 14px 56px;padding:10px 12px;border:1.5px dashed var(--line);border-radius:16px;background:var(--surface);display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13.5px}.gapli>div{flex:1 1 180px}.gapli small{color:var(--muted)}
 </style>
 
 <header class="top">
@@ -1013,7 +1014,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('5decb23b1d|8 พ.ย. 11:48|1.24');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('cd0e93ab5f|8 พ.ย. 12:06|1.25');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1504,6 +1505,27 @@ async function swapStop(id, dir){
   const r=arrange(dn, NL, a>0 ? a-1 : a, new Set(), L); applyArrange(r);
   closeSheet(); renderAll();
   try{ await savePlanDay(dn); UNDO=undo; toastUndo('สลับแล้ว: '+second.h.slice(0,20)+' ไปก่อน '+first.h.slice(0,20)+' · จัดเวลาให้ต่อกันแล้ว', true) }catch(e){}
+}
+// a long idle time before a stop that can't come earlier (sunset, a meal time, opening time, a fixed time): say why, and offer to fill it
+function shownTimes(it, dn, RP){ const r=RP[it.id], v=S.done[it.id];
+  const t = r ? r.t : toMin(it.t), e = v&&v.left ? planMin(dn, v.left) : r ? (r.e??t+30) : (it.e?toMin(it.e):t+30); return {t, e} }
+function holdWhy(it, dn, t){
+  const dur=it.e ? toMin(it.e)-toMin(it.t) : 60;
+  if(pinnedStop(it)) return 'เวลานี้ขยับไม่ได้';
+  if(/sunset|พระอาทิตย์ตก/i.test(it.h) && t<=notBefore(it,dur)) return 'รอดูพระอาทิตย์ตก (~17:40)';
+  if(/มื้อเที่ยง|ข้าวเที่ยง|lunch/i.test(it.h) && t<=11*60) return 'มื้อเที่ยงเริ่ม 11:00';
+  if(/มื้อค่ำ|มื้อเย็น|dinner/i.test(it.h) && t<=17*60+30) return 'มื้อค่ำเริ่ม 17:30';
+  const iv=ohFor(itemOH(it), ohDow(dn)); if(iv && iv.some(([a])=>a===t)) return 'รอเปิด '+hhmm(t);
+  return '';
+}
+function gapHTML(dn, list, k, RP){
+  if(k===0 || S.compact) return ''; const it=list[k], prev=list[k-1];
+  if(S.done[it.id] || INSIDE_STOP.has(it.id) || INSIDE_STOP.has(prev.id) || prev.id==='3b' || prev.id==='1a' || it.tz==='TH' || prev.tz==='TH' || prev.flight || it.flight) return '';   // not after landing (immigration, bags) or inside Disney's day
+  const a=shownTimes(prev, dn, RP), b=shownTimes(it, dn, RP), free=b.t-a.e-travelMins(dn, prev, it);
+  if(free<45) return '';
+  const why=holdWhy(it, dn, b.t), h=Math.floor(free/60), m=free%60, len=(h?h+' ชม. ':'')+(m?m+' นาที':'');
+  return '<li class="gapli"><div>⏳ ว่าง ~'+len+' ก่อน '+esc(it.h.slice(0,26))+(why?' <small>('+why+')</small>':'')+'</div>'
+    +'<button type="button" class="btn-s pay" data-gapadd="'+dn+'|'+hm(a.e+10)+'">'+ic('plus')+'เพิ่มที่เที่ยวช่วงนี้</button></li>';
 }
 function staySheetHTML(d){
   const cur = d.t && d.e ? ((toMin(d.e)-toMin(d.t))+1440)%1440 : null, L=[15,30,45,60,90,120,180];
@@ -2302,7 +2324,7 @@ function renderPlan(){
       ${!done && sel.manual ? `<div class="fin">${sel.key==='bus:c'?`<input type="text" id="no-${it.id}" placeholder="เลขสาย" value="${esc(it.go&&it.go.no||'')}" style="width:80px">`:''}
          <label for="fare-${it.id}">${sel.shared?'ค่ารถรวม':'ค่ารถ/คน'} HK$</label><input type="number" inputmode="decimal" min="0" step="0.1" id="fare-${it.id}" data-fare="${it.id}" data-key="${sel.key}" value="${sel.fare??''}"></div>`:''}
     </div>` : '';
-    return `<li class="it${done?' done':''}${canLeave(it,list)?' here':''}${cur===it.id?' now':''}${skippedStop(list,k)?' skip':''}" id="it-${it.id}">
+    return gapHTML(S.day, list, k, RP) + `<li class="it${done?' done':''}${canLeave(it,list)?' here':''}${cur===it.id?' now':''}${skippedStop(list,k)?' skip':''}" id="it-${it.id}">
       <button class="tick" type="button" data-arrive="${it.id}" aria-label="${arriveWord(it,done)}: ${esc(it.h)}">${ic('check')}</button>
       <div class="card">
         <div class="time num"><span${r?' style="text-decoration:line-through;opacity:.6"':''}>${esc(tShow(it.t,it))}${it.e?' – '+esc(tShow(it.e,it)):''} น.${tzTag(it)}</span>
@@ -3889,6 +3911,7 @@ document.addEventListener('click', e=>{
   if(ds.stpick) return openStPick(ds.stpick);
   if(ds.stline && S.sheet){ S.sheet.line=ds.stline; drawSheet(); return }
   if(ds.stset!=null && S.sheet && S.sheet.kind==='stpick') return applyStPick(ds.stset);
+  if(ds.gapadd){ const [dn,t]=ds.gapadd.split('|'); openItem(Number(dn), null); Object.assign(S.sheet,{t, tTouched:true}); drawSheet(); return }
   if(ds.swap && S.sheet && S.sheet.kind==='item' && S.sheet.id) return swapStop(S.sheet.id, Number(ds.swap));
   if(ds.stay && S.sheet && S.sheet.kind==='item'){ const d=S.sheet; readItemForm(); if(!d.t) return toast('ใส่เวลาเริ่มก่อน');
     const m=Number(ds.stay); d.stay=m; d.eTouched=true; d.e=hm(toMin(d.t)+m); drawSheet(); return }
