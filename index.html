@@ -616,6 +616,15 @@ input[type=time].txt{appearance:none;min-height:46px}
 .smartbtn{display:block;width:100%;margin:0 0 12px;padding:11px 14px;border:1.5px dashed var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}.arrive.leave{background:var(--sky-soft);color:var(--ink)}
 .time .edit.top{margin-left:auto;padding:5px 11px;font-size:12.5px;font-family:inherit;min-height:0}
 .chips.stay{align-items:center}.stayn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}.stayn input{width:86px;padding:7px 10px;margin:0}
+.leaverow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 4px}.it.done.here .card{opacity:1}
+.leavebig{flex:1 1 100%;border:none;border-radius:16px;background:var(--pink);color:var(--pink-ink);font:inherit;font-weight:800;font-size:17px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 6px 16px rgba(255,79,139,.3);cursor:pointer;animation:leavepop .35s ease-out}
+.leavebig small{font-weight:500;font-size:12px;opacity:.92}
+.leaveundo{flex:none;margin-left:auto}
+@keyframes leavepop{from{transform:scale(.92);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.leavebig{animation:none}}
+.leavebar{position:fixed;z-index:7;left:max(12px,calc(env(safe-area-inset-left,0px) + 12px));right:72px;bottom:calc(86px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:6px 6px 6px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.leavebar span{flex:1;min-width:0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.leavebar .leavebig{flex:none;font-size:14px;padding:10px 12px;box-shadow:none;animation:none}
 </style>
 
 <header class="top">
@@ -1004,7 +1013,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('d7a565604e|8 พ.ย. 11:40|1.23');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('5decb23b1d|8 พ.ย. 11:48|1.24');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1295,7 +1304,7 @@ const nowPlanMin = dn => { const n=hkNow(); return n.date===DAYS[dn-1].date ? n.
 function liveAnchor(dn, L0, tryOut){
   if(tripDay()!==dn && !(tryOut && DAYS[0].date>hkNow().date)) return null;
   const a=[...L0].reverse().find(i=>S.done[i.id]); if(!a) return null;
-  const v=S.done[a.id]||{}, now=nowPlanMin(dn), at=v.at ? planMin(dn, v.at) : null;
+  const v=S.done[a.id]||{}, now=tripDay()===dn ? nowPlanMin(dn) : hkNow().min, at=v.at ? planMin(dn, v.at) : null;   // trying it out before the trip: today's clock as that day's
   const stay = a.e ? toMin(a.e)-toMin(a.t) : 30;
   const end = v.left ? planMin(dn, v.left) : at!=null ? Math.max(at+stay, now) : Math.max(toMin(a.e||a.t), now);
   return {it:a, at, end, left:!!v.left};
@@ -2293,7 +2302,7 @@ function renderPlan(){
       ${!done && sel.manual ? `<div class="fin">${sel.key==='bus:c'?`<input type="text" id="no-${it.id}" placeholder="เลขสาย" value="${esc(it.go&&it.go.no||'')}" style="width:80px">`:''}
          <label for="fare-${it.id}">${sel.shared?'ค่ารถรวม':'ค่ารถ/คน'} HK$</label><input type="number" inputmode="decimal" min="0" step="0.1" id="fare-${it.id}" data-fare="${it.id}" data-key="${sel.key}" value="${sel.fare??''}"></div>`:''}
     </div>` : '';
-    return `<li class="it${done?' done':''}${cur===it.id?' now':''}${skippedStop(list,k)?' skip':''}" id="it-${it.id}">
+    return `<li class="it${done?' done':''}${canLeave(it,list)?' here':''}${cur===it.id?' now':''}${skippedStop(list,k)?' skip':''}" id="it-${it.id}">
       <button class="tick" type="button" data-arrive="${it.id}" aria-label="${arriveWord(it,done)}: ${esc(it.h)}">${ic('check')}</button>
       <div class="card">
         <div class="time num"><span${r?' style="text-decoration:line-through;opacity:.6"':''}>${esc(tShow(it.t,it))}${it.e?' – '+esc(tShow(it.e,it)):''} น.${tzTag(it)}</span>
@@ -2313,9 +2322,11 @@ function renderPlan(){
         ${it.tip?`<div class="tip">${esc(it.tip)}</div>`:''}
         ${eatHTML(it)}
         ${gh}
+        ${canLeave(it,list)?`<div class="leaverow"><button class="leavebig" type="button" data-leave="${it.id}">🚶 เที่ยวเสร็จ ไปต่อ<small>แตะตอนออกจากที่นี่ แอปจะจัดเวลาที่เหลือให้ทันที</small></button>
+          <button class="arrive undo leaveundo" type="button" data-arrive="${it.id}">${ic('check',2.4)}ยกเลิกถึงแล้ว</button></div>`:''}
         <div class="acts">
-          <button class="arrive${done?' undo':''}" type="button" data-arrive="${it.id}">${ic('check',2.4)}${arriveWord(it,done)}</button>
-          ${canLeave(it,list)?`<button class="arrive leave" type="button" data-leave="${it.id}">🚶 เที่ยวเสร็จ ไปต่อ</button>`:done&&S.done[it.id].left?`<span class="btn-s paid">ออกมาแล้ว ${esc(S.done[it.id].left)} น.</span>`:''}
+          ${canLeave(it,list)?'':`<button class="arrive${done?' undo':''}" type="button" data-arrive="${it.id}">${ic('check',2.4)}${arriveWord(it,done)}</button>`}
+          ${done&&S.done[it.id].left?`<span class="btn-s paid">ออกมาแล้ว ${esc(S.done[it.id].left)} น.</span>`:''}
           ${it.map||it.h?`<a class="btn-s" href="${mapUrl((eatOf(it)||{}).q||it.map||it.h)}" target="_blank" rel="noopener">${ic('pin')}แผนที่</a>`:''}
           ${it.cost?(allExp().some(e=>e.planId===it.id)?`<span class="btn-s paid">${ic('check')}จด ${hk(it.cost.amt)} แล้ว</span>`:`<button class="btn-s pay" type="button" data-cost="${it.id}">${ic('plus')}จด ${esc(it.cost.note)} ${hk(it.cost.amt)}</button>`):''}
           ${/disney/i.test((it.map||'')+it.h)&&it.id!=='3b'?`<button class="btn-s pay" type="button" data-tab="dz">${ic('ticket')}แผนเครื่องเล่น</button>`:''}
@@ -2332,6 +2343,7 @@ function renderPlan(){
       <div class="pillrow"><span class="pill mint num">ถึงแล้ว ${doneCount}/${list.length}</span>${(()=>{ const n=list.filter(i=>{ const x=exitFor(i); return x&&x.planRef }).length; return n?`<span class="pill sun num">ปรับ Exit ตามข้อมูลจริง ${n} จุด</span>`:'' })()}${RPd!=null&&RPd>=10?`<span class="pill sun num">ช้ากว่าแผน ${RPd} นาที · ปรับเวลาที่เหลือให้แล้ว</span>`:''}<span class="pill sky num">ค่าเดินทางที่จดวันนี้ ${hk(transportToday(d.n))}/คน</span></div>
     </div>
     ${dayArrangeHTML(S.day)}
+    ${(()=>{ const h=list.find(i=>canLeave(i,list)); return h?`<div class="leavebar"><span>อยู่ที่ <b>${esc(h.h.slice(0,28))}</b></span><button type="button" class="leavebig" data-leave="${h.id}">🚶 เที่ยวเสร็จ ไปต่อ</button></div>`:'' })()}
     <div class="viewsw" role="group" aria-label="มุมมองแผน">${[[false,'แบบเต็ม'],[true,'ดูภาพรวม']].map(([v,l])=>`<button type="button" data-compact="${v?1:0}" aria-pressed="${S.compact===v}">${l}</button>`).join('')}</div>
     ${list.length?`<ol class="tl${S.compact?' compact':''}">${items}</ol>`:`<div class="empty">${ic('pin',1.6)}<div>วันนี้ยังไม่มีที่เที่ยว</div></div>`}
     <button class="addit" type="button" data-additem="${d.n}">${ic('plus',2.2)}เพิ่มที่เที่ยววันนี้</button>`;
