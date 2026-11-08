@@ -718,7 +718,7 @@ const DEFAULT_PLAN = [
   {id:'2e',t:'13:30',e:'15:45',h:'ชายหาด Repulse Bay',p:'เดินเล่นริมหาด ถ่ายรูป พักผ่อน',map:'Repulse Bay Beach',st:null,ll:[22.2368,114.1963],bus:[{n:'บัส 6 / 6X / 260',d:'ขึ้นที่ Exchange Square',fare:10,mins:35}],go:{mode:'bus:0'}},
   {id:'2f',t:'15:45',e:'18:30',h:'Sunset ที่ Kennedy Town',exit:'C',p:'เดินริมทะเล ถ่ายรูปพระอาทิตย์ตก แวะคาเฟ่',map:'Kennedy Town Praya',st:'KET',ll:[22.2830,114.1275],bus:[{n:'บัส 6X หรือ 6 + MTR',d:'ขึ้นบัส 6X/6 ที่ป้าย Repulse Bay Beach กลับ Central (Exchange Square) HK$7.5 แล้วต่อ MTR สายน้ำเงิน Central → Kennedy Town HK$5.9',fare:13.4,mins:55,combo:true}],go:{mode:'bus:0'}},
   {id:'2g',t:'18:30',e:'19:45',h:'มื้อค่ำย่านจิมซาจุ่ย',p:'นั่ง MTR ไปจิมซาจุ่ย หาร้านกินข้าวแถวถนน Canton Road / Peking Road',map:'Peking Road Tsim Sha Tsui',st:'TST',ll:[22.2963,114.1702]},
-  {id:'2h',t:'19:45',e:'21:45',h:'วิวอ่าวยามค่ำ Avenue of Stars + ช้อป K11 MUSEA / Harbour City',p:'เดินชมไฟตึกริมอ่าววิคตอเรีย (ยังเปิดสวยทุกคืน) แล้วช้อปต่อที่ K11 MUSEA ห้างริมน้ำติด Avenue of Stars หรือ Harbour City ถนน Canton Road ห้างส่วนใหญ่เปิดถึงประมาณ 22:00',tip:'โชว์เลเซอร์ Symphony of Lights หยุดแสดงตั้งแต่ ก.ย. 2569 แล้ว · อยากได้ของถูกแบบตลาดนัด ไป Temple Street Night Market ที่จอร์แดน (MTR 1 ป้าย)',map:'K11 MUSEA Tsim Sha Tsui',st:'TST',ll:[22.2938,114.1745]}
+  {id:'2h',t:'19:45',e:'21:45',h:'วิวอ่าวยามค่ำ Avenue of Stars + ช้อป K11 MUSEA / Harbour City',p:'เดินชมไฟตึกริมอ่าววิคตอเรียตอนกลางคืน แล้วช้อปต่อที่ K11 MUSEA ห้างริมน้ำติด Avenue of Stars หรือ Harbour City ถนน Canton Road ห้างส่วนใหญ่เปิดถึงประมาณ 22:00',tip:'อยากได้ของถูกแบบตลาดนัด ไป Temple Street Night Market ที่จอร์แดน (MTR 1 ป้าย)',map:'K11 MUSEA Tsim Sha Tsui',st:'TST',ll:[22.2938,114.1745]}
  ],
  [
   {id:'3a',t:'08:00',e:'08:45',h:'อาหารเช้าให้อิ่มจุก',p:'วันนี้ต้องเดินเยอะมาก กินให้เต็มที่',st:'MOK'},
@@ -1266,7 +1266,7 @@ function sheetArrange(d){
   if(!timeChanged) return null;
   const sl=slotOf(d);
   const r = sl ? arrangeAfter(d.day, withAt(base, tmp, sl.prevId), base, sl.prevId||tmp.id, null)
-    : arrangeAfter(d.day, [...base.filter(i=>i.id!==tmp.id), tmp].sort((a,b)=>toMin(a.t)-toMin(b.t)), base, tmp.id, tmp.id);
+    : arrangeAfter(d.day, [...base.filter(i=>i.id!==tmp.id), tmp].sort((a,b)=>toMin(a.t)-toMin(b.t) || (a===tmp?-1:b===tmp?1:0)), base, tmp.id, tmp.id);
   // the day is already full: say so rather than squeezing the new place in at midnight
   if(d.day<4 && toMin(d.t)>=23*60) r.warn.unshift('เริ่ม '+hm(toMin(d.t))+' ดึกมาก วันนี้แน่นแล้ว ลองเลือกวันอื่น หรือตั้งเวลาเอง');
   return r;
@@ -1470,6 +1470,24 @@ function itemOH(it){
   const v=p?p[9]:known?KNOWN_OH[known]:''; OH_MEMO.set(key,v); return v;
 }
 // how long to spend here: tap a length (or type minutes) and the end time follows; the stops after it are arranged on saving
+function swapNeighbours(dn, id){ const L=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)), k=L.findIndex(i=>i.id===id);
+  const ok=j=>j>=0 && j<L.length && !pinnedStop(L[j]) && !S.done[L[j].id]; return {L, k, up:ok(k-1)?L[k-1]:null, down:ok(k+1)?L[k+1]:null} }
+function swapHTML(d){
+  const old=findItem(d.id); if(!old || old.dn!==d.day || pinnedStop(old.it) || S.done[d.id]) return '';
+  const {up,down}=swapNeighbours(d.day, d.id); if(!up && !down) return '';
+  return `<div class="fl">สลับลำดับ</div><div class="chips">${up?`<button class="chip" type="button" data-swap="-1">⬆ ไปก่อน ${esc(up.h.slice(0,22))}</button>`:''}${down?`<button class="chip" type="button" data-swap="1">⬇ ไปหลัง ${esc(down.h.slice(0,22))}</button>`:''}</div>`;
+}
+async function swapStop(id, dir){
+  const f=findItem(id); if(!f) return; const dn=f.dn, {L, k}=swapNeighbours(dn, id), j=k+dir, a=Math.min(k,j);
+  if(j<0 || j>=L.length) return;
+  const undo=[[dn, S.plan[dn-1].map(x=>({...x}))]];
+  const first=L[a], second=L[a+1], dur=second.e ? toMin(second.e)-toMin(second.t) : null;
+  const NL=L.slice(); NL[a]=second; NL[a+1]=first;
+  second.t=first.t; if(dur!=null) second.e=hm(toMin(second.t)+dur);   // the pair starts when the first of them did
+  const r=arrange(dn, NL, a>0 ? a-1 : a, new Set(), L); applyArrange(r);
+  closeSheet(); renderAll();
+  try{ await savePlanDay(dn); UNDO=undo; toastUndo('สลับแล้ว: '+second.h.slice(0,20)+' ไปก่อน '+first.h.slice(0,20)+' · จัดเวลาให้ต่อกันแล้ว', true) }catch(e){}
+}
 function staySheetHTML(d){
   const cur = d.t && d.e ? ((toMin(d.e)-toMin(d.t))+1440)%1440 : null, L=[15,30,45,60,90,120,180];
   const lab = m => m<60 ? m+' นาที' : m%30===0 ? (m/60)+' ชม.' : Math.floor(m/60)+' ชม. '+(m%60)+' นาที';
@@ -3388,7 +3406,7 @@ function openExpense(pre={}){ if(S.me==null) return openSheet({kind:'who'}); con
 const EXP_TYPES = {own:{type:'own',mine:true}, split:{type:'split',mine:true}, 'split-them':{type:'split',mine:false}, 'adv-me':{type:'adv',mine:true}, 'adv-them':{type:'adv',mine:false}};
 function openItem(dn, it){
   const x=exitFor(it);
-  openSheet({kind:'item', id:it?it.id:null, fromDay:dn, day:dn, oh:itemOH(it), t:it?it.t:'', e:it&&it.e||'', h:it?it.h:'', p:it&&it.p?it.p.replace(/<[^>]+>/g,''):'', st:it&&it.st||'', ex:x?x.ref:'', map:it&&it.map||'', sure:false});
+  openSheet({kind:'item', id:it?it.id:null, fromDay:dn, day:dn, oh:itemOH(it), stay:it&&it.e ? ((toMin(it.e)-toMin(it.t))+1440)%1440 || null : null, t:it?it.t:'', e:it&&it.e||'', h:it?it.h:'', p:it&&it.p?it.p.replace(/<[^>]+>/g,''):'', st:it&&it.st||'', ex:x?x.ref:'', map:it&&it.map||'', sure:false});
 }
 function expHint(d){
   const a=Number(d.amt)||0, me=S.me, o=other(me), N=i=>(S.settings.names||DEFAULTS.names)[i];
@@ -3501,6 +3519,7 @@ function drawSheet(){
     <div id="i-oh">${ohSheetHTML(d)}</div><div id="i-arr">${arrangeText(sheetArrange(d))}</div>
     <div class="grid2"><div><div class="fl">สถานี MTR ที่ใกล้ที่สุด</div>${NET?stBtn(d.st,'item',''):''}</div>
       <div><label class="fl" for="i-ex">Exit (เว้นว่าง = เลือกให้อัตโนมัติ)</label><input class="txt" id="i-ex" maxlength="6" value="${esc(d.ex)}" placeholder="เช่น B2" autocapitalize="characters"></div></div>
+    ${d.id?swapHTML(d):''}
     <label class="fl" for="i-p">โน้ต</label><input class="txt" id="i-p" maxlength="200" value="${esc(d.p)}" placeholder="เช่น ออก Exit E2">
     <label class="fl" for="i-map">ชื่อสำหรับค้นแผนที่ (ไม่ใส่ก็ได้)</label><input class="txt" id="i-map" maxlength="80" value="${esc(d.map)}" placeholder="ใช้ชื่อสถานที่ถ้าเว้นว่าง">
     <button class="save" type="button" id="i-save">บันทึก</button>
@@ -3665,7 +3684,7 @@ async function saveItem(){
   if(timeChanged){
     const sl=slotOf(d);
     if(sl){ const r=arrangeAfter(d.day, withAt(before, it, sl.prevId), before, sl.prevId||it.id, null); shifted+=applyArrange(r) - r.ch.filter(c=>c.it===it).length }
-    else shifted+=applyArrange(arrangeAfter(d.day, dayItems(d.day), before, it.id, it.id));
+    else shifted+=applyArrange(arrangeAfter(d.day, dayItems(d.day).sort((a,b)=>toMin(a.t)-toMin(b.t) || (a===it?-1:b===it?1:0)), before, it.id, it.id));
     if(beforeOld){ const k=beforeOld.findIndex(x=>x.id===it.id), p=k>0?beforeOld[k-1].id:null; const NL=dayItems(old.dn);
       if(p) shifted+=applyArrange(arrangeAfter(old.dn, NL, beforeOld, p, null)) }
   }
@@ -3850,6 +3869,7 @@ document.addEventListener('click', e=>{
   if(ds.stpick) return openStPick(ds.stpick);
   if(ds.stline && S.sheet){ S.sheet.line=ds.stline; drawSheet(); return }
   if(ds.stset!=null && S.sheet && S.sheet.kind==='stpick') return applyStPick(ds.stset);
+  if(ds.swap && S.sheet && S.sheet.kind==='item' && S.sheet.id) return swapStop(S.sheet.id, Number(ds.swap));
   if(ds.stay && S.sheet && S.sheet.kind==='item'){ const d=S.sheet; readItemForm(); if(!d.t) return toast('ใส่เวลาเริ่มก่อน');
     const m=Number(ds.stay); d.stay=m; d.eTouched=true; d.e=hm(toMin(d.t)+m); drawSheet(); return }
   if(ds.f && S.sheet){
