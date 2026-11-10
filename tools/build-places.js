@@ -11,6 +11,12 @@ const TH={'Wong Tai Sin Temple':'วัดหวังต้าเซียน',
  'Tin Hau Temple':'ศาลเจ้าแม่ทับทิม (Tin Hau)','Kowloon Walled City Park':'สวนเกาลูนวอลล์ซิตี้','Victoria Peak':'ยอดเขาวิกตอเรีย','Hong Kong Museum of History':'พิพิธภัณฑ์ประวัติศาสตร์ฮ่องกง',
  'Tim Ho Wan':'ติ่มซำทิมโฮวาน',"Mak's Noodle":"บะหมี่เกี๊ยวกุ้ง Mak's",'Australia Dairy Company':'ออสเตรเลียแดรี่ (ไข่คน-พุดดิ้งนม)','Kam Wah Cafe':'คัมวาคาเฟ่ (ขนมปังสับปะรด)',
  'Lan Fong Yuen':'หลานฟงหยวน (ชานมฮ่องกง)','Mammy Pancake':'แมมมี่แพนเค้ก (ขนมไข่ฮ่องกง)','Kau Kee':'เกาคี (บะหมี่เนื้อตุ๋น)','Yat Lok':'ยัตล็อก (ห่านย่าง)','Joy Hing Roasted Meat':'จอยฮิง (หมูแดงย่าง)','Lin Heung Tea House':'ร้านน้ำชาหลินเฮือง (ติ่มซำ)'};
+// places whose English name is shared by many (several "Kwun Yam Temple"): the Thai name goes to the one at this spot
+const TH_AT=[['Kwun Yam Temple',22.30805,114.18578,'วัดเจ้าแม่กวนอิม ฮงฮำ (Hung Hom) ยืมเงินเจ้าแม่','Mo-Su 08:00-17:45'],['Lin Fa Temple',22.27956,114.19293,'วัดลินฟ้า (Lin Fa Kung) ไท่หาง','Mo-Su 07:30-17:00'],   // hours: Chinese Temples Committee, checked Nov 2026
+
+ ['Kwun Yum Temple',22.21882,114.20746,'ศาลเจ้าแม่กวนอิม รีพัลส์เบย์']];
+const thAt=(en,p)=>{const h=TH_AT.find(x=>x[0]===en&&Math.hypot((x[1]-p[0])*111320,(x[2]-p[1])*102000)<250);return h?h[3]:''};
+const ohAt=(en,p)=>{const h=TH_AT.find(x=>x[0]===en&&Math.hypot((x[1]-p[0])*111320,(x[2]-p[1])*102000)<250);return h&&h[4]||''};
 const CUI={dim_sum:'ติ่มซำ',noodle:'ก๋วยเตี๋ยว/บะหมี่',cantonese:'กวางตุ้ง',chinese:'จีน',dessert:'ของหวาน',coffee_shop:'กาแฟ',japanese:'ญี่ปุ่น',thai:'ไทย',korean:'เกาหลี',burger:'เบอร์เกอร์',seafood:'ซีฟู้ด',pizza:'พิซซ่า',italian:'อิตาเลียน',vietnamese:'เวียดนาม',ramen:'ราเมง',sushi:'ซูชิ',bubble_tea:'ชาไข่มุก',tea:'ชา',bakery:'เบเกอรี่',barbecue:'บาร์บีคิว',hot_pot:'หม้อไฟ',congee:'โจ๊ก',roast:'ของย่าง',vegetarian:'มังสวิรัติ',indian:'อินเดีย',western:'ฝรั่ง',hong_kong_style:'ร้านชาฮ่องกง',cha_chaan_teng:'ร้านชาฮ่องกง'};
 const cuisine=s=>String(s||'').split(/[;,]/).map(x=>CUI[x.trim()]).filter(Boolean).slice(0,2).join(', ');
 const cat=t=>t.amenity==='cafe'?'cafe':t.amenity==='restaurant'||t.amenity==='fast_food'?'food':t.tourism==='theme_park'?'theme':t.tourism==='museum'||t.tourism==='gallery'?'museum':t.tourism==='viewpoint'||t.natural==='peak'?'view':t.tourism==='zoo'||t.tourism==='aquarium'?'zoo':
@@ -20,7 +26,7 @@ const out_=[];const seen=new Map();
 for(const x of e){const t=x.tags||{};const en=(t['name:en']||'').trim();if(!en)continue;const p=[x.lat??(x.center&&x.center.lat),x.lon??(x.center&&x.center.lon)];if(p[0]==null)continue;
  const k=en.toLowerCase();const prev=seen.get(k);if(prev&&prev.some(q=>md(q,p)<400))continue;(seen.get(k)||seen.set(k,[]).get(k)).push(p);
  const fee=t.charge||(t.fee==='no'?'0':'');
- out_.push([en,(t['name:zh']||t.name||'').replace(/\s*[A-Za-z].*$/,'').slice(0,30),TH[en]||t['name:th']||'',Math.round(p[0]*1e5),Math.round(p[1]*1e5),cat(t),t.wikidata?1:0,fee.slice(0,30),cuisine(t.cuisine),(t.opening_hours||"").slice(0,200)])}
+ out_.push([en,(t['name:zh']||t.name||'').replace(/\s*[A-Za-z].*$/,'').slice(0,30),thAt(en,p)||TH[en]||t['name:th']||'',Math.round(p[0]*1e5),Math.round(p[1]*1e5),cat(t),t.wikidata?1:0,fee.slice(0,30),cuisine(t.cuisine),(t.opening_hours||ohAt(en,p)||"").slice(0,200)])}
 out_.sort((a,b)=>b[6]-a[6]);
 fs.writeFileSync(out,JSON.stringify({v:new Date().toISOString().slice(0,10),p:out_}));
 console.log('places',out_.length,'thai',out_.filter(r=>r[2]).length,'bytes',fs.statSync(out).size);

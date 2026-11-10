@@ -15,8 +15,13 @@ const seq={};csv('stop_times.txt',r=>{(seq[r[0]]??=[]).push([+r[4],r[3]])});
 const patCount={},patMask={};
 for(const tid in seq){const rt=tripRoute[tid];if(!rt)continue;const dir=tid.split('-')[1];
  const s=seq[tid].sort((a,b)=>a[0]-b[0]).map(x=>x[1]).join(' ');const k=rt+'|'+dir;(patCount[k]??={});patCount[k][s]=(patCount[k][s]||0)+1;patMask[k]=(patMask[k]||0)|(cal[tripSvc[tid]]||0)}
-// headways
-const hw={};csv('frequencies.txt',r=>{const rt=tripRoute[r[0]];if(!rt)return;const h=+r[3];const st=+r[1].slice(0,2);if(st>=9&&st<=18)(hw[rt]??=[]).push(h)});
+// headways, and when each route direction runs: first and last departure from its first stop, per day of the week
+// (the app only offers a bus at an hour it really runs; 10 Nov 2026: sightseeing route H4, hourly 11:00-18:00, was offered at any time)
+const svc={}, hm=t=>+t.slice(0,2)*60+ +t.slice(3,5);
+const span=(tid,a,b)=>{const rt=tripRoute[tid];if(!rt)return;const k=rt+'|'+tid.split('-')[1],m=cal[tripSvc[tid]]||0,S=(svc[k]??=Array.from({length:7},()=>[9999,-1]));
+ for(let d=0;d<7;d++)if(m&(1<<d)){if(a<S[d][0])S[d][0]=a;if(b>S[d][1])S[d][1]=b}};
+for(const tid in seq){const x=tid.split('-').pop();if(/^d{4}$/.test(x)){const a=+x.slice(0,2)*60+ +x.slice(2);span(tid,a,a)}}
+const hw={};csv('frequencies.txt',r=>{const rt=tripRoute[r[0]];if(!rt)return;span(r[0],hm(r[1]),hm(r[2]));const h=+r[3];const st=+r[1].slice(0,2);if(st>=9&&st<=18)(hw[rt]??=[]).push(h)});
 for(const rt in hw){const a=hw[rt].sort((x,y)=>x-y);routes[rIdx[rt]][4]=Math.round(a[a.length>>1]/60)}
 // fares
 const price={};csv('fare_attributes.txt',r=>{price[r[0]]=+r[1]});
@@ -24,7 +29,7 @@ const fare={};csv('fare_rules.txt',r=>{const p=price[r[0]];if(p!=null)fare[r[1]+
 const pats=[];let nf=0,tot=0;
 for(const k in patCount){const [rt,dir]=k.split('|');const best=Object.entries(patCount[k]).sort((a,b)=>b[1]-a[1])[0][0].split(' ');
  const last=best[best.length-1];const f=best.map((s,i)=>{if(i===best.length-1)return -1;tot++;let p=fare[rt+'|'+s+'|'+last];if(p==null){for(let j=best.length-1;j>i&&p==null;j--)p=fare[rt+'|'+s+'|'+best[j]]}if(p==null){nf++;return -1}return Math.round(p*10)});
- pats.push([rIdx[rt],+dir,best.map(s=>sIdx[s]),f,patMask[k]||127])}
+ pats.push([rIdx[rt],+dir,best.map(s=>sIdx[s]),f,patMask[k]||127,svc[k]?svc[k].flatMap(x=>x[1]<0?[-1,-1]:x):null])}
 // station coordinates from bus stops named "<station> STATION"
 eval(fs.readFileSync(mtrjs,'utf8').replace('const MTR','global.MTR'));
 const stc={},miss=[];

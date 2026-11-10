@@ -6,6 +6,10 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 T="$ROOT/tools"; C="$ROOT/data-cache"; N="$C/new"
 rm -rf "$N"; mkdir -p "$N/mtr" "$N/gtfs" "$N/osm"
 UA="hk-trip-planner/1.0 (personal trip app)"
+# KMB/Long Win's own stop positions, at most weekly. Its server answers about one request every few minutes and refuses
+# the rest (403), so the stop list is asked for here and the route list near the end of this script.
+mkdir -p "$C/ops"; KMB=0
+if node "$T/build-busfix.js" --need-kmb "$C/ops"; then KMB=1; curl -fsS -m 120 -o "$C/ops/kmb-stop.raw.json" https://data.etabus.gov.hk/v1/transport/kmb/stop || rm -f "$C/ops/kmb-stop.raw.json"; fi
 curl -fsSL --retry 3 --retry-delay 10 -o "$N/mtr/stations.csv" https://opendata.mtr.com.hk/data/mtr_lines_and_stations.csv
 curl -fsSL --retry 3 --retry-delay 10 -o "$N/mtr/fares.csv"    https://opendata.mtr.com.hk/data/mtr_lines_fares.csv
 curl -fsSL --retry 3 --retry-delay 10 -o "$N/gtfs/gtfs.zip"    https://static.data.gov.hk/td/pt-headway-en/gtfs.zip
@@ -47,6 +51,16 @@ if curl -fsSL --retry 3 -o "$N/water/lcsd.csv" https://www.lcsd.gov.hk/datagovhk
 if node "$T/build-lasttrain.js" "$N/mtr-data.js" "$N/lasttrain.json"; then cp "$N/lasttrain.json" "$ROOT/lasttrain.json"; else echo "last trains unavailable - keeping previous"; fi
 # Hong Kong Disneyland calendar for our park day (hours, shows); keep the previous copy if it fails
 if node "$T/build-dzcal.js" 2026-11-16 "$N/dzcal.json"; then cp "$N/dzcal.json" "$ROOT/dzcal.json"; else echo "disney calendar unavailable - keeping previous"; fi
+# bus stop positions from KMB/Long Win and Citybus themselves (the timetable file puts some stops tens of metres off);
+# if a company can't be reached its last saved list is used, and if nothing matches the timetable positions stay
+if [ "$KMB" = 1 ]; then
+  kmbget(){ for i in 1 2 3 4 5 6; do curl -fsS -m 120 -o "$1" "$2" && grep -q '"data"' "$1" && return 0; sleep 75; done; rm -f "$1"; return 1; }
+  [ -s "$C/ops/kmb-stop.raw.json" ] || kmbget "$C/ops/kmb-stop.raw.json" https://data.etabus.gov.hk/v1/transport/kmb/stop || true
+  kmbget "$C/ops/kmb-routestop.raw.json" https://data.etabus.gov.hk/v1/transport/kmb/route-stop || echo "KMB route list unavailable - using the saved one"
+fi
+cp "$N/bus.json" "$N/bus.pre.json"
+if node "$T/build-busfix.js" "$N/bus.json" "$C/ops" && node "$T/check-bus.js" "$N/bus.json"; then :; else echo "bus stop positions not refined - keeping the timetable positions"; cp "$N/bus.pre.json" "$N/bus.json"; fi
+rm -f "$N/bus.pre.json" "$C/ops"/kmb-*.raw.json
 # all checks passed: swap in
 cp "$N/bus.json" "$ROOT/bus.json"
 cp "$N/places.json" "$ROOT/places.json"

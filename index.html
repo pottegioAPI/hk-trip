@@ -636,6 +636,8 @@ input[type=time].txt{appearance:none;min-height:46px}
 @keyframes shNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
 @keyframes shIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){#sidehint,.sh-btn,.sh-arrow{animation:none}}
+.sg.sgo{border-style:dashed}
+.risk{background:var(--surface);border:2px solid var(--danger);border-radius:16px;padding:12px 14px;margin:0 0 12px;font-size:13.5px}.risk>b{display:block;color:var(--danger);margin-bottom:6px}.rk{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px 0;border-top:1px dashed var(--line)}.rk span{flex:1;min-width:0}.rk.hard span{color:var(--danger);font-weight:600}.rk .btn-s{flex:none}
 </style>
 
 <header class="top">
@@ -944,12 +946,12 @@ function busKind(r){ return r[3]===4?'เรือ' : r[3]===0?'รถราง'
 function busRoutes(a,b,ctx={}){
   if(!BUS||!a||!b||metres(a,b)<350) return [];
   const dow = ctx.dow ?? null, nightOk = ctx.min==null || ctx.min<360 || ctx.min>=1380;
-  const mk=a.join()+'>'+b.join()+'|'+dow+'|'+nightOk; if(busMemo.has(mk)) return busMemo.get(mk);
+  const mk=a.join()+'>'+b.join()+'|'+dow+'|'+nightOk+'|'+(ctx.min==null?'':Math.floor(ctx.min/10))+(ctx.arr?'a':''); if(busMemo.has(mk)) return busMemo.get(mk);
   let list=[];
   for(const R of [450,800]){
     const O=nearStops(a,R), D=nearStops(b,R); if(!O.size||!D.size) continue;
     const best=new Map();
-    for(const [ri,dir,ss,fs,mask] of BUS.pats){
+    for(const [ri,dir,ss,fs,mask,svc] of BUS.pats){
       const rr=BUS.routes[ri]; if(PRIVATE_OPS.has(rr[1])) continue;
       if(dow!=null && mask!=null && !(mask & (1<<dow))) continue;          // doesn't run that day
       const isNight=/^N\d/.test(rr[0]); if(isNight && !nightOk) continue;  // overnight routes only late at night
@@ -958,9 +960,15 @@ function busRoutes(a,b,ctx={}){
       for(let k=0;k<ss.length;k++){
         const s=ss[k];
         if(bi>=0 && D.has(s)){
-          const r=BUS.routes[ri], w2=D.get(s), n=k-bi, wait=r[4]?Math.min(r[4]/2,15):8;
-          const mins=Math.round(bw/75 + wait + n*1.6 + w2/75), key=r[0]+'|'+r[1], cur=best.get(key);
-          if(!cur||mins+night<cur.rank) best.set(key,{key:'bx:'+key, ri, dir, first:ss[0], last:ss[ss.length-1], from:ss[bi], seq:bi, to:s, w1:Math.round(bw), w2:Math.round(w2), n, fare:fs[bi]>=0?fs[bi]/10:null, mins, rank:mins+night, night:!!night});
+          const r=BUS.routes[ri], w2=D.get(s), n=k-bi, wait=r[4]?Math.min(r[4]/2,30):8;
+          let far=0; for(let j=bi;j<k;j++) far+=metres(stopLL(ss[j]),stopLL(ss[j+1]));
+          const mins=Math.round(bw/75 + wait + Math.max(n*1.6, far/600) + w2/75), key=r[0]+'|'+r[1], cur=best.get(key);
+          // only at an hour the route runs: svc = first and last departure from its first stop that day; the bus reaches our stop ~1.6 min per stop later.
+          // ctx.arr: ctx.min is when we want to be there (a planned stop), else it is when we set off
+          let dep=null, lastAt=null;
+          if(svc && dow!=null && ctx.min!=null){ const f=svc[dow*2], l=svc[dow*2+1], off=bi*1.6; dep=ctx.arr ? ctx.min-mins : ctx.min; if(dep<180) dep+=1440;
+            if(l<0 || dep<f+off-25 || dep>l+off+5) continue; lastAt=Math.round(l+off) }
+          if(!cur||mins+night<cur.rank) best.set(key,{dep, lastAt, key:'bx:'+key, ri, dir, first:ss[0], last:ss[ss.length-1], from:ss[bi], seq:bi, to:s, w1:Math.round(bw), w2:Math.round(w2), n, fare:fs[bi]>=0?fs[bi]/10:null, mins, rank:mins+night, night:!!night});
         }
         const w=O.get(s); if(w!=null && w<bw && !/SET DOWN ONLY/i.test(BUS.stops[s][2])){ bi=k; bw=w }
       }
@@ -980,7 +988,7 @@ function busSteps(o){
   return `<ol class="legs">
     <li class="lg walk" style="--c:var(--muted)"><span class="nd"></span><div><div class="stn">จุดที่อยู่ตอนนี้</div><div class="how">เดินไปป้ายรถ ประมาณ ${o.w1} ม. (~${Math.max(1,Math.round(o.w1/75))} นาที)</div></div></li>
     <li class="lg" style="--c:${c}"><span class="nd"></span><div><div class="stn">${esc(stopName(o.from))}</div>
-      <div class="how">ขึ้น <span class="ln" style="background:${c}">${busKind(r)} ${esc(r[0])}</span> ป้ายหน้ารถเขียนปลายทาง <b>${esc(toward)}</b> · นั่ง ${o.n} ป้าย${r[4]?` · มาทุก ~${r[4]} นาที`:''}${r[4]>=30?' <b style="color:var(--danger)">(รถไม่บ่อย)</b>':''}</div>
+      <div class="how">ขึ้น <span class="ln" style="background:${c}">${busKind(r)} ${esc(r[0])}</span> ป้ายหน้ารถเขียนปลายทาง <b>${esc(toward)}</b> · นั่ง ${o.n} ป้าย${r[4]?` · มาทุก ~${r[4]} นาที`:''}${r[4]>=30?' <b style="color:var(--danger)">(รถไม่บ่อย)</b>':''}${o.lastAt!=null && o.dep!=null && o.lastAt-o.dep<=75?` <b style="color:var(--danger)">· เที่ยวสุดท้ายผ่านป้ายนี้ราว ${hhmm(o.lastAt)} น.</b>`:''}</div>
       ${o.seq!=null?liveBtn({bus:o}):''}
       <div class="how"><a class="btn-s" href="https://www.google.com/maps/search/?api=1&query=${ll[0]},${ll[1]}" target="_blank" rel="noopener">${ic('pin')}ดูป้ายขึ้นในแผนที่</a></div></div></li>
     <li class="lg end" style="--c:${c}"><span class="nd"></span><div><div class="stn">${esc(stopName(o.to))} <small>ป้ายลง</small></div><div class="how">${(()=>{ const s=ridePattern(o); return s&&s.length>2?`ป้ายก่อนหน้าคือ <b>${esc(stopName(s[s.length-2]))}</b> พอเห็นชื่อนี้บนจอในรถให้กดกริ่ง · `:'' })()}ลงป้ายนี้ แล้วเดินต่อ ~${o.w2} ม.</div><div class="how">${rideBtn(o)}</div></div></li></ol>
@@ -1024,7 +1032,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('985bd1564e|9 พ.ย. 06:13|1.27');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('092c00ab0f|10 พ.ย. 09:42|1.28');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1230,7 +1238,8 @@ function arrange(dn, list, from, keep, was, anchorEnd){
       break;
     }
     const og = o.t-(orig.get(prev.id).e ?? orig.get(prev.id).t+30);   // the gap these two had
-    const gap = anchorEnd!=null && k===from+1 ? ride+5 : wasNext.get(prev.id)===it.id && og>=0 ? (og>ride+15 ? ride+5 : og) : ride+5;
+    const need = ride<=10 || /^กลับ(ที่พัก|โรงแรม)/.test(it.h) ? 0 : ride;
+    const gap = anchorEnd!=null && k===from+1 ? ride+5 : wasNext.get(prev.id)===it.id && og>=need ? (og>ride+15 ? ride+5 : og) : ride+5;
     let t=up5(Math.max(end+gap, notBefore(it,dur)));
     const iv=ohFor(itemOH(it), ohDow(dn));
     if(iv && iv.length && !iv.some(([a,b])=>t>=a&&t<b)){ const nx=iv.find(([a])=>a>t); if(nx) t=nx[0] }
@@ -1318,7 +1327,8 @@ function liveAnchor(dn, L0, tryOut){
   const v=S.done[a.id]||{}, now=tripDay()===dn ? nowPlanMin(dn) : hkNow().min, at=v.at ? planMin(dn, v.at) : null;   // trying it out before the trip: today's clock as that day's
   const stay = a.e ? toMin(a.e)-toMin(a.t) : 30;
   const end = v.left ? planMin(dn, v.left) : at!=null ? Math.max(at+stay, now) : Math.max(toMin(a.e||a.t), now);
-  return {it:a, at, end, left:!!v.left};
+  const overdue = !v.left && L0.some(i=>pinnedStop(i) && !S.done[i.id] && !i.flight && i.tz!=='TH' && i.id!=='3b' && i.id!=='3c' && toMin(i.t) < (at??now));
+  return {it:a, at, end: overdue ? Math.max(at??now, now) : end, left:!!v.left};
 }
 function dayArrange(dn, tryOut){
   const L0=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)), live=liveAnchor(dn, L0, tryOut);
@@ -1359,15 +1369,49 @@ function dayArrangeHTML(dn){
     <details${mv.length?' open':''}><summary>ดูเวลาที่จะเปลี่ยน</summary>${r.ch.map(c=>`<div>${mv.some(m=>m.it===c.it)?'📍 ':''}${esc(c.it.h.slice(0,32))} <span class="num">${hm(toMin(c.it.t))} → ${hm(c.t)}</span></div>`).join('')}${r.warn.map(w=>`<div class="warn">⚠️ ${esc(w)}</div>`).join('')}</details></div>
     <button type="button" class="btn-s pay" data-arrday="${dn}">จัดให้เลย</button></div>`;
 }
-async function arrangeDay(dn, lead){
+async function arrangeDay(dn, lead, undo0){
   const r=dayArrange(dn);
-  if(!r){ if(lead) toast(lead); else toast(tripDay()!==dn && dayItems(dn).some(i=>S.done[i.id]) ? 'วันนี้มีการกดถึงแล้วไว้ (ตอนลองใช้แอป) แอปจะเริ่มจัดจากเวลาจริงในวันเที่ยว' : 'แผนวันนี้ลงตัวแล้ว ไม่ต้องปรับ'); return }
-  const undo=[[dn, S.plan[dn-1].map(x=>({...x}))]], n=applyArrange(r);
+  if(!r){ if(undo0){ renderAll(); try{ await savePlanDay(dn); UNDO=undo0; toastUndo(lead||'ปรับแผนแล้ว', true) }catch(e){} return }
+    if(lead) toast(lead); else toast(tripDay()!==dn && dayItems(dn).some(i=>S.done[i.id]) ? 'วันนี้มีการกดถึงแล้วไว้ (ตอนลองใช้แอป) แอปจะเริ่มจัดจากเวลาจริงในวันเที่ยว' : 'แผนวันนี้ลงตัวแล้ว ไม่ต้องปรับ'); return }
+  const undo=undo0||[[dn, S.plan[dn-1].map(x=>({...x}))]], n=applyArrange(r);
   if(r.anchor){ const A=r.anchor; if(A.t!=null) A.it.t=hm(A.t); if(A.e!=null) A.it.e=hm(A.e) }
   renderAll();
   const mv=(r.moved||[]).map(m=>' · ย้าย '+m.it.h.slice(0,24)+' ไปช่วงที่เปิด').join('');
   try{ await savePlanDay(dn); UNDO=undo; toastUndo((lead?lead+' · ':'')+(n?'จัดเวลาที่เหลือให้ '+n+' ที่':'ปรับแผนแล้ว')+mv, true) }catch(e){}
 }
+// what can no longer work today, for the stops still ahead (trip day only)
+function dayRisks(dn){
+  if(tripDay()!==dn) return [];
+  const L=dayItems(dn).filter(i=>!INSIDE_STOP.has(i.id)), last=lastDoneIdx(L), out=[], T=toMin;
+  let prev=last>=0?L[last]:null, end=prev ? (S.done[prev.id]&&S.done[prev.id].left ? planMin(dn,S.done[prev.id].left) : Math.max(T(prev.e||prev.t), nowPlanMin(dn))) : null;
+  const fixedRisk=(it, arrive, from)=>{ const t=T(it.t), late=arrive-t; if(late<=5) return;
+    if(it.id==='4e'){ const danger=arrive>19*60+15;
+      out.push({id:it.id, h:it.h, hard:danger, drop:false, txt: danger ? 'จะถึงสนามบินราว '+hm(arrive)+' เสี่ยงตกเครื่อง (เคาน์เตอร์เช็คอินปิดราว 20:00) ไปสนามบินเดี๋ยวนี้' : 'จะถึงสนามบินราว '+hm(arrive)+' ช้ากว่าแผน '+late+' นาที ยังทันเช็คอิน (เคาน์เตอร์ปิดราว 20:00)'}) }
+    else out.push({id:it.id, h:it.h, drop:false, txt:'จะไปถึงช้า ~'+late+' นาที'+(from?' ออกจาก '+from.h.slice(0,20)+' ให้เร็วขึ้น':'')}) };
+  const fixedOK=it=>pinnedStop(it) && !S.done[it.id] && !it.flight && it.tz!=='TH' && it.id!=='3b' && it.id!=='3c';
+  for(let k=0;k<last;k++){ const it=L[k]; if(fixedOK(it) && prev) fixedRisk(it, end+travelMins(dn,prev,it), prev) }   // its time has gone by while we are still at an earlier stop
+  for(let k=last+1;k<L.length;k++){ const it=L[k]; if(S.done[it.id]) continue; const t=T(it.t), e=it.e?T(it.e):null;
+    if(pinnedStop(it)){
+      if(prev && end!=null && fixedOK(it)) fixedRisk(it, end+travelMins(dn,prev,it), prev);
+    } else {
+      const c=ohCheck(itemOH(it), dn, t, e);
+      if(c && c.warn && !/อยู่ได้ราว/.test(c.warn)) out.push({id:it.id, h:it.h, txt:c.warn, drop:true});
+      else if(/sunset|พระอาทิตย์ตก/i.test(it.h) && t>17*60+40) out.push({id:it.id, h:it.h, txt:'จะไปถึง '+hm(t)+' หลังพระอาทิตย์ตกแล้ว (~17:40)', drop:true});
+      else if(dn<4 && t>=24*60) out.push({id:it.id, h:it.h, txt:'จะเริ่มหลังเที่ยงคืน ('+hm(t)+')', drop:true});
+    }
+    prev=it; end=e!=null?e:t+30;
+  }
+  return out;
+}
+function dayRisksHTML(dn){
+  const R=dayRisks(dn); if(!R.length) return '';
+  return '<div class="risk"><b>⚠️ วันนี้ช้ากว่าแผน มี '+R.length+' ที่ที่ต้องตัดสินใจ</b>'+R.map(r=>'<div class="rk'+(r.hard?' hard':'')+'"><span><b>'+esc(r.h.slice(0,34))+'</b> '+esc(r.txt)+'</span>'
+    +(r.drop?'<button type="button" class="btn-s" data-drop="'+esc(r.id)+'">ข้ามที่นี่</button>':'')+'</div>').join('')+'</div>';
+}
+// skip a stop today: it leaves the plan (undo brings it back) and the rest closes up
+async function dropStop(id){ const f=findItem(id); if(!f) return;
+  const undo=[[f.dn, S.plan[f.dn-1].map(x=>({...x}))]]; S.plan[f.dn-1]=S.plan[f.dn-1].filter(x=>x.id!==id);
+  await arrangeDay(f.dn, 'ข้าม '+f.it.h.slice(0,24)+' แล้ว', undo) }
 // on the trip day the plan follows what really happened: after "ถึงแล้ว" or "เที่ยวเสร็จ" the rest of the day is re-timed at once
 function liveRearrange(dn, msg){ if(tripDay()===dn) return arrangeDay(dn, msg); toast(msg+(DAYS[0].date>hkNow().date?" (ลองกดดู: วันเที่ยวจริงแอปจะจัดเวลาที่เหลือให้ทันที)":"")) }
 async function leaveStop(id){
@@ -1405,7 +1449,7 @@ function optionsBetween(dn,prev,it){
     else { const legs=mtrRoute(a,b), f=mtrFare(a,b);
       if(legs) opts.push({key:'mtr',mode:'mtr',n:'MTR',d:legs.filter(l=>l.line!=='WALK').map(l=>LINES[l.line].n.split(' ')[0]).join(' → ')+` · ${stName(a)} → ${stName(b)}`,fare:f,mins:legMins(legs),legs}) }
   }
-  const bx = busRoutes(locOf(prev), locOf(it), {dow:dowOf(DAYS[dn-1].date), min:toMin(it.t)}).map(busOpt);
+  const bx = busRoutes(locOf(prev), locOf(it), {dow:dowOf(DAYS[dn-1].date), min:toMin(it.t), arr:true}).map(busOpt);
   for(const o of bx){ const no=BUS.routes[o.bx.ri][0];  // remember what the old plan said, to show the correction
     const pre=(it.bus||[]).find(p=>p.n.split(/[\s\/+]+/).includes(no)); if(pre && pre.fare!==o.fare) o.planFare=pre.fare }
   // plan presets: shown when no direct bus is found, and always for two-leg trips the direct-bus search can't build
@@ -1561,9 +1605,35 @@ const PCAT = {temple:['วัด/ศาลเจ้า',60], museum:['พิพ�
   food:['ร้านอาหาร',60], cafe:['คาเฟ่',45]};
 const TH_CAT = [['ร้านอาหาร','food'],['อาหาร','food'],['ร้านกิน','food'],['คาเฟ่','cafe'],['กาแฟ','cafe'],['วัด','temple'],['ศาลเจ้า','temple'],['พิพิธภัณฑ์','museum'],['มิวเซียม','museum'],['จุดชมวิว','view'],['สวนสนุก','theme'],['ห้าง','mall'],['ตลาด','market'],['หาด','beach'],['สวน','park']];
 const isFood = p => p[5]==='food' || p[5]==='cafe';
+// areas people type, as the MTR station there (Thai spellings; English and Chinese station names are matched as they are)
+const TH_AREA = [['ฮงฮำ','HUH'],['หงหำ','HUH'],['ฮุงฮอม','HUH'],['จิมซาจุ่ย','TST'],['จิมซาจุย','TST'],['มงก๊ก','MOK'],['มงกก','MOK'],['เซ็นทรัล','CEN'],['เซนทรัล','CEN'],['คอสเวย์เบย์','CAB'],['คอสเวย์','CAB'],
+  ['หว่านไจ๋','WAC'],['วานไจ','WAC'],['จอร์แดน','JOR'],['เหยาหม่าเต๋ย','YMT'],['ซัมซุยโป','SSP'],['ชามชุยโป','SSP'],['แอดมิรัลตี้','ADM'],['เชิงหว่าน','SHW'],['ตุงชุง','TUC'],['ซาถิ่น','SHT'],['ชาทิน','SHT'],
+  ['หว่องไท่ซิน','WTS'],['หวังต้าเซียน','WTS'],['เคนเนดี้ทาวน์','KET'],['นอร์ทพอยต์','NOP'],['ทินเฮา','TIH'],['ไดมอนด์ฮิลล์','DIH'],['ปริ๊นซ์เอ็ดเวิร์ด','PRE'],['หวัมเปา','WHA'],['ไทไว','TAW']];
+function areaOf(q){
+  if(!BUS) return null; const s=q.toLowerCase(); let best=null;
+  for(const [th,code] of TH_AREA) if(q.includes(th) && BUS.stc[code]) return {code, word:th};
+  for(const [code,en,zh] of MTR.st){ if(!BUS.stc[code]) continue; const e=en.toLowerCase();
+    if((e.length>=4 && s.includes(e)) || (zh && q.includes(zh))){ const w=s.includes(e)?e:zh; if(!best || w.length>best.word.length) best={code, word:w} } }
+  return best;
+}
+// "วัด Hung Hom", "ร้านอาหาร มงก๊ก", "Hung Hom": the kind of place and/or the area, when that is all that was typed
+function areaSearch(q, ref){
+  const ar=areaOf(q); if(!ar) return null;
+  const cat=TH_CAT.find(([w])=>q.includes(w)), sl=q.toLowerCase();
+  let rest=sl.replace(ar.word,' '); for(const [w] of TH_CAT) rest=rest.split(w).join(' ');
+  rest=rest.replace(/(temple|restaurant|food|cafe|museum|market|mall|park|station|mtr|near| in |ที่|ใน|แถว|ย่าน|ใกล้)/g,' ').replace(/\s+/g,' ').trim();
+  const enCat = /temple/.test(sl)?'temple' : /museum/.test(sl)?'museum' : /market/.test(sl)?'market' : /mall/.test(sl)?'mall' : /park/.test(sl)?'park' : /restaurant|food/.test(sl)?'food' : /cafe/.test(sl)?'cafe' : null;
+  const kind = cat ? cat[1] : enCat, c=[BUS.stc[ar.code][0]/1e5, BUS.stc[ar.code][1]/1e5], out=[];
+  for(const p of PL.p){ const d=metres(c,[p[3]/1e5,p[4]/1e5]); if(d>1200) continue;
+    if(kind ? p[5]!==kind : isFood(p)) continue;                     // an area alone lists places to see, not every restaurant
+    if(rest && !(p[0].toLowerCase().includes(rest) || (p[2]&&p[2].includes(rest)) || (p[1]&&p[1].includes(rest)))) continue;
+    out.push([80 - d/20 + p[6]*15 + (p[2]?20:0) - (kind==='temple' && /church|cathedral|chapel|mosque|assembly|synagogue|gurdwara|christian|mission/i.test(p[0]) ? 60 : 0), p]) }
+  return out.length ? out.sort((a,b)=>b[0]-a[0]).slice(0,8).map(x=>x[1]) : null;
+}
 // ref: where the person will be (the day's previous stop) — food is ranked by how close it is
 function searchPlaces(q, ref){
   q=(q||'').trim(); if(!PL || q.length<2) return [];
+  const byArea=areaSearch(q, ref);
   const s=q.toLowerCase(), toks=s.split(/\s+/), res=[];
   const near = p => ref ? Math.max(0, 40 - metres(ref,[p[3]/1e5,p[4]/1e5])/100) : 0; // up to +40 within ~4 km
   for(const p of PL.p){
@@ -1575,6 +1645,7 @@ function searchPlaces(q, ref){
     else if(toks.length>1 && toks.every(t=>en.includes(t))) sc=50;
     if(sc>=0) res.push([sc+p[6]*15+(p[2]?20:0)+(isFood(p)?near(p):0), p]); // places with a Thai name are the well-known ones
   }
+  if(byArea && res.length<3) return byArea;   // few or no places by that exact name: the area's own places
   if(!res.length){ // Thai generic words: "วัด" → well-known temples, "ร้านอาหาร" → food near the previous stop
     const c=TH_CAT.find(([w])=>q.includes(w));
     if(c) for(const p of PL.p) if(p[5]===c[1] && (p[6] || isFood(p))) res.push([(p[2]?20:10)+(isFood(p)?near(p)*2:0), p]);
@@ -2374,6 +2445,7 @@ function renderPlan(){
       <h2>${esc(d.title)}</h2>
       <div class="pillrow"><span class="pill mint num">ถึงแล้ว ${doneCount}/${list.length}</span>${(()=>{ const n=list.filter(i=>{ const x=exitFor(i); return x&&x.planRef }).length; return n?`<span class="pill sun num">ปรับ Exit ตามข้อมูลจริง ${n} จุด</span>`:'' })()}${RPd!=null&&RPd>=10?`<span class="pill sun num">ช้ากว่าแผน ${RPd} นาที · ปรับเวลาที่เหลือให้แล้ว</span>`:''}<span class="pill sky num">ค่าเดินทางที่จดวันนี้ ${hk(transportToday(d.n))}/คน</span></div>
     </div>
+    ${dayRisksHTML(S.day)}
     ${dayArrangeHTML(S.day)}
     ${(()=>{ const h=list.find(i=>canLeave(i,list)); return h?`<div class="leavebar"><span>อยู่ที่ <b>${esc(h.h.slice(0,28))}</b></span><button type="button" class="leavebig" data-leave="${h.id}">🚶 เที่ยวเสร็จ ไปต่อ</button></div>`:'' })()}
     <div class="viewsw" role="group" aria-label="มุมมองแผน">${[[false,'แบบเต็ม'],[true,'ดูภาพรวม']].map(([v,l])=>`<button type="button" data-compact="${v?1:0}" aria-pressed="${S.compact===v}">${l}</button>`).join('')}</div>
@@ -3198,8 +3270,8 @@ const CHECK_DEFAULT = ['พาสปอร์ต (อายุเหลือเ
   .map((t,i)=>({id:'d'+i, t, d:[false,false]}));
 function checkItems(){ return S.check || CHECK_DEFAULT }
 function checkStats(){ const it=checkItems(), me=S.me??0; return {total:it.length, mine:it.filter(x=>x.d&&x.d[me]).length, other:it.filter(x=>x.d&&x.d[other(me)]).length} }
-// packing is done the day before: shown on 13 Nov and on the 14th until LET'S GO, until this phone taps "finished"
-const checkDue = () => { const d=hkNow().date; return (d==='2026-11-13' || d===DAYS[0].date && !S.done.start) && lsGet('hk-chk-done','')!=='1' };
+// packing: shown from a week before the flight and on the 14th until LET'S GO, until this phone taps "finished" (a closed row until opened)
+const checkDue = () => { const d=hkNow().date; return (d>='2026-11-07' && d<DAYS[0].date || d===DAYS[0].date && !S.done.start) && lsGet('hk-chk-done','')!=='1' };
 function checklistHTML(){
   if(!checkDue()) return '';
   const items=checkItems(), me=S.me??0, c=checkStats(), open=S.checkOpen;
@@ -3257,7 +3329,7 @@ function renderHome(){
     ${alertsHTML()}
     ${nextStopHTML()}
     ${phase!=='post'?pushCardHTML():''}
-    ${phase==='pre' ? `${checklistHTML()}${weatherHTML(td)}`            // before the trip: pack, then the forecast
+    ${phase==='pre' ? `${checklistHTML()}${weatherHTML(td)}${funCardHTML()}`            // before the trip: pack, the forecast, and the games to try out
       : phase==='trip' ? `${checklistHTML()}${gpsCardHTML()}${daySummaryHTML()}${nowHTML()}${weatherHTML(td)}${funCardHTML()}`   // on the road: where we are, today, weather, games
       : funCardHTML()}
     <div class="hstats">
@@ -3582,10 +3654,37 @@ function drawSheet(){
 function sugHTML(q){
   const d=S.sheet, list0=d?dayItems(d.day).filter(i=>i.id!==d.id):[], prev=list0.length?list0[list0.length-1]:null;
   const ref = prev ? locOf(prev) : HOTEL_LL, refName = prev ? prev.h : 'ที่พัก';
-  const list=searchPlaces(q, ref); if(!list.length) return '';
+  const list=searchPlaces(q, ref), qq=(q||'').trim();
+  const online = qq.length>=3 && navigator.onLine!==false ? `<button type="button" class="sg sgo" data-osmfind="1"><b>🔎 ค้นหา "${esc(qq.slice(0,30))}" จากแผนที่ออนไลน์</b><small>${list.length?'ถ้าไม่เจอที่ต้องการในรายการด้านบน':'ไม่พบในรายการของแอป'} · ใช้เน็ต</small></button>` : '';
+  if(d && d.osm && d.osmQ===qq) return osmRowsHTML(d)+online;
+  if(!list.length) return online;
   return list.map(p=>{ const i=PL.p.indexOf(p), ll=[p[3]/1e5,p[4]/1e5], ns=nearestStation(ll), km=ref?metres(ref,ll)/1000:null;
-    return `<button type="button" class="sg" data-pick="${i}"><b>${esc(p[2]||p[0])}</b>${p[2]?` <small>${esc(p[0])}</small>`:''}<small>${PCAT[p[5]]?PCAT[p[5]][0]:''}${p[8]?' · '+esc(p[8]):''}${ns?` · MTR ${esc(codeName(ns.c))} ~${ns.m} ม.`:''}${isFood(p)&&km!=null?` · ห่างจาก${esc(refName)} ${km<1?Math.round(km*1000)+' ม.':km.toFixed(1)+' กม.'}`:''}</small></button>` }).join('');
+    return `<button type="button" class="sg" data-pick="${i}"><b>${esc(p[2]||p[0])}</b>${p[2]?` <small>${esc(p[0])}</small>`:''}<small>${PCAT[p[5]]?PCAT[p[5]][0]:''}${p[8]?' · '+esc(p[8]):''}${ns?` · MTR ${esc(codeName(ns.c))} ~${ns.m} ม.`:''}${isFood(p)&&km!=null?` · ห่างจาก${esc(refName)} ${km<1?Math.round(km*1000)+' ม.':km.toFixed(1)+' กม.'}`:''}</small></button>` }).join('')+online;
 }
+// places from OpenStreetMap's own search (Nominatim), asked for only when its row is tapped; a picked one works like any other place
+const OSM_CAT = t => /place_of_worship|temple|shrine|monastery/.test(t)?'temple' : /museum|gallery/.test(t)?'museum' : /restaurant|fast_food|food_court/.test(t)?'food' : /cafe|bakery|dessert|ice_cream/.test(t)?'cafe'
+  : /mall|department_store/.test(t)?'mall' : /marketplace|market/.test(t)?'market' : /viewpoint|peak/.test(t)?'view' : /beach/.test(t)?'beach' : /park|garden/.test(t)?'park' : /theme_park/.test(t)?'theme' : 'sight';
+function osmRowsHTML(d){
+  if(d.osm==='wait') return '<div class="sg"><small>กำลังค้นหาจากแผนที่ออนไลน์…</small></div>';
+  if(d.osm==='fail') return '<div class="sg"><small>ค้นหาออนไลน์ไม่สำเร็จ ลองใหม่ หรือพิมพ์ชื่อแล้วกดบันทึกได้เลย</small></div>';
+  if(!d.osm.length) return '<div class="sg"><small>ไม่พบในแผนที่ออนไลน์ ลองพิมพ์ชื่อภาษาอังกฤษ หรือพิมพ์ชื่อแล้วกดบันทึกได้เลย</small></div>';
+  return d.osm.map((p,i)=>{ const ns=nearestStation([p[3]/1e5,p[4]/1e5]);
+    return '<button type="button" class="sg" data-osmpick="'+i+'"><b>'+esc(p[0])+'</b>'+(p[1]?' <small>'+esc(p[1])+'</small>':'')+'<small>'+(PCAT[p[5]]?PCAT[p[5]][0]:'')+(p.addr?' · '+esc(p.addr):'')+(ns?' · MTR '+esc(codeName(ns.c))+' ~'+ns.m+' ม.':'')+' · จากแผนที่ออนไลน์</small></button>' }).join('');
+}
+async function osmFind(){
+  const d=S.sheet; if(!d || d.kind!=='item') return; readItemForm(); const q=(d.h||'').trim(); if(q.length<3) return;
+  d.osmQ=q; d.sugQ=q; d.osm='wait'; const paint=()=>{ const el=document.getElementById('i-sug'); if(el && S.sheet===d) el.innerHTML=sugHTML(d.sugQ) }; paint();
+  try{
+    const u='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&addressdetails=1&accept-language=en&viewbox=113.82,22.57,114.45,22.14&bounded=1&q='+encodeURIComponent(q);
+    const r=await fetch(u,{headers:{Accept:'application/json'}}); if(!r.ok) throw 0; const j=await r.json();
+    d.osm=j.filter(x=>x.lat && x.lon && x.name && x.type!=='bus_stop' && x.category!=='highway').map(x=>{ const a=x.address||{}, row=[x.name, '', '', Math.round(+x.lat*1e5), Math.round(+x.lon*1e5), OSM_CAT((x.type||'')+' '+(x.category||'')), 0, '', '', ''];
+      row.addr=[a.road, a.suburb||a.quarter||a.city_district].filter(Boolean).join(', ').slice(0,40); return row });
+  }catch(e){ d.osm='fail' }
+  paint();
+}
+function osmPick(i){ const d=S.sheet, p=d && Array.isArray(d.osm) && d.osm[i]; if(!p || !PL) return;
+  let k=PL.p.findIndex(q=>q[0]===p[0] && Math.abs(q[3]-p[3])<30 && Math.abs(q[4]-p[4])<30);   // the app may know it already (with hours)
+  if(k<0){ PL.p.push(p); k=PL.p.length-1 } d.osm=null; pickPlace(k) }
 function readItemForm(){ const d=S.sheet; for(const k of ['h','t','e','p','map','ex']) { const el=document.getElementById('i-'+k); if(el) d[k]=el.value } }   // the station comes from the station picker (d.st)
 
 /* ---------- writes ---------- */
@@ -3826,6 +3925,7 @@ function mapGo(v){ const [d,id]=v.split(':'); S.day=Number(d); setTab('plan');
 document.addEventListener('keydown', e=>{ const mg=e.target.closest&&e.target.closest('[data-mapgo]'); if(mg&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); mapGo(mg.dataset.mapgo) } });
 document.addEventListener('click', e=>{
   if(e.target.closest && e.target.closest('[data-undo]')){ undoArrange(); return }
+  if(e.target.closest && e.target.closest('[data-drop]')){ dropStop(e.target.closest('[data-drop]').dataset.drop); return }
   if(e.target.closest && e.target.closest('[data-leave]')){ leaveStop(e.target.closest('[data-leave]').dataset.leave); return }
   if(e.target.closest && e.target.closest('[data-arrday]')){ arrangeDay(Number(e.target.closest('[data-arrday]').dataset.arrday)); return }
   const mg=e.target.closest('[data-mapgo]'); if(mg) return mapGo(mg.dataset.mapgo);
@@ -3945,6 +4045,8 @@ document.addEventListener('click', e=>{
   if(t.id==='f-save') return saveExpense();
   if(t.id==='i-save') return saveItem();
   if(ds.pick && S.sheet) return pickPlace(Number(ds.pick));
+  if(ds.osmfind && S.sheet) return osmFind();
+  if(ds.osmpick && S.sheet) return osmPick(Number(ds.osmpick));
   if(t.id==='i-del') return deleteItem();
   if(ds.ex){ S.openEx = S.openEx===ds.ex ? null : ds.ex; renderMoney(); return }
   if(t.hasAttribute('data-cancel')){ S.openEx=null; renderMoney(); return }
