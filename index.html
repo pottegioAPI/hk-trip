@@ -930,7 +930,7 @@ function exitFor(it){
 }
 const exitTxt = x => x ? `Exit ${x.ref}${x.name?' · '+x.name:''}` : '';
 const HOTEL_LL = [22.3174,114.1694]; // Sun Hing Building, 603-609 Nathan Road, Mong Kok (MTR Mong Kok Exit E1, ~100 m south)
-const DEF_LL = Object.fromEntries([...DEFAULT_PLAN.flat().filter(i=>i.ll).map(i=>[i.id,i.ll]), ...['1b','2a','3a','3d','4a'].map(id=>[id,HOTEL_LL]), ['3c',[22.3130,114.0413]], ['4c',[22.2893,113.9408]], ['4d',[22.2896,113.9417]]]); // also covers saved plans made before coordinates existed
+const DEF_LL = Object.fromEntries([...DEFAULT_PLAN.flat().filter(i=>i.ll).map(i=>[i.id,i.ll]), ...['1b','2a','3a','3d','4a'].map(id=>[id,HOTEL_LL]), ['3c',[22.3130,114.0413]], ['4c',[22.2890,113.9385]], ['4d',[22.2896,113.9417]]]); // also covers saved plans made before coordinates existed
 const locOf = it => it ? ((eatOf(it)||{}).ll || it.ll || DEF_LL[it.id] || (it.st ? stLL(it.st) : null)) : null;
 function metres(a,b){ const dy=(a[0]-b[0])*111320, dx=(a[1]-b[1])*111320*Math.cos(a[0]*Math.PI/180); return Math.hypot(dx,dy) }
 const dowOf = iso => (new Date(iso+'T12:00:00Z').getUTCDay()+6)%7; // Mon=0 … Sun=6
@@ -985,16 +985,16 @@ function busOpt(o){
   const r=BUS.routes[o.ri], kind=busKind(r);
   return {key:o.key, mode:r[3]===4?'ferry':'bus', n:`${kind} ${r[0]}${o.night?' (รอบกลางคืน)':''}`, d:`ขึ้นป้าย ${stopName(o.from)} · ${o.n} ป้าย`, fare:o.fare, mins:o.mins, bx:o};
 }
-function busSteps(o, itemId){
+function busSteps(o, itemId, src, srcName, dest){
   const r=BUS.routes[o.ri], toward = o.last==null ? r[2] : o.last===o.first ? r[2]+' (สายวงกลม)' : stopName(o.last);
-  const ll=stopLL(o.from), c='var(--sky)';
+  const ll=stopLL(o.from), c='var(--sky)', w1=walkLeg(src, ll), w2=walkLeg(stopLL(o.to), dest);
   return `<ol class="legs">
-    <li class="lg walk" style="--c:var(--muted)"><span class="nd"></span><div><div class="stn">จุดที่อยู่ตอนนี้</div><div class="how">เดินไปป้ายรถ ประมาณ ${o.w1} ม. (~${Math.max(1,Math.round(o.w1/75))} นาที)</div></div></li>
+    <li class="lg walk" style="--c:var(--muted)"><span class="nd"></span><div><div class="stn">${esc(srcName||'จุดที่อยู่ตอนนี้')}</div><div class="how">${w1?`ออกจากที่นี่ เดินไปป้ายรถ <b>${esc(stopName(o.from))}</b> · ${w1.txt}`:`เดินไปป้ายรถ ประมาณ ${o.w1} ม. (~${Math.max(1,Math.round(o.w1/75))} นาที)`}</div>${w1&&w1.d>=40?`<div class="how"><a class="btn-s" href="${w1.url}" target="_blank" rel="noopener">${ic('pin')}นำทางเดินไปป้ายรถ</a></div>`:''}</div></li>
     <li class="lg" style="--c:${c}"><span class="nd"></span><div><div class="stn">${esc(stopName(o.from))}</div>
       <div class="how">ขึ้น <span class="ln" style="background:${c}">${busKind(r)} ${esc(r[0])}</span> ป้ายหน้ารถเขียนปลายทาง <b>${esc(toward)}</b> · นั่ง ${o.n} ป้าย${r[4]?` · มาทุก ~${r[4]} นาที`:''}${r[4]>=30?' <b style="color:var(--danger)">(รถไม่บ่อย)</b>':''}${o.lastAt!=null && o.dep!=null && o.lastAt-o.dep<=75?` <b style="color:var(--danger)">· เที่ยวสุดท้ายผ่านป้ายนี้ราว ${hhmm(o.lastAt)} น.</b>`:''}</div>
       ${o.seq!=null?liveBtn({bus:o}):''}
       <div class="how"><a class="btn-s" href="https://www.google.com/maps/search/?api=1&query=${ll[0]},${ll[1]}" target="_blank" rel="noopener">${ic('pin')}ดูป้ายขึ้นในแผนที่</a></div></div></li>
-    <li class="lg end" style="--c:${c}"><span class="nd"></span><div><div class="stn">${esc(stopName(o.to))} <small>ป้ายลง</small></div><div class="how">${itemId&&o.alts&&o.alts.length?`<div class="how alts">ลงป้ายอื่นได้: ${o.alts.slice(0,3).map(a=>`<button type="button" class="btn-s" data-alight="${esc(itemId)}|${esc(a.name)}">${esc(a.name.replace(/, .*$/,''))} <small>เดินต่อ ~${a.d} ม.</small></button>`).join('')}</div>`:''}${(()=>{ const s=ridePattern(o); return s&&s.length>2?`ป้ายก่อนหน้าคือ <b>${esc(stopName(s[s.length-2]))}</b> พอเห็นชื่อนี้บนจอในรถให้กดกริ่ง · `:'' })()}ลงป้ายนี้ แล้วเดินต่อ ~${o.w2} ม.</div><div class="how">${rideBtn(o)}</div></div></li></ol>
+    <li class="lg end" style="--c:${c}"><span class="nd"></span><div><div class="stn">${esc(stopName(o.to))} <small>ป้ายลง</small></div><div class="how">${(()=>{ const s=ridePattern(o); return s&&s.length>2?`ป้ายก่อนหน้าคือ <b>${esc(stopName(s[s.length-2]))}</b> พอเห็นชื่อนี้บนจอในรถให้กดกริ่ง · `:'' })()}ลงป้ายนี้ ${w2?`แล้ว${w2.txt.replace(/^เดิน/,'เดินต่อ')}`:`แล้วเดินต่อ ~${o.w2} ม.`}</div><div class="how">${rideBtn(o)}${w2&&w2.d>=40?`<a class="btn-s" href="${w2.url}" target="_blank" rel="noopener">${ic('pin')}นำทางเดินจากป้ายรถ</a>`:''}</div>${itemId&&o.alts&&o.alts.length?`<div class="how alts">อยากลงป้ายอื่น: ${o.alts.slice(0,2).map(a=>`<button type="button" class="btn-s" data-alight="${esc(itemId)}|${esc(a.name)}">${esc(a.name.replace(/, .*$/,''))} <small>เดินต่อ ~${a.d} ม.</small></button>`).join('')}</div>`:''}</div></li></ol>
     ${r[5]?`<a class="btn-s" href="${esc(r[5])}" target="_blank" rel="noopener">${ic('bus')}ดูเวลารถมาจริง (เว็บ ${esc(r[1])})</a>`:''}
     <div class="src">${esc(r[1])} · ${esc(r[2])} · ค่ารถตามป้ายที่ขึ้น (บัตร Octopus/เงินสด) ข้อมูลกรมขนส่งฮ่องกง</div>`;
 }
@@ -1035,7 +1035,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('e1855df3fa|10 พ.ย. 10:10|1.30');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('a528937126|10 พ.ย. 10:47|1.31');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -2375,9 +2375,32 @@ function legHTML(l){
   return `<div class="leg">${esc(stName(l.from))} <span class="arrow">→</span> <span class="ln" style="background:${LINES[l.line].c}">${LINES[l.line].n}</span> <span class="arrow">→</span> <b>${esc(stName(l.to))}</b><span class="fare">ทาง ${esc(l.toward)} · ${l.stops} ป้าย</span></div>`;
 }
 // entrance → platform direction → change → exit, as a vertical line diagram
-function stepsHTML(legs, inEx, outEx, dest){
+// walking from one point to another: which way, how far (streets are ~30% longer than the straight line), and a walking map
+function walkLeg(a, b){ if(!a||!b) return null; const d=metres(a,b), mins=Math.max(1,Math.round(d*1.3/75));
+  return {d, mins, txt: d<40 ? 'อยู่ตรงนั้นเลย (ไม่ถึง 50 ม.)' : 'เดินไปทางทิศ<b>'+compassTh(bearing(a,b))+'</b> ประมาณ '+wDist(d*1.3)+' (~'+mins+' นาที)',
+    url:'https://www.google.com/maps/dir/?api=1&origin='+a[0].toFixed(5)+','+a[1].toFixed(5)+'&destination='+b[0].toFixed(5)+','+b[1].toFixed(5)+'&travelmode=walking'} }
+// the first step of a ride: leave the place we are at and walk to the station entrance
+// a walk from one stop of the plan to the next
+function walkStepsHTML(prev, it){
+  const a=locOf(prev), b=locOf(it), w=walkLeg(a, b); if(!w) return '';
+  const from = prev.id==='hotel' ? 'ที่พัก' : prev.h;
+  return '<div class="route"><ol class="legs"><li class="lg walk" style="--c:var(--muted)"><span class="nd"></span><div><div class="stn">'+esc(from)+'</div>'
+    +'<div class="how">ออกจากที่นี่ '+w.txt+'</div>'+(w.d>=40?'<div class="how"><a class="btn-s" href="'+w.url+'" target="_blank" rel="noopener">'+ic('pin')+'นำทางเดิน</a></div>':'')+'</div></li>'
+    +'<li class="lg end" style="--c:var(--muted)"><span class="nd"></span><div><div class="stn">'+esc(it.h)+' <small>ที่หมาย</small></div>'
+    +(it.p?'':'<div class="how">ถ้าหาไม่เจอ กด "แผนที่" ด้านล่าง</div>')+'</div></li></ol></div>';
+}
+function firstMileMTR(st, inEx, src, srcName){
+  if(!src) return '';
+  let ref=String(inEx||'').split(/\s/)[0], name=String(inEx||'').replace(/^\S+\s*·?\s*/,'');
+  if(!ref){ const x=nearestExit(st, src); if(x){ ref=x.ref; name=x.name||'' } }
+  const to = (ref && exitLL(st, ref)) || stLL(st), w=walkLeg(src, to); if(!w) return '';
+  return '<li class="lg walk" style="--c:var(--muted)"><span class="nd"></span><div><div class="stn">'+esc(srcName||'จุดที่อยู่ตอนนี้')+'</div>'
+    +'<div class="how">ออกจากที่นี่ เดินไปสถานี MTR <b>'+esc(stName(NET.byCode[st]))+'</b>'+(ref?' เข้าทาง <span class="exit">Exit '+esc(ref)+'</span>'+(name&&!/ประมาณจากแผนที่/.test(name)?' ('+esc(name)+')':''):'')+' · '+w.txt+'</div>'
+    +(w.d>=40?'<div class="how"><a class="btn-s" href="'+w.url+'" target="_blank" rel="noopener">'+ic('pin')+'นำทางเดินไป'+(ref?' Exit '+esc(ref):'สถานี')+'</a></div>':'')+'</div></li>';
+}
+function stepsHTML(legs, inEx, outEx, dest, src, srcName){
   const endSt=legs[legs.length-1].to;
-  return `<ol class="legs">` + legs.map((L,k)=>{
+  return `<ol class="legs">` + firstMileMTR(MTR.st[legs[0].from][0], inEx, src, srcName) + legs.map((L,k)=>{
     const walk=L.line==='WALK', c=walk?'var(--muted)':LINES[L.line].c;
     const enter = k===0 ? `เข้าสถานี${inEx?` ทาง <span class="exit">Exit ${esc(inEx)}</span>`:''} แล้ว` : 'เปลี่ยนสาย';
     return `<li class="lg${walk?' walk':''}" style="--c:${c}"><span class="nd"></span><div>
@@ -2404,10 +2427,11 @@ function renderPlan(){
     if(S.compact) return compactItem(it, done, cur, sel, r);
     const gh = opts.length ? `<div class="gh"><div class="lab">วิธีไปจาก ${esc(prev.h)}${done?' (ถึงแล้ว)':''}</div>
       <div class="opts">${optHTML(it,sel,true)}</div>
-      ${!done && routeOpen && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it))}
+      ${!done && routeOpen && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it), locOf(prev), prev.id==='hotel'?'ที่พัก':prev.h)}
         ${window.claude?`<a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}ดูเวลารถไฟขบวนถัดไป (MTR)</a>`:''}</div>` : ''}
-      ${!done && routeOpen && sel.bx ? `<div class="route">${busSteps(sel.bx, it.id)}</div>` : ''}
-      ${!done ? `<div class="ghbtns">${sel.legs&&sel.legs.length||sel.bx?`<button class="more" type="button" data-route="${it.id}">${routeOpen?'ซ่อนเส้นทาง ▴':'ดูเส้นทาง ▾'}</button>`:''}
+      ${!done && routeOpen && sel.bx ? `<div class="route">${busSteps(sel.bx, it.id, locOf(prev), prev.id==='hotel'?'ที่พัก':prev.h, locOf(it))}</div>` : ''}
+      ${!done && routeOpen && sel.key==='walk' ? walkStepsHTML(prev, it) : ''}
+      ${!done ? `<div class="ghbtns">${sel.legs&&sel.legs.length||sel.bx||sel.key==='walk'&&walkLeg(locOf(prev),locOf(it))?`<button class="more" type="button" data-route="${it.id}">${routeOpen?'ซ่อนเส้นทาง ▴':'ดูเส้นทาง ▾'}</button>`:''}
         <button class="more" type="button" data-gh="${it.id}">${open?'ปิดตัวเลือก ▴':`เปลี่ยนวิธี (${opts.length-1} แบบอื่น) ▾`}</button></div>` : ''}
       ${open ? `<div class="opts others">${opts.filter(o=>o.key!==sel.key).map(o=>optHTML(it,o,false)).join('')}</div>` : ''}
       ${!done && sel.manual ? `<div class="fin">${sel.key==='bus:c'?`<input type="text" id="no-${it.id}" placeholder="เลขสาย" value="${esc(it.go&&it.go.no||'')}" style="width:80px">`:''}
