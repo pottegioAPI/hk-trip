@@ -2133,35 +2133,45 @@ function flightHTML(no){
       <a class="btn-s" href="https://www.flightstats.com/v2/flight-tracker/EK/${no.slice(2)}" target="_blank" rel="noopener">ติดตามเครื่องบิน</a></div></div>`;
 }
 /* ---------- EK384 tracker (server follows the aircraft every 5 min, 10–14 Nov; this only reads it) ---------- */
-let EK=null; try{ EK=JSON.parse(lsGet('hk-ek384','null')) }catch(e){}
+// which flight the plane on the home page follows: EK384 (our flight there) until the 14th, then EK385 (home) until the 17th
+const ekNo = () => hkNow().date<'2026-11-15' ? '384' : '385';
+const EKR = { '384': {from:'ดูไบ', mid:'กรุงเทพฯ', to:'ฮ่องกง', f:['dxbDep','bkkArr','bkkDep','hkgArr'], ap:['dxbApprox','bkkArrApprox'], cols:['ออกดูไบ','ถึง BKK','ออก BKK','ถึง HK']},
+              '385': {from:'ฮ่องกง', mid:'กรุงเทพฯ', to:'ดูไบ', f:['hkgDep','bkkArr','bkkDep','dxbArr'], ap:['hkgApprox','bkkArrApprox'], cols:['ออก HK','ถึง BKK','ออก BKK','ถึงดูไบ']} };
+let EK=null; try{ EK=JSON.parse(lsGet('hk-ek'+ekNo(),'null')) }catch(e){}
 S.ekOpen=false;
-const ekShow = () => hkNow().date<'2026-11-15';
+const ekShow = () => hkNow().date<'2026-11-18';
 async function ekFetch(force){
-  if(window.claude || !ekShow()) return; if(!force && EK && Date.now()-EK.got<3*60e3) return;
-  try{ const j=await liveJSON(SB.url+'/functions/v1/hk-push?ek384=1'); if(j && !j.error){ EK={...j, got:Date.now()}; lsSet('hk-ek384', JSON.stringify(EK)); if(S.tab==='home') renderHome() } }catch(e){}
+  if(window.claude || !ekShow()) return; const no=ekNo(); if(EK && EK.no!==no) EK=null;
+  if(!force && EK && Date.now()-EK.got<3*60e3) return;
+  try{ const j=await liveJSON(SB.url+'/functions/v1/hk-push?ek'+no+'=1'); if(j && !j.error){ EK={...j, no, got:Date.now()}; lsSet('hk-ek'+no, JSON.stringify(EK)); if(S.tab==='home') renderHome() } }catch(e){}
 }
 const thT = iso => { if(!iso) return null; const d=new Date(Date.parse(iso)+7*3600e3); return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0') };
 const thToday = () => new Date(Date.now()+7*3600e3).toISOString().slice(0,10);
-// where the aircraft is in today's trip: 0 nothing yet, 1 flying from Dubai, 2 in Bangkok, 3 flying to Hong Kong, 4 in Hong Kong
-function ekStage(){ const t=EK&&EK.hist&&EK.hist[thToday()]; if(!t) return 0; return t.hkgArr?4:t.bkkDep?3:t.bkkArr?2:t.dxbDep?1:0 }
+// where the aircraft is in today's trip: 0 nothing yet, 1 first leg, 2 in Bangkok, 3 second leg, 4 arrived
+// (EK385 leaves Hong Kong in the Thai evening and lands in Dubai after midnight: before 08:00 the trip is yesterday's)
+const ekDay = () => ekNo()==='385' && new Date(Date.now()+7*3600e3).getUTCHours()<8 ? new Date(Date.now()-17*3600e3).toISOString().slice(0,10) : thToday();
+function ekStage(){ const t=EK&&EK.hist&&EK.hist[ekDay()], f=EKR[ekNo()].f; if(!t) return 0; return t[f[3]]?4:t[f[2]]?3:t[f[1]]?2:t[f[0]]?1:0 }
 function ekChipHTML(){
   if(!ekShow() || window.claude) return '';
-  const st=ekStage(), lab=['ยังไม่ออก','บินจากดูไบ','อยู่กรุงเทพฯ','บินไปฮ่องกง','ถึงฮ่องกง'][st];
-  return '<button type="button" class="ekchip" data-ek="1" aria-expanded="'+S.ekOpen+'" aria-label="ติดตามเที่ยวบิน EK384"><svg viewBox="-12 -12 24 24" width="16" height="16" aria-hidden="true"><path d="M-11 1 L-3 -1 L2 -9 L5 -9 L3 -1 L10 -1 Q12 0 10 1 L3 1 L5 9 L2 9 L-3 1 Z" fill="currentColor"/></svg>EK384<span class="ekst s'+st+'">'+lab+'</span></button>';
+  const no=ekNo(), r=EKR[no], st=ekStage(), lab=['ยังไม่ออก','บินจาก'+r.from,'อยู่กรุงเทพฯ','บินไป'+r.to,'ถึง'+r.to][st];
+  return '<button type="button" class="ekchip" data-ek="1" aria-expanded="'+S.ekOpen+'" aria-label="ติดตามเที่ยวบิน EK'+no+'"><svg viewBox="-12 -12 24 24" width="16" height="16" aria-hidden="true"><path d="M-11 1 L-3 -1 L2 -9 L5 -9 L3 -1 L10 -1 Q12 0 10 1 L3 1 L5 9 L2 9 L-3 1 Z" fill="currentColor"/></svg>EK'+no+'<span class="ekst s'+st+'">'+lab+'</span></button>';
 }
 function ekPanelHTML(){
   if(!S.ekOpen || !ekShow()) return '';
-  const d=thToday(), t=EK&&EK.hist&&EK.hist[d]||{}, row=(k,v,approx)=>'<li><span>'+k+'</span><b class="num">'+(v?(approx?'≈ ':'')+v+' น.':'—')+'</b></li>';
+  const no=ekNo(), r=EKR[no], f=r.f, d=ekDay(), t=EK&&EK.no===no&&EK.hist&&EK.hist[d]||{}, row=(k,v,approx)=>'<li><span>'+k+'</span><b class="num">'+(v?(approx?'≈ ':'')+v+' น.':'—')+'</b></li>';
   const seen=EK&&EK.seen&&Date.now()-Date.parse(EK.seen.at)<15*60e3 ? EK.seen : null;
-  const past=Object.entries(EK&&EK.hist||{}).filter(([k])=>k<d).sort().reverse().slice(0,4);
-  const mine=d==='2026-11-14';
-  return '<div class="panel ekpanel"><h3>✈️ ติดตาม EK384 · ดูไบ → กรุงเทพฯ → ฮ่องกง</h3>'
-    +'<p class="mini" style="margin:0 0 6px">วันนี้ ('+(+d.slice(8))+' พ.ย.) · เวลาไทย</p><ul class="ekrows">'
-    +row('ออกจากดูไบ', thT(t.dxbDep), t.dxbApprox)+row('ถึงสุวรรณภูมิ', thT(t.bkkArr), t.bkkArrApprox)+row('ออกจากสุวรรณภูมิ', thT(t.bkkDep))+row('ถึงฮ่องกง', thT(t.hkgArr))+'</ul>'
+  const past=Object.entries(EK&&EK.no===no&&EK.hist||{}).filter(([k])=>k<d).sort().reverse().slice(0,4);
+  const mine = no==='384' ? d==='2026-11-14' : d==='2026-11-17';
+  const note = no==='384'
+    ? (mine?'<b>เที่ยวที่เราบิน:</b> ออกจากสุวรรณภูมิ 13:45 น. ประตูขึ้นเครื่องและเวลาบอร์ดดิ้งดูบนบอร์ดดิ้งพาส หรือจอในสนามบิน':'วันที่ 14 พ.ย. เราบินช่วงกรุงเทพฯ → ฮ่องกง ออก 13:45 น.')
+    : (mine?'<b>เที่ยวที่เรานั่งกลับ:</b> ออกจากฮ่องกง 21:00 น. (20:00 น. เวลาไทย) ลงที่สุวรรณภูมิ':'วันที่ 17 พ.ย. เรานั่งช่วงฮ่องกง → กรุงเทพฯ ออก 21:00 น. เวลาฮ่องกง');
+  return '<div class="panel ekpanel"><h3>✈️ ติดตาม EK'+no+' · '+r.from+' → '+r.mid+' → '+r.to+'</h3>'
+    +'<p class="mini" style="margin:0 0 6px">เที่ยววันที่ '+(+d.slice(8))+' พ.ย. · เวลาไทย</p><ul class="ekrows">'
+    +row('ออกจาก'+r.from, thT(t[f[0]]), t[r.ap[0]])+row('ถึงสุวรรณภูมิ', thT(t[f[1]]), t[r.ap[1]])+row('ออกจากสุวรรณภูมิ', thT(t[f[2]]))+row('ถึง'+r.to, thT(t[f[3]]))+'</ul>'
     +(seen?'<p class="mini">ตอนนี้: '+(seen.alt==='ground'?'จอดอยู่บนพื้น':'บินอยู่ที่ความสูง '+Math.round(seen.alt/100)*100+' ฟุต')+'</p>':'')
-    +(past.length?'<p class="mini" style="margin:8px 0 4px">วันก่อนๆ (ดูว่าตรงเวลาแค่ไหน)</p><table class="ektab"><tr><th>วัน</th><th>ออกดูไบ</th><th>ถึง BKK</th><th>ออก BKK</th></tr>'
-      +past.map(([k,v])=>'<tr><td>'+(+k.slice(8))+' พ.ย.</td><td class="num">'+(thT(v.dxbDep)||'—')+'</td><td class="num">'+(thT(v.bkkArr)||'—')+'</td><td class="num">'+(thT(v.bkkDep)||'—')+'</td></tr>').join('')+'</table>':'')
-    +(mine?'<p class="mini" style="margin-top:8px"><b>เที่ยวที่เราบิน:</b> ออกจากสุวรรณภูมิ 13:45 น. ประตูขึ้นเครื่องและเวลาบอร์ดดิ้งดูบนบอร์ดดิ้งพาส หรือจอในสนามบิน</p>':'<p class="mini" style="margin-top:8px">วันที่ 14 พ.ย. เราบินช่วงกรุงเทพฯ → ฮ่องกง ออก 13:45 น.</p>')
+    +(past.length?'<p class="mini" style="margin:8px 0 4px">วันก่อนๆ (ดูว่าตรงเวลาแค่ไหน)</p><table class="ektab"><tr><th>วัน</th>'+r.cols.map(c=>'<th>'+c+'</th>').join('')+'</tr>'
+      +past.map(([k,v])=>'<tr><td>'+(+k.slice(8))+' พ.ย.</td>'+f.map(x=>'<td class="num">'+(thT(v[x])||'—')+'</td>').join('')+'</tr>').join('')+'</table>':'')
+    +'<p class="mini" style="margin-top:8px">'+note+'</p>'
     +'<p class="mini">ข้อมูลจากสัญญาณเครื่องบินจริง (ADS-B) และตารางสนามบินฮ่องกง'+(EK&&EK.checked?' · เช็คล่าสุด '+thT(EK.checked)+' น.':'')+'</p>'
     +'<div class="acts"><a class="btn-s" href="https://www.emirates.com/english/manage-booking/flight-status/" target="_blank" rel="noopener">สถานะบนเว็บ Emirates</a></div></div>';
 }

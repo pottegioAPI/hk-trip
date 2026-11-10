@@ -83,48 +83,57 @@ const AP: Record<string, [number, number]> = { DXB: [25.2532, 55.3657], BKK: [13
 const km = (a: [number, number], b: [number, number]) => { const r = Math.PI / 180, x = (b[1] - a[1]) * r * Math.cos((a[0] + b[0]) / 2 * r), y = (b[0] - a[0]) * r; return Math.sqrt(x * x + y * y) * 6371 };
 const thTime = (iso: string) => { const d = new Date(Date.parse(iso) + 7 * 3600e3); return String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0') };
 const thDate = (t: number) => new Date(t + 7 * 3600e3).toISOString().slice(0, 10);
-async function ekTrack(now: number, mock: any = {}) {
-  const st: any = JSON.parse((await conf('ek384')) || '{}'); st.hist = st.hist || {}; const ev: string[] = [];
-  const j = mock.adsb || await getJSON('https://api.adsb.lol/v2/callsign/UAE384');
+// one tracker for both flights: route [origin, Bangkok stop, destination]; field names follow the airports
+// (EK384: dxbDep, bkkArr, bkkDep, hkgArr · EK385: hkgDep, bkkArr, bkkDep, dxbArr)
+async function ekTrack(key: string, cs: string, route: string[], now: number, adsb?: any) {
+  const [O, M, D] = route, o = O.toLowerCase(), m = M.toLowerCase(), d = D.toLowerCase();
+  const oDep = o + 'Dep', oAp = o + 'Approx', mArr = m + 'Arr', mAp = m + 'ArrApprox', mDep = m + 'Dep', dArr = d + 'Arr';
+  const side = Math.sign(AP[D][1] - AP[M][1]);   // +1: the second leg flies east (to Hong Kong), -1: west (to Dubai)
+  const st: any = JSON.parse((await conf(key)) || '{}'); st.hist = st.hist || {}; const ev: string[] = [];
+  const j = adsb || await getJSON('https://api.adsb.lol/v2/callsign/' + cs);
   const a = (j?.ac || [])[0], iso = new Date(now).toISOString();
-  let cur = st.cur && now - Date.parse(st.cur.start) < 20 * 3600e3 ? st.cur : null;   // one trip of the aircraft, Dubai to Hong Kong, takes ~11 h
+  let cur = st.cur && now - Date.parse(st.cur.start) < 20 * 3600e3 ? st.cur : null;   // one trip of the aircraft takes ~11-12 h
   if (a && a.lat != null) {
     const p: [number, number] = [a.lat, a.lon], ground = a.alt_baro === 'ground', alt = ground ? 0 : Number(a.alt_baro) || 0;
-    const dD = km(p, AP.DXB), dB = km(p, AP.BKK), dH = km(p, AP.HKG);
-    if (!ground && !cur && dD < dB) {   // in the air on the Dubai leg: a new trip
-      cur = { day: thDate(now), start: iso, dxbDep: iso, dxbApprox: dD > 400 }; ev.push('dxbDep');
+    const dO = km(p, AP[O]), dM = km(p, AP[M]), dD = km(p, AP[D]), past = side * (a.lon - AP[M][1]);
+    if (!ground && !cur && dO < dM) {   // in the air on the first leg: a new trip
+      cur = { day: thDate(now), start: iso, [oDep]: iso, [oAp]: dO > 400 }; ev.push('oDep');
     }
-    if (!ground && !cur && dB < 400 && a.lon > AP.BKK[1]) {   // first seen already leaving Bangkok (the Dubai leg was missed)
-      cur = { day: thDate(now), start: iso, dxbDep: null, bkkArr: null, bkkDep: iso }; ev.push('bkkDep');
+    if (!ground && !cur && dM < 400 && past > 0) {   // first seen already leaving Bangkok (the first leg was missed)
+      cur = { day: thDate(now), start: iso, [oDep]: null, [mArr]: null, [mDep]: iso }; ev.push('mDep');
     }
     if (cur) {
-      if (cur.dxbDep && !cur.bkkArr && ground && dB < 30) { cur.bkkArr = iso; ev.push('bkkArr') }
-      // in the air east of Bangkok: on the way to Hong Kong (also when the landing in Bangkok was not caught)
-      if (cur.dxbDep && !cur.bkkArr && !ground && a.lon > AP.BKK[1] + 0.3) { cur.bkkArr = cur.last?.at || iso; cur.bkkArrApprox = true }
-      if (cur.bkkArr && !cur.bkkDep && !ground && dB < 400) { cur.bkkDep = iso; ev.push('bkkDep') }
-      if (cur.bkkDep && !cur.hkgArr && ground && dH < 30) { cur.hkgArr = iso; ev.push('hkgArr') }
+      if (cur[oDep] && !cur[mArr] && ground && dM < 30) { cur[mArr] = iso; ev.push('mArr') }
+      // in the air beyond Bangkok: on the second leg (also when the landing in Bangkok was not caught)
+      if (cur[oDep] && !cur[mArr] && !ground && past > 0.3) { cur[mArr] = cur.last?.at || iso; cur[mAp] = true }
+      if (cur[mArr] && !cur[mDep] && !ground && dM < 400) { cur[mDep] = iso; ev.push('mDep') }
+      if (cur[mDep] && !cur[dArr] && ground && dD < 30) { cur[dArr] = iso; ev.push('dArr') }
       cur.last = { lat: a.lat, lon: a.lon, alt, gs: a.gs ?? null, at: iso };
     }
   } else if (cur && cur.last && now - Date.parse(cur.last.at) < 30 * 60e3 && cur.last.alt > 0 && cur.last.alt < 15000) {
     // gone from the air while coming down near an airport: landed (receivers often miss aircraft on the ground);
     // the landing time is the last sighting plus the flying time left at that speed
-    const p: [number, number] = [cur.last.lat, cur.last.lon], land = (d: number) => new Date(Date.parse(cur.last.at) + Math.min(20, d / ((cur.last.gs || 250) * 1.852 / 60)) * 60e3).toISOString();
-    const dB = km(p, AP.BKK), dH = km(p, AP.HKG);
-    if (!cur.bkkArr && dB < 150) { cur.bkkArr = land(dB); ev.push('bkkArr') }
-    else if (cur.bkkDep && !cur.hkgArr && dH < 150) { cur.hkgArr = land(dH); ev.push('hkgArr') }
+    const p: [number, number] = [cur.last.lat, cur.last.lon], land = (x: number) => new Date(Date.parse(cur.last.at) + Math.min(20, x / ((cur.last.gs || 250) * 1.852 / 60)) * 60e3).toISOString();
+    const dM = km(p, AP[M]), dD = km(p, AP[D]);
+    if (!cur[mArr] && dM < 150) { cur[mArr] = land(dM); ev.push('mArr') }
+    else if (cur[mDep] && !cur[dArr] && dD < 150) { cur[dArr] = land(dD); ev.push('dArr') }
   }
-  if (cur) { st.cur = cur; st.hist[cur.day] = { dxbDep: cur.dxbDep, dxbApprox: cur.dxbApprox, bkkArr: cur.bkkArr || null, bkkArrApprox: !!cur.bkkArrApprox, bkkDep: cur.bkkDep || null, hkgArr: cur.hkgArr || null } }
+  if (cur) { st.cur = cur; st.hist[cur.day] = { [oDep]: cur[oDep] || null, [oAp]: !!cur[oAp], [mArr]: cur[mArr] || null, [mAp]: !!cur[mAp], [mDep]: cur[mDep] || null, [dArr]: cur[dArr] || null } }
   const days = Object.keys(st.hist).sort(); while (days.length > 7) delete st.hist[days.shift()!];
   st.seen = a ? { at: iso, lat: a.lat, lon: a.lon, alt: a.alt_baro, gs: a.gs ?? null } : st.seen || null; st.checked = iso;
-  await db.from('hk_config').upsert({ k: 'ek384', v: JSON.stringify(st) });
+  await db.from('hk_config').upsert({ k: key, v: JSON.stringify(st) });
   return { st, cur, ev };
 }
+const hkTime = (iso: string) => { const d = new Date(Date.parse(iso) + 8 * 3600e3); return String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0') };
 
 async function tick(atIso?: string, mock: any = {}) {
   const n = hkAt(atIso ? Date.parse(atIso) : Date.now()), log: string[] = [];
   const now = atIso ? Date.parse(atIso) : Date.now();
   const ekDays = ['2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13', '2026-11-14'];
-  const ek = ekDays.includes(n.date) || (n.date === '2026-11-15' && n.min < 60) ? await ekTrack(now, mock) : null;
+  const ek5Days = [...ekDays, '2026-11-15', '2026-11-16', '2026-11-17'];
+  const ek = ekDays.includes(n.date) || (n.date === '2026-11-15' && n.min < 60) ? await ekTrack('ek384', 'UAE384', ['DXB', 'BKK', 'HKG'], now, mock.adsb) : null;
+  // EK385 leaves 21:00 and lands in Bangkok ~23:00 Thai (00:00 next day in Hong Kong); the Dubai leg runs on into the night
+  const ek5 = ek5Days.includes(n.date) && n.min >= 18 * 60 || ek5Days.includes(hkAt(now - 10 * 3600e3).date) && n.min < 8 * 60 ? await ekTrack('ek385', 'UAE385', ['HKG', 'BKK', 'DXB'], now, mock.adsb5) : null;
   const { data: subs } = await db.from('hk_push_subs').select('uid');
   const uids = [...new Set((subs || []).map((s: any) => s.uid as string))];
   if (!uids.length) return { n, log: ['no subscribers'] };
@@ -141,25 +150,38 @@ async function tick(atIso?: string, mock: any = {}) {
   at('2026-11-13', '20:00', 'pack', 'pack', '🧳 พรุ่งนี้บินแล้ว!', 'เปิดเช็คลิสต์ก่อนบินในแอป เตรียมของให้ครบ');
   at('2026-11-14', '09:00', 'go-bkk', 'flight', '✈️ วันนี้บิน EK384', 'เครื่องออก 13:45 น. เวลาไทย · ไปให้ถึงสุวรรณภูมิประมาณ 10:45 น.');
 
-  // --- EK384 every day until we fly it: still scheduled? left Dubai? landed in Bangkok?
-  if (ek) {
-    const c = ek.cur, mine = n.date === '2026-11-14';
-    // (only when the airport's schedule could be read: a failed read is tried again at the next tick, never reported as "not found")
-    const hk = ekDays.includes(n.date) && n.min >= 8 * 60 && n.min < 22 * 60 ? (mock.hkg !== undefined ? { found: mock.hkg } : await getJSON(`${FN}hk-flight?flight=EK384&date=${n.date}&arrival=1`)) : null;
-    if (hk && !hk.error) {
-      const f = hk.found;
-      const today = c && c.day === thDate(now) ? c : null;
-      const body = !f ? 'ไม่พบ EK384 ในตารางสนามบินฮ่องกงวันนี้ ลองเช็คกับ Emirates'
-        : /cancel/i.test(String(f.status || '')) ? '❗ สนามบินฮ่องกงแจ้งว่าเที่ยวบินวันนี้ถูกยกเลิก'
-        : [`วันนี้ยังบินตามกำหนด ดูไบ → กรุงเทพฯ → ฮ่องกง (ตารางถึงฮ่องกง ${f.time} น. เวลาฮ่องกง)`,
-           today && today.dxbDep ? `ออกจากดูไบ ${today.dxbApprox ? 'ราว ' : ''}${thTime(today.dxbDep)} น.` : '',
-           today && today.bkkArr ? `ถึงสุวรรณภูมิ ${thTime(today.bkkArr)} น.` : '',
-           mine ? 'เที่ยวที่เราบิน: ออกจากสุวรรณภูมิ 13:45 น. · ประตูขึ้นเครื่องและเวลาบอร์ดดิ้งดูบนบอร์ดดิ้งพาสหรือจอในสนามบิน' : ''].filter(Boolean).join(' · ') + (today ? ' (เวลาไทย)' : '');
-      R.push({ id: 'ek-daily', kind: 'flight', msg: { title: `📋 EK384 วันนี้ (${+n.date.slice(8)} พ.ย.)`, body, tag: 'ek-daily' } });
+  // --- EK384 every day until we fly it, EK385 every day until we fly home: still scheduled? where is it now?
+  // one morning message for both (only when the airport's schedule could be read: a failed read is tried again at the next tick)
+  if ((ekDays.includes(n.date) || ek5Days.includes(n.date)) && n.min >= 8 * 60 && n.min < 22 * 60) {
+    const lines: string[] = []; let ok = true;
+    if (ekDays.includes(n.date)) {
+      const hk = mock.hkg !== undefined ? { found: mock.hkg } : await getJSON(`${FN}hk-flight?flight=EK384&date=${n.date}&arrival=1`);
+      if (!hk || hk.error) ok = false; else { const f = hk.found, t = ek?.st?.hist?.[thDate(now)];
+        lines.push(!f ? 'EK384: ไม่พบในตารางสนามบินฮ่องกงวันนี้ ลองเช็คกับ Emirates'
+          : /cancel/i.test(String(f.status || '')) ? 'EK384: ❗ สนามบินฮ่องกงแจ้งว่าวันนี้ถูกยกเลิก'
+          : `EK384: บินตามกำหนด (ถึงฮ่องกง ${f.time} น. เวลาฮ่องกง)${t && t.dxbDep ? ` · ออกดูไบ ${t.dxbApprox ? 'ราว ' : ''}${thTime(t.dxbDep)} น. เวลาไทย` : ''}`
+            + (n.date === '2026-11-14' ? ' · เที่ยวที่เราบิน ออกสุวรรณภูมิ 13:45 น. ประตูและเวลาบอร์ดดิ้งดูบนบอร์ดดิ้งพาส' : '')) }
     }
-    if (c && ek.ev.includes('dxbDep')) R.push({ id: 'ek-dxb-' + c.day, kind: 'flight', msg: { title: '🛫 EK384 ออกจากดูไบแล้ว', body: `ออกเมื่อ${c.dxbApprox ? 'ราว' : ''} ${thTime(c.dxbDep)} น. (เวลาไทย) กำลังบินมากรุงเทพฯ`, tag: 'ek-air' } });
-    if (c && ek.ev.includes('bkkDep')) R.push({ id: 'ek-bkkdep-' + c.day, kind: 'flight', msg: { title: '🛫 EK384 ออกจากสุวรรณภูมิแล้ว', body: `ออกเมื่อ ${thTime(c.bkkDep)} น. (เวลาไทย) กำลังบินไปฮ่องกง`, tag: 'ek-air' } });
-    if (c && ek.ev.includes('bkkArr')) R.push({ id: 'ek-bkk-' + c.day, kind: 'flight', msg: { title: '🛬 EK384 ถึงสุวรรณภูมิแล้ว', body: `ลงเมื่อ ${thTime(c.bkkArr)} น. (เวลาไทย)${c.day === '2026-11-14' ? ' · เครื่องลำที่เราจะขึ้นมาถึงแล้ว' : ''}`, tag: 'ek-air' } });
+    if (ek5Days.includes(n.date)) {
+      const hk = mock.hkg5 !== undefined ? { found: mock.hkg5 } : await getJSON(`${FN}hk-flight?flight=EK385&date=${n.date}&arrival=0`);
+      if (!hk || hk.error) ok = false; else { const f = hk.found;
+        lines.push(!f ? 'EK385: ไม่พบในตารางสนามบินฮ่องกงวันนี้ ลองเช็คกับ Emirates'
+          : /cancel/i.test(String(f.status || '')) ? 'EK385: ❗ สนามบินฮ่องกงแจ้งว่าวันนี้ถูกยกเลิก'
+          : `EK385: บินตามกำหนด ออกจากฮ่องกง ${f.time} น. (เวลาฮ่องกง)${f.gate ? ' ประตู ' + f.gate : ''}${f.aisle ? ' เช็คอินแถว ' + f.aisle : ''}`
+            + (n.date === '2026-11-17' ? ' · เที่ยวที่เราบินกลับ' : '')) }
+    }
+    if (ok && lines.length) R.push({ id: 'ek-daily', kind: 'flight', msg: { title: `📋 เที่ยวบินวันนี้ (${+n.date.slice(8)} พ.ย.)`, body: lines.join('\n'), tag: 'ek-daily' } });
+  }
+  if (ek && ek.cur) { const c = ek.cur;
+    if (ek.ev.includes('oDep')) R.push({ id: 'ek-dxb-' + c.day, kind: 'flight', msg: { title: '🛫 EK384 ออกจากดูไบแล้ว', body: `ออกเมื่อ${c.dxbApprox ? 'ราว' : ''} ${thTime(c.dxbDep)} น. (เวลาไทย) กำลังบินมากรุงเทพฯ`, tag: 'ek-air' } });
+    if (ek.ev.includes('mArr')) R.push({ id: 'ek-bkk-' + c.day, kind: 'flight', msg: { title: '🛬 EK384 ถึงสุวรรณภูมิแล้ว', body: `ลงเมื่อ ${thTime(c.bkkArr)} น. (เวลาไทย)${c.day === '2026-11-14' ? ' · เครื่องลำที่เราจะขึ้นมาถึงแล้ว' : ''}`, tag: 'ek-air' } });
+    if (ek.ev.includes('mDep')) R.push({ id: 'ek-bkkdep-' + c.day, kind: 'flight', msg: { title: '🛫 EK384 ออกจากสุวรรณภูมิแล้ว', body: `ออกเมื่อ ${thTime(c.bkkDep)} น. (เวลาไทย) กำลังบินไปฮ่องกง`, tag: 'ek-air' } });
+    if (ek.ev.includes('dArr')) R.push({ id: 'ek-hkg-' + c.day, kind: 'flight', msg: { title: '🛬 EK384 ถึงฮ่องกงแล้ว', body: `ลงเมื่อ ${thTime(c.hkgArr)} น. เวลาไทย (${hkTime(c.hkgArr)} น. เวลาฮ่องกง)`, tag: 'ek-air' } });
+  }
+  // EK385: leaving Hong Kong and landing in Bangkok (the Dubai leg after midnight is only kept in the app, no message at night)
+  if (ek5 && ek5.cur) { const c = ek5.cur, mine = c.day === '2026-11-17' ? ' · เที่ยวที่เรานั่งกลับ' : '';
+    if (ek5.ev.includes('oDep')) R.push({ id: 'ek5-hkg-' + c.day, kind: 'flight', msg: { title: '🛫 EK385 ออกจากฮ่องกงแล้ว', body: `ออกเมื่อ${c.hkgApprox ? 'ราว' : ''} ${thTime(c.hkgDep)} น. เวลาไทย (${hkTime(c.hkgDep)} น. เวลาฮ่องกง) กำลังบินมากรุงเทพฯ${mine}`, tag: 'ek5-air' } });
+    if (ek5.ev.includes('mArr')) R.push({ id: 'ek5-bkk-' + c.day, kind: 'flight', msg: { title: '🛬 EK385 ถึงสุวรรณภูมิแล้ว', body: `ลงเมื่อ ${thTime(c.bkkArr)} น. (เวลาไทย)${mine}`, tag: 'ek5-air' } });
   }
 
   // Disney's own calendar for the Disney day: opening time and the fireworks
@@ -272,7 +294,8 @@ Deno.serve(async (req: Request) => {
   try {
     const pub = await vapid();
     if (req.method === 'GET') {
-      if (new URL(req.url).searchParams.has('ek384')) { const s = JSON.parse((await conf('ek384')) || '{}'); return out({ hist: s.hist || {}, cur: s.cur || null, seen: s.seen || null, checked: s.checked || null }) }
+      const qp = new URL(req.url).searchParams, fk = qp.has('ek385') ? 'ek385' : qp.has('ek384') ? 'ek384' : '';
+      if (fk) { const s = JSON.parse((await conf(fk)) || '{}'); return out({ hist: s.hist || {}, cur: s.cur || null, seen: s.seen || null, checked: s.checked || null }) }
       return out({ pub });
     }
     const body = await req.json().catch(() => ({}));
