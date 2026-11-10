@@ -639,6 +639,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 .sg.sgo{border-style:dashed}
 .risk{background:var(--surface);border:2px solid var(--danger);border-radius:16px;padding:12px 14px;margin:0 0 12px;font-size:13.5px}.risk>b{display:block;color:var(--danger);margin-bottom:6px}.rk{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px 0;border-top:1px dashed var(--line)}.rk span{flex:1;min-width:0}.rk.hard span{color:var(--danger);font-weight:600}.rk .btn-s{flex:none}
 .how.alts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.how.alts small{opacity:.7}
+.gpsl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--muted);margin:2px 0 8px}
 </style>
 
 <header class="top">
@@ -977,7 +978,7 @@ function busRoutes(a,b,ctx={}){
       }
     }
     list=[...best.values()].sort((x,y)=>x.rank-y.rank).slice(0,5);
-    if(list.length) break;
+    if(list.some(o=>o.fare==null||o.fare<30)) break;   // only a pricey sightseeing bus nearby: look a little further for an ordinary one
   }
   busMemo.set(mk,list); return list;
 }
@@ -1035,7 +1036,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('97a15c5e12|10 พ.ย. 11:02|1.32');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('17efbb6798|10 พ.ย. 11:18|1.33');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1786,13 +1787,35 @@ async function liveShow(id){
 /* ---------- GPS: where am I (own website only; asks permission once) ---------- */
 S.gps=null; let gpsWatch=null, gpsTrail=[];
 const gpsFresh = () => S.gps && Date.now()-S.gps.at < 3*60e3 && S.gps.acc < 250;
+// where we really are, as the starting point for the next stop: only in Hong Kong, only when it is clearly not the planned stop before
+// (plans change: skip the market, go straight from the hotel), and not when this stop was set back to "as planned"
+const inHK = ll => ll && ll[0]>22.15 && ll[0]<22.57 && ll[1]>113.83 && ll[1]<114.45;
+S.planRoute = new Set();
+function gpsPrev(it, prev){
+  if(!gpsFresh() || !inHK(S.gps.ll) || S.planRoute.has(it.id)) return null;
+  const pl=prev && locOf(prev); if(pl && metres(S.gps.ll, pl) < Math.max(200, S.gps.acc)) return null;   // we are where the plan says: nothing changes
+  const r=x=>Math.round(x*2000)/2000, ll=[r(S.gps.ll[0]), r(S.gps.ll[1])], n=nearestStation(ll);   // ~50 m steps, so routes don't recompute at every step
+  return {id:'gps', h:'ตำแหน่งตอนนี้', ll, st: n && n.m<700 ? n.c : null};
+}
+// from where we really are, the plan's saved way may not fit: walk if it is short, otherwise the quickest, with a hefty fare counting against it
+// (a HK$50 sightseeing bus should not beat a HK$10 one that takes a few minutes longer)
+function liveChoice(opts){ const ok=opts.filter(o=>!o.manual && o.mins!=null && o.fare!=null); if(!ok.length) return null;
+  const w=ok.find(o=>o.mode==='walk' && o.mins<=15); if(w) return w;
+  return ok.filter(o=>o.mode!=='walk').sort((a,b)=>(a.mins+a.fare/2)-(b.mins+b.fare/2))[0] || null }
+function gpsLineHTML(it, vp, planPrev){
+  if(vp) return '<div class="gpsl">📍 คิดจากตำแหน่งตอนนี้ (GPS)'+(planPrev && planPrev.id!=='hotel' ? ' ไม่ใช่จาก '+esc(planPrev.h.slice(0,24)) : '')+' <button type="button" class="btn-s" data-planroute="'+esc(it.id)+'">ใช้เส้นทางตามแผน</button></div>';
+  if(S.planRoute.has(it.id)) return '<div class="gpsl">เส้นทางตามแผน <button type="button" class="btn-s" data-gpsroute="'+esc(it.id)+'">คิดจากตำแหน่งตอนนี้</button></div>';
+  if(!gpsFresh() && navigator.geolocation && !window.claude) return '<div class="gpsl">เปลี่ยนแผนหรือไม่ได้อยู่ที่จุดก่อนหน้า? <button type="button" class="btn-s" data-gpsroute="'+esc(it.id)+'">📍 คิดเส้นทางจากตำแหน่งตอนนี้</button></div>';
+  return '';
+}
 function gpsStart(ask){
   if(window.claude || !navigator.geolocation || gpsWatch!=null) return;
   if(!ask && lsGet('hk-gps','')!=='on') return;
   gpsWatch = navigator.geolocation.watchPosition(p=>{
     const first=!S.gps; S.gps={ll:[p.coords.latitude,p.coords.longitude], acc:p.coords.accuracy, at:Date.now()}; lsSet('hk-gps','on');
     gpsTrail.push({ll:S.gps.ll, at:S.gps.at}); gpsTrail=gpsTrail.filter(x=>S.gps.at-x.at<6*60e3);
-    gpsCheck(); if(first || S.tab==='home') rerender();
+    const k50=Math.round(S.gps.ll[0]*2000)+','+Math.round(S.gps.ll[1]*2000), moved50=k50!==S.gpsKey; S.gpsKey=k50;   // the plan redraws only after ~50 m
+    gpsCheck(); if(first || S.tab==='home' || (S.tab==='plan' && moved50)) rerender();
   }, e=>{ gpsWatch=null; if(e.code===1){ lsSet('hk-gps','off'); toast('ไม่ได้รับอนุญาตใช้ตำแหน่ง เปิดได้ที่ ตั้งค่า > Safari > ตำแหน่ง') } else toast('หาตำแหน่งไม่ได้ ลองออกไปที่โล่ง') },
   {enableHighAccuracy:true, maximumAge:15000, timeout:30000});
 }
@@ -2423,11 +2446,13 @@ function renderPlan(){
   const dayChips = DAYS.map(x=>`<button class="day" type="button" data-day="${x.n}" aria-pressed="${x.n===S.day}"><small>${x.dow}</small><b>${x.d}</b><small>วันที่ ${x.n}</small></button>`).join('');
   const doneCount=list.filter(i=>S.done[i.id]).length;
   const items = list.map((it,k)=>{
-    const done=!!S.done[it.id], {prev,opts}=optionsFor(S.day,it), sel=opts.length?chosen(S.day,it,opts):null;
+    const done=!!S.done[it.id]; let {prev,opts}=optionsFor(S.day,it); const planPrev=prev;
+    const vp = !done && cur===it.id ? gpsPrev(it, prev) : null; if(vp) ({prev,opts}=optionsBetween(S.day, vp, it));
+    const sel=opts.length?(vp && liveChoice(opts) || chosen(S.day,it,opts)):null;
     const open = !done && S.ghOpen.has(it.id), routeOpen = routeIsOpen(it.id, cur);   // the next stop's route is open by itself; other ways only on request
     const r=!done&&moved(RP[it.id])?RP[it.id]:null;
     if(S.compact) return compactItem(it, done, cur, sel, r);
-    const gh = opts.length ? `<div class="gh"><div class="lab">${tripHead(sel)}${done?' (ถึงแล้ว)':''}</div>
+    const gh = opts.length ? `<div class="gh"><div class="lab">${tripHead(sel)}${done?' (ถึงแล้ว)':''}</div>${!done && cur===it.id ? gpsLineHTML(it, vp, planPrev) : ''}
       <div class="opts">${optHTML(it,sel,true)}</div>
       ${!done && routeOpen && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it), locOf(prev), prev.id==='hotel'?'ที่พัก':prev.h)}
         ${window.claude?`<a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}ดูเวลารถไฟขบวนถัดไป (MTR)</a>`:''}</div>` : ''}
@@ -4019,6 +4044,8 @@ document.addEventListener('click', e=>{
   if(ds.hday){ const v=Number(ds.hday); S.homeDay = S.homeDay===v ? null : v; renderHome(); return }
   if(ds.live) return liveShow(ds.live);
   if(ds.gps){ if(ds.gps==='on') gpsStart(true); else gpsStop(); renderHome(); return }
+  if(ds.planroute){ S.planRoute.add(ds.planroute); renderPlan(); return }
+  if(ds.gpsroute){ S.planRoute.delete(ds.gpsroute); if(!gpsFresh()){ gpsStart(true); toast('กำลังหาตำแหน่ง…') } renderPlan(); return }
   if(ds.sos){ openSheet({kind:'sos'}); return }
   if(ds.dzinfo){ S.dzInfo=ds.dzinfo; openSheet({kind:'dzinfo'}); return }
   if(ds.walk){ const ll=ds.walk.split(',').map(Number); return walkTo(ds.wname||'ที่หมาย', ll) }
