@@ -2373,6 +2373,8 @@ function walkLeg(a, b){ if(!a||!b) return null; const d=metres(a,b), mins=Math.m
     url:'https://www.google.com/maps/dir/?api=1&origin='+a[0].toFixed(5)+','+a[1].toFixed(5)+'&destination='+b[0].toFixed(5)+','+b[1].toFixed(5)+'&travelmode=walking'} }
 // the first step of a ride: leave the place we are at and walk to the station entrance
 // a walk from one stop of the plan to the next
+// the heading above the ways to go: what we will do next, in plain words
+const tripHead = sel => !sel ? 'วิธีเดินทาง' : sel.key==='walk' ? 'วิธีเดินทาง: เดินไป' : sel.bx || sel.mode==='bus' || sel.mode==='ferry' ? 'วิธีเดินทางไปขึ้น'+sel.n : sel.legs ? 'วิธีเดินทางไปขึ้น MTR' : 'วิธีเดินทาง: '+sel.n;
 function walkStepsHTML(prev, it){
   const a=locOf(prev), b=locOf(it), w=walkLeg(a, b); if(!w) return '';
   const from = prev.id==='hotel' ? 'ที่พัก' : prev.h;
@@ -2417,7 +2419,7 @@ function renderPlan(){
     const open = !done && S.ghOpen.has(it.id), routeOpen = routeIsOpen(it.id, cur);   // the next stop's route is open by itself; other ways only on request
     const r=!done&&moved(RP[it.id])?RP[it.id]:null;
     if(S.compact) return compactItem(it, done, cur, sel, r);
-    const gh = opts.length ? `<div class="gh"><div class="lab">วิธีไปจาก ${esc(prev.h)}${done?' (ถึงแล้ว)':''}</div>
+    const gh = opts.length ? `<div class="gh"><div class="lab">${tripHead(sel)}${done?' (ถึงแล้ว)':''}</div>
       <div class="opts">${optHTML(it,sel,true)}</div>
       ${!done && routeOpen && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it), locOf(prev), prev.id==='hotel'?'ที่พัก':prev.h)}
         ${window.claude?`<a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}ดูเวลารถไฟขบวนถัดไป (MTR)</a>`:''}</div>` : ''}
