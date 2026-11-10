@@ -638,6 +638,7 @@ input[type=time].txt{appearance:none;min-height:46px}
 @media (prefers-reduced-motion:reduce){#sidehint,.sh-btn,.sh-arrow{animation:none}}
 .sg.sgo{border-style:dashed}
 .risk{background:var(--surface);border:2px solid var(--danger);border-radius:16px;padding:12px 14px;margin:0 0 12px;font-size:13.5px}.risk>b{display:block;color:var(--danger);margin-bottom:6px}.rk{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px 0;border-top:1px dashed var(--line)}.rk span{flex:1;min-width:0}.rk.hard span{color:var(--danger);font-weight:600}.rk .btn-s{flex:none}
+.how.alts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.how.alts small{opacity:.7}
 </style>
 
 <header class="top">
@@ -737,7 +738,7 @@ const DEFAULT_PLAN = [
   {id:'1s',t:'11:45',tz:'TH',flight:true,h:'ถึงสนามบินสุวรรณภูมิ (BKK)',p:'เช็คอิน Emirates โหลดกระเป๋า แล้วผ่าน ตม. ขาออก',tip:'มาถึงก่อนเครื่องออกอย่างน้อย 3 ชั่วโมง เคาน์เตอร์เช็คอินมักปิดประมาณ 1 ชั่วโมงก่อนเครื่องออก ดูเวลาที่แน่นอนบนตั๋ว'},
   {id:'1f',t:'14:45',tz:'TH',flight:true,h:'บิน EK384 สุวรรณภูมิ → ฮ่องกง',p:'ออก 13:45 น. เวลาไทย · ถึงฮ่องกง 17:40 น. เวลาฮ่องกง · บินประมาณ 3 ชั่วโมง',tip:'ขึ้นเครื่องประมาณ 45 นาทีก่อนออก ดูประตูและเวลาขึ้นเครื่องบนบอร์ดดิ้งพาส · ตั้งนาฬิกาเร็วขึ้น 1 ชั่วโมงเมื่อถึงฮ่องกง'},
   {id:'1a',t:'17:40',h:'ถึงสนามบินฮ่องกง (HKG)',p:'ผ่าน ตม. และรับกระเป๋าให้เรียบร้อย',tip:'ซื้อหรือเติมเงินบัตร Octopus ที่สนามบินได้เลย ใช้ได้ทั้ง MTR และรถบัส',map:'Hong Kong International Airport',st:null,ll:[22.3155,113.9365]},
-  {id:'1b',t:'19:45',e:'20:30',h:'เช็คอิน Kam Mun Guest House',p:'ขึ้นบัส A21 ที่สนามบิน ลงป้าย <b>"Bank Centre, Nathan Road"</b> (มงก๊ก ป้ายที่ 8) แล้วข้ามถนน Nathan Road ไปตึก <b>Sun Hing Building</b> เลขที่ 603-609 ขึ้นชั้น 21 ห้อง 2101',exit:'E1',tip:'บนรถมีจอ LED บอกชื่อป้าย ป้ายก่อนหน้าคือ "Argyle Centre, Nathan Road" ถ้าเลยไปลงป้าย "Sino Centre, Nathan Road" แล้วเดินย้อนขึ้นไปทางเหนือประมาณ 100 เมตร',map:'Sun Hing Building 607 Nathan Road Mong Kok',st:'MOK',bus:[{n:'บัส A21',d:'สนามบิน → Bank Centre, Nathan Road (มงก๊ก)',fare:34.6,mins:60}],go:{mode:'bus:0'}},
+  {id:'1b',t:'19:45',e:'20:30',h:'เช็คอิน Kam Mun Guest House',p:'ขึ้นบัส A21 ที่สนามบิน ลงป้าย <b>"Sino Centre, Nathan Road"</b> (มงก๊ก ป้ายที่ 9) แล้วเดินย้อนขึ้นไปทางเหนือ ข้ามถนน Nathan Road ไปตึก <b>Sun Hing Building</b> เลขที่ 603-609 ขึ้นชั้น 21 ห้อง 2101',exit:'E1',tip:'บนรถมีจอ LED บอกชื่อป้าย ลงป้าย "Sino Centre, Nathan Road" (ป้ายที่ 9 จากสนามบิน) ป้ายก่อนหน้าคือ "Bank Centre, Nathan Road" พอเห็นชื่อนี้ให้กดกริ่ง ลงแล้วเดินย้อนขึ้นไปทางเหนือราว 150 เมตร ข้ามถนน Nathan Road ไปตึก Sun Hing Building',map:'Sun Hing Building 607 Nathan Road Mong Kok',st:'MOK',bus:[{n:'บัส A21',d:'สนามบิน → Bank Centre, Nathan Road (มงก๊ก)',fare:34.6,mins:60}],go:{mode:'bus:0'}},
   {id:'1c',t:'20:45',e:'22:00',h:"ตลาดเลดี้ส์ (Ladies' Market) มงก๊ก",p:'เดินจากที่พักได้ ไม่ต้องนั่งรถ เดินดูของ กินของทานเล่น แล้วกลับไปพักผ่อน',tip:'ร้านส่วนใหญ่ปิดราว 23:00 ต่อราคาได้',map:"Ladies' Market Mong Kok",st:'MOK',ll:[22.3190,114.1717]}
  ],
  [
@@ -946,10 +947,11 @@ function busKind(r){ return r[3]===4?'เรือ' : r[3]===0?'รถราง'
 function busRoutes(a,b,ctx={}){
   if(!BUS||!a||!b||metres(a,b)<350) return [];
   const dow = ctx.dow ?? null, nightOk = ctx.min==null || ctx.min<360 || ctx.min>=1380;
-  const mk=a.join()+'>'+b.join()+'|'+dow+'|'+nightOk+'|'+(ctx.min==null?'':Math.floor(ctx.min/10))+(ctx.arr?'a':''); if(busMemo.has(mk)) return busMemo.get(mk);
+  const mk=a.join()+'>'+b.join()+'|'+dow+'|'+nightOk+'|'+(ctx.min==null?'':Math.floor(ctx.min/10))+(ctx.arr?'a':'')+'|'+(ctx.alight||''); if(busMemo.has(mk)) return busMemo.get(mk);
   let list=[];
   for(const R of [450,800]){
-    const O=nearStops(a,R), D=nearStops(b,R); if(!O.size||!D.size) continue;
+    const O=nearStops(a,R), D0=nearStops(b,R); if(!O.size||!D0.size) continue;
+    let D=D0; if(ctx.alight){ const only=new Map([...D0].filter(([i])=>stopName(i)===ctx.alight)); if(only.size) D=only }   // the stop chosen to get off at
     const best=new Map();
     for(const [ri,dir,ss,fs,mask,svc] of BUS.pats){
       const rr=BUS.routes[ri]; if(PRIVATE_OPS.has(rr[1])) continue;
@@ -968,7 +970,8 @@ function busRoutes(a,b,ctx={}){
           let dep=null, lastAt=null;
           if(svc && dow!=null && ctx.min!=null){ const f=svc[dow*2], l=svc[dow*2+1], off=bi*1.6; dep=ctx.arr ? ctx.min-mins : ctx.min; if(dep<180) dep+=1440;
             if(l<0 || dep<f+off-25 || dep>l+off+5) continue; lastAt=Math.round(l+off) }
-          if(!cur||mins+night<cur.rank) best.set(key,{dep, lastAt, key:'bx:'+key, ri, dir, first:ss[0], last:ss[ss.length-1], from:ss[bi], seq:bi, to:s, w1:Math.round(bw), w2:Math.round(w2), n, fare:fs[bi]>=0?fs[bi]/10:null, mins, rank:mins+night, night:!!night});
+          const alts=[]; for(let j=bi+1;j<ss.length;j++){ const q=ss[j], d=D0.get(q); if(d!=null && q!==s && d<=450 && !alts.some(x=>x.name===stopName(q))) alts.push({name:stopName(q), d:Math.round(d), n:j-bi}) }
+          if(!cur||mins+night<cur.rank) best.set(key,{alts, dep, lastAt, key:'bx:'+key, ri, dir, first:ss[0], last:ss[ss.length-1], from:ss[bi], seq:bi, to:s, w1:Math.round(bw), w2:Math.round(w2), n, fare:fs[bi]>=0?fs[bi]/10:null, mins, rank:mins+night, night:!!night});
         }
         const w=O.get(s); if(w!=null && w<bw && !/SET DOWN ONLY/i.test(BUS.stops[s][2])){ bi=k; bw=w }
       }
@@ -982,7 +985,7 @@ function busOpt(o){
   const r=BUS.routes[o.ri], kind=busKind(r);
   return {key:o.key, mode:r[3]===4?'ferry':'bus', n:`${kind} ${r[0]}${o.night?' (รอบกลางคืน)':''}`, d:`ขึ้นป้าย ${stopName(o.from)} · ${o.n} ป้าย`, fare:o.fare, mins:o.mins, bx:o};
 }
-function busSteps(o){
+function busSteps(o, itemId){
   const r=BUS.routes[o.ri], toward = o.last==null ? r[2] : o.last===o.first ? r[2]+' (สายวงกลม)' : stopName(o.last);
   const ll=stopLL(o.from), c='var(--sky)';
   return `<ol class="legs">
@@ -991,7 +994,7 @@ function busSteps(o){
       <div class="how">ขึ้น <span class="ln" style="background:${c}">${busKind(r)} ${esc(r[0])}</span> ป้ายหน้ารถเขียนปลายทาง <b>${esc(toward)}</b> · นั่ง ${o.n} ป้าย${r[4]?` · มาทุก ~${r[4]} นาที`:''}${r[4]>=30?' <b style="color:var(--danger)">(รถไม่บ่อย)</b>':''}${o.lastAt!=null && o.dep!=null && o.lastAt-o.dep<=75?` <b style="color:var(--danger)">· เที่ยวสุดท้ายผ่านป้ายนี้ราว ${hhmm(o.lastAt)} น.</b>`:''}</div>
       ${o.seq!=null?liveBtn({bus:o}):''}
       <div class="how"><a class="btn-s" href="https://www.google.com/maps/search/?api=1&query=${ll[0]},${ll[1]}" target="_blank" rel="noopener">${ic('pin')}ดูป้ายขึ้นในแผนที่</a></div></div></li>
-    <li class="lg end" style="--c:${c}"><span class="nd"></span><div><div class="stn">${esc(stopName(o.to))} <small>ป้ายลง</small></div><div class="how">${(()=>{ const s=ridePattern(o); return s&&s.length>2?`ป้ายก่อนหน้าคือ <b>${esc(stopName(s[s.length-2]))}</b> พอเห็นชื่อนี้บนจอในรถให้กดกริ่ง · `:'' })()}ลงป้ายนี้ แล้วเดินต่อ ~${o.w2} ม.</div><div class="how">${rideBtn(o)}</div></div></li></ol>
+    <li class="lg end" style="--c:${c}"><span class="nd"></span><div><div class="stn">${esc(stopName(o.to))} <small>ป้ายลง</small></div><div class="how">${itemId&&o.alts&&o.alts.length?`<div class="how alts">ลงป้ายอื่นได้: ${o.alts.slice(0,3).map(a=>`<button type="button" class="btn-s" data-alight="${esc(itemId)}|${esc(a.name)}">${esc(a.name.replace(/, .*$/,''))} <small>เดินต่อ ~${a.d} ม.</small></button>`).join('')}</div>`:''}${(()=>{ const s=ridePattern(o); return s&&s.length>2?`ป้ายก่อนหน้าคือ <b>${esc(stopName(s[s.length-2]))}</b> พอเห็นชื่อนี้บนจอในรถให้กดกริ่ง · `:'' })()}ลงป้ายนี้ แล้วเดินต่อ ~${o.w2} ม.</div><div class="how">${rideBtn(o)}</div></div></li></ol>
     ${r[5]?`<a class="btn-s" href="${esc(r[5])}" target="_blank" rel="noopener">${ic('bus')}ดูเวลารถมาจริง (เว็บ ${esc(r[1])})</a>`:''}
     <div class="src">${esc(r[1])} · ${esc(r[2])} · ค่ารถตามป้ายที่ขึ้น (บัตร Octopus/เงินสด) ข้อมูลกรมขนส่งฮ่องกง</div>`;
 }
@@ -1032,7 +1035,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('25b1857f8b|10 พ.ย. 09:58|1.29');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('e1855df3fa|10 พ.ย. 10:10|1.30');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -1449,7 +1452,7 @@ function optionsBetween(dn,prev,it){
     else { const legs=mtrRoute(a,b), f=mtrFare(a,b);
       if(legs) opts.push({key:'mtr',mode:'mtr',n:'MTR',d:legs.filter(l=>l.line!=='WALK').map(l=>LINES[l.line].n.split(' ')[0]).join(' → ')+` · ${stName(a)} → ${stName(b)}`,fare:f,mins:legMins(legs),legs}) }
   }
-  const bx = busRoutes(locOf(prev), locOf(it), {dow:dowOf(DAYS[dn-1].date), min:toMin(it.t), arr:true}).map(busOpt);
+  const bx = busRoutes(locOf(prev), locOf(it), {dow:dowOf(DAYS[dn-1].date), min:toMin(it.t), arr:true, alight:it.go&&it.go.alight||null}).map(busOpt);
   for(const o of bx){ const no=BUS.routes[o.bx.ri][0];  // remember what the old plan said, to show the correction
     const pre=(it.bus||[]).find(p=>p.n.split(/[\s\/+]+/).includes(no)); if(pre && pre.fare!==o.fare) o.planFare=pre.fare }
   // plan presets: shown when no direct bus is found, and always for two-leg trips the direct-bus search can't build
@@ -2403,7 +2406,7 @@ function renderPlan(){
       <div class="opts">${optHTML(it,sel,true)}</div>
       ${!done && routeOpen && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it))}
         ${window.claude?`<a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}ดูเวลารถไฟขบวนถัดไป (MTR)</a>`:''}</div>` : ''}
-      ${!done && routeOpen && sel.bx ? `<div class="route">${busSteps(sel.bx)}</div>` : ''}
+      ${!done && routeOpen && sel.bx ? `<div class="route">${busSteps(sel.bx, it.id)}</div>` : ''}
       ${!done ? `<div class="ghbtns">${sel.legs&&sel.legs.length||sel.bx?`<button class="more" type="button" data-route="${it.id}">${routeOpen?'ซ่อนเส้นทาง ▴':'ดูเส้นทาง ▾'}</button>`:''}
         <button class="more" type="button" data-gh="${it.id}">${open?'ปิดตัวเลือก ▴':`เปลี่ยนวิธี (${opts.length-1} แบบอื่น) ▾`}</button></div>` : ''}
       ${open ? `<div class="opts others">${opts.filter(o=>o.key!==sel.key).map(o=>optHTML(it,o,false)).join('')}</div>` : ''}
@@ -3762,6 +3765,9 @@ function fixHotel(items){ const defs=Object.fromEntries(DEFAULT_PLAN.flat().map(
     for(const k of ['h','p','tip','map','ll']) if(d[k]!==undefined) it[k]=clone(d[k]); else delete it[k];
     if(!it.exitUser){ if(d.exit) it.exit=d.exit; else delete it.exit } }
   for(const it of items||[]) if(defs[it.id]){ if(defs[it.id].bus) it.bus=clone(defs[it.id].bus); else delete it.bus } // presets follow the checked data
+  for(const it of items||[]) if(it.id==='1b'){ if(!(it.go && it.go.alight)) it.go={...(it.go||{}), alight:'SINO CENTRE, NATHAN ROAD'};
+    if(it.tip==="บนรถมีจอ LED บอกชื่อป้าย ป้ายก่อนหน้าคือ \"Argyle Centre, Nathan Road\" ถ้าเลยไปลงป้าย \"Sino Centre, Nathan Road\" แล้วเดินย้อนขึ้นไปทางเหนือประมาณ 100 เมตร") it.tip="บนรถมีจอ LED บอกชื่อป้าย ลงป้าย \"Sino Centre, Nathan Road\" (ป้ายที่ 9 จากสนามบิน) ป้ายก่อนหน้าคือ \"Bank Centre, Nathan Road\" พอเห็นชื่อนี้ให้กดกริ่ง ลงแล้วเดินย้อนขึ้นไปทางเหนือราว 150 เมตร ข้ามถนน Nathan Road ไปตึก Sun Hing Building";
+    if(it.p) it.p=it.p.replace('(มงก๊ก ป้ายที่ 8)','(มงก๊ก ป้ายที่ 9)') }
   for(const it of items||[]) if(HOTEL_IDS.has(it.id) && it.st==='TST'){ it.st='MOK'; if(it.exit==='D2'){ it.exit='E1'; delete it.exitUser } if(/Mirador/.test(it.map||'')) it.map='Sun Hing Building 607 Nathan Road Mong Kok';
     if(it.id==='1b'){ const d=DEFAULT_PLAN[0].find(x=>x.id==='1b'); it.p=d.p; it.tip=d.tip; it.bus=d.bus } } return items }
 function findItem(id){ for(let d=0;d<4;d++){ const it=S.plan[d].find(i=>i.id===id); if(it) return {dn:d+1,it} } return null }
@@ -3930,6 +3936,7 @@ function mapGo(v){ const [d,id]=v.split(':'); S.day=Number(d); setTab('plan');
 document.addEventListener('keydown', e=>{ const mg=e.target.closest&&e.target.closest('[data-mapgo]'); if(mg&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); mapGo(mg.dataset.mapgo) } });
 document.addEventListener('click', e=>{
   if(e.target.closest && e.target.closest('[data-undo]')){ undoArrange(); return }
+  if(e.target.closest && e.target.closest('[data-alight]')){ const [id,name]=e.target.closest('[data-alight]').dataset.alight.split('|'); const f=findItem(id); if(f){ f.it.go={...(f.it.go||{}), alight:name}; renderPlan(); savePlanDay(f.dn).catch(()=>{}); toast('เปลี่ยนเป็นลงป้าย '+name) } return }
   if(e.target.closest && e.target.closest('[data-drop]')){ dropStop(e.target.closest('[data-drop]').dataset.drop); return }
   if(e.target.closest && e.target.closest('[data-leave]')){ leaveStop(e.target.closest('[data-leave]').dataset.leave); return }
   if(e.target.closest && e.target.closest('[data-arrday]')){ arrangeDay(Number(e.target.closest('[data-arrday]').dataset.arrday)); return }
