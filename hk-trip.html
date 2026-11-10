@@ -1434,6 +1434,21 @@ function prevStop(dn,id){
   if(dn>1) return {id:'hotel', h:'ที่พัก (Sun Hing Building)', st:'MOK', ll:HOTEL_LL}; // every morning starts from the guesthouse
   return null;
 }
+// the bus named in a plan's "bus + MTR" preset, to the station where the train is best caught, then the train to the stop's station
+const comboMemo=new Map();
+function presetCombo(dn, prev, it, x){
+  if(!NET || !BUS || !it.st || !(it.st in NET.byCode)) return null;
+  const a=locOf(prev), b=locOf(it); if(!a||!b) return null;
+  const nos=new Set(String(x.n).split(/[\s\/+]+/).filter(t=>/^\d+[A-Z]?$/.test(t))); if(!nos.size) return null;
+  const mk=a.join()+'>'+it.st+'|'+[...nos].join()+'|'+dn+'|'+it.t; if(comboMemo.has(mk)) return comboMemo.get(mk);
+  const ib=NET.byCode[it.st], ctx={dow:dowOf(DAYS[dn-1].date), min:toMin(it.t), arr:true};
+  const near=Object.keys(NET.byCode).filter(c=>c!==it.st && stLL(c)).map(c=>({c, m:metres(b,stLL(c))})).sort((p,q)=>p.m-q.m).slice(0,15);
+  let best=null;
+  for(const {c} of near){ const bus=busRoutes(a, stLL(c), ctx).find(o=>nos.has(BUS.routes[o.ri][0])); if(!bus) continue;
+    const legs=mtrRoute(NET.byCode[c], ib); if(!legs) continue;
+    const mins=bus.mins+3+legMins(legs); if(!best || mins<best.mins) best={bx:bus, legs, viaSt:c, mins} }
+  comboMemo.set(mk,best); return best;
+}
 function optionsFor(dn,it){ return optionsBetween(dn, prevStop(dn,it.id), it) }
 function optionsBetween(dn,prev,it){
   const opts=[];
@@ -1449,7 +1464,7 @@ function optionsBetween(dn,prev,it){
   for(const o of bx){ const no=BUS.routes[o.bx.ri][0];  // remember what the old plan said, to show the correction
     const pre=(it.bus||[]).find(p=>p.n.split(/[\s\/+]+/).includes(no)); if(pre && pre.fare!==o.fare) o.planFare=pre.fare }
   // plan presets: shown when no direct bus is found, and always for two-leg trips the direct-bus search can't build
-  (it.bus||[]).forEach((x,i)=>{ if(!bx.length || x.combo) opts.push({key:'bus:'+i,mode:'bus',n:x.n,d:x.d,fare:x.fare,mins:x.mins}) });
+  (it.bus||[]).forEach((x,i)=>{ if(!bx.length || x.combo) opts.push({key:'bus:'+i,mode:'bus',n:x.n,d:x.d,fare:x.fare,mins:x.mins,cb:x.combo?presetCombo(dn,prev,it,x):null}) });
   opts.push(...bx);
   if(it.go && it.go.mode==='bus:c') opts.push({key:'bus:c',mode:'bus',n:'บัส '+(it.go.no||''),d:'กรอกค่ารถเอง',fare:it.go.fare??null,mins:null,manual:true});
   else opts.push({key:'bus:c',mode:'bus',n:'รถบัสสายอื่น',d:'กรอกเลขสายและค่ารถเอง',fare:null,mins:null,manual:true});
@@ -2451,8 +2466,9 @@ function renderPlan(){
       ${!done && routeOpen && sel.legs && sel.legs.length ? `<div class="route">${stepsHTML(sel.legs, exitTxt(exitFor(prev)).replace(/^Exit /,''), exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it), locOf(prev), prev.id==='hotel'?'ที่พัก':prev.h)}
         ${window.claude?`<a class="btn-s" style="margin-top:6px" href="https://www.mtr.com.hk/mtrmobile/en/transport/next-train" target="_blank" rel="noopener">${ic('train')}ดูเวลารถไฟขบวนถัดไป (MTR)</a>`:''}</div>` : ''}
       ${!done && routeOpen && sel.bx ? `<div class="route">${busSteps(sel.bx, it.id, locOf(prev), prev.id==='hotel'?'ที่พัก':prev.h, locOf(it))}</div>` : ''}
+      ${!done && routeOpen && sel.cb ? `<div class="route">${busSteps(sel.cb.bx, null, locOf(prev), prev.id==='hotel'?'ที่พัก':prev.h, null)}<div class="how" style="margin:8px 0">ลงรถแล้วต่อ MTR ที่สถานี <b>${esc(stName(NET.byCode[sel.cb.viaSt]))}</b></div>${stepsHTML(sel.cb.legs, null, exitTxt(exitFor(it)).replace(/^Exit /,''), locOf(it), stopLL(sel.cb.bx.to), 'ป้าย '+stopName(sel.cb.bx.to))}</div>` : ''}
       ${!done && routeOpen && sel.key==='walk' ? walkStepsHTML(prev, it) : ''}
-      ${!done ? `<div class="ghbtns">${sel.legs&&sel.legs.length||sel.bx||sel.key==='walk'&&walkLeg(locOf(prev),locOf(it))?`<button class="more" type="button" data-route="${it.id}">${routeOpen?'ซ่อนเส้นทาง ▴':'ดูเส้นทาง ▾'}</button>`:''}
+      ${!done ? `<div class="ghbtns">${sel.legs&&sel.legs.length||sel.bx||sel.cb||sel.key==='walk'&&walkLeg(locOf(prev),locOf(it))?`<button class="more" type="button" data-route="${it.id}">${routeOpen?'ซ่อนเส้นทาง ▴':'ดูเส้นทาง ▾'}</button>`:''}
         <button class="more" type="button" data-gh="${it.id}">${open?'ปิดตัวเลือก ▴':`เปลี่ยนวิธี (${opts.length-1} แบบอื่น) ▾`}</button></div>` : ''}
       ${open ? `<div class="opts others">${opts.filter(o=>o.key!==sel.key).map(o=>optHTML(it,o,false)).join('')}</div>` : ''}
       ${!done && sel.manual ? `<div class="fin">${sel.key==='bus:c'?`<input type="text" id="no-${it.id}" placeholder="เลขสาย" value="${esc(it.go&&it.go.no||'')}" style="width:80px">`:''}
