@@ -1798,6 +1798,8 @@ function gpsLineHTML(it, vp, planPrev){
   if(vp) return '<div class="gpsl">📍 คิดจากตำแหน่งตอนนี้ (GPS)'+(planPrev && planPrev.id!=='hotel' ? ' ไม่ใช่จาก '+esc(planPrev.h.slice(0,24)) : '')+' <button type="button" class="btn-s" data-planroute="'+esc(it.id)+'">ใช้เส้นทางตามแผน</button></div>';
   if(S.planRoute.has(it.id)) return '<div class="gpsl">เส้นทางตามแผน <button type="button" class="btn-s" data-gpsroute="'+esc(it.id)+'">คิดจากตำแหน่งตอนนี้</button></div>';
   if(!gpsFresh() && navigator.geolocation && !window.claude) return '<div class="gpsl">เปลี่ยนแผนหรือไม่ได้อยู่ที่จุดก่อนหน้า? <button type="button" class="btn-s" data-gpsroute="'+esc(it.id)+'">📍 คิดเส้นทางจากตำแหน่งตอนนี้</button></div>';
+  if(gpsFresh() && !inHK(S.gps.ll)) return '<div class="gpsl">📍 GPS: ตอนนี้อยู่นอกฮ่องกง ใช้เส้นทางตามแผนไปก่อน</div>';
+  if(gpsFresh()) return '<div class="gpsl">📍 GPS: อยู่ที่จุดก่อนหน้าตามแผนแล้ว ใช้เส้นทางนี้ได้เลย</div>';
   return '';
 }
 function gpsStart(ask){
