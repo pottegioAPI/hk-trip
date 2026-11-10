@@ -94,8 +94,13 @@ async function ekTrack(now: number, mock: any = {}) {
     if (!ground && !cur && dD < dB) {   // in the air on the Dubai leg: a new trip
       cur = { day: thDate(now), start: iso, dxbDep: iso, dxbApprox: dD > 400 }; ev.push('dxbDep');
     }
+    if (!ground && !cur && dB < 400 && a.lon > AP.BKK[1]) {   // first seen already leaving Bangkok (the Dubai leg was missed)
+      cur = { day: thDate(now), start: iso, dxbDep: null, bkkArr: null, bkkDep: iso }; ev.push('bkkDep');
+    }
     if (cur) {
       if (cur.dxbDep && !cur.bkkArr && ground && dB < 30) { cur.bkkArr = iso; ev.push('bkkArr') }
+      // in the air east of Bangkok: on the way to Hong Kong (also when the landing in Bangkok was not caught)
+      if (cur.dxbDep && !cur.bkkArr && !ground && a.lon > AP.BKK[1] + 0.3) { cur.bkkArr = cur.last?.at || iso; cur.bkkArrApprox = true }
       if (cur.bkkArr && !cur.bkkDep && !ground && dB < 400) { cur.bkkDep = iso; ev.push('bkkDep') }
       if (cur.bkkDep && !cur.hkgArr && ground && dH < 30) { cur.hkgArr = iso; ev.push('hkgArr') }
       cur.last = { lat: a.lat, lon: a.lon, alt, gs: a.gs ?? null, at: iso };
@@ -108,7 +113,7 @@ async function ekTrack(now: number, mock: any = {}) {
     if (!cur.bkkArr && dB < 150) { cur.bkkArr = land(dB); ev.push('bkkArr') }
     else if (cur.bkkDep && !cur.hkgArr && dH < 150) { cur.hkgArr = land(dH); ev.push('hkgArr') }
   }
-  if (cur) { st.cur = cur; st.hist[cur.day] = { dxbDep: cur.dxbDep, dxbApprox: cur.dxbApprox, bkkArr: cur.bkkArr || null, bkkDep: cur.bkkDep || null, hkgArr: cur.hkgArr || null } }
+  if (cur) { st.cur = cur; st.hist[cur.day] = { dxbDep: cur.dxbDep, dxbApprox: cur.dxbApprox, bkkArr: cur.bkkArr || null, bkkArrApprox: !!cur.bkkArrApprox, bkkDep: cur.bkkDep || null, hkgArr: cur.hkgArr || null } }
   const days = Object.keys(st.hist).sort(); while (days.length > 7) delete st.hist[days.shift()!];
   st.seen = a ? { at: iso, lat: a.lat, lon: a.lon, alt: a.alt_baro, gs: a.gs ?? null } : st.seen || null; st.checked = iso;
   await db.from('hk_config').upsert({ k: 'ek384', v: JSON.stringify(st) });
@@ -147,12 +152,13 @@ async function tick(atIso?: string, mock: any = {}) {
       const body = !f ? 'ไม่พบ EK384 ในตารางสนามบินฮ่องกงวันนี้ ลองเช็คกับ Emirates'
         : /cancel/i.test(String(f.status || '')) ? '❗ สนามบินฮ่องกงแจ้งว่าเที่ยวบินวันนี้ถูกยกเลิก'
         : [`วันนี้ยังบินตามกำหนด ดูไบ → กรุงเทพฯ → ฮ่องกง (ตารางถึงฮ่องกง ${f.time} น. เวลาฮ่องกง)`,
-           today ? `ออกจากดูไบ ${today.dxbApprox ? 'ราว ' : ''}${thTime(today.dxbDep)} น.` : '',
+           today && today.dxbDep ? `ออกจากดูไบ ${today.dxbApprox ? 'ราว ' : ''}${thTime(today.dxbDep)} น.` : '',
            today && today.bkkArr ? `ถึงสุวรรณภูมิ ${thTime(today.bkkArr)} น.` : '',
            mine ? 'เที่ยวที่เราบิน: ออกจากสุวรรณภูมิ 13:45 น. · ประตูขึ้นเครื่องและเวลาบอร์ดดิ้งดูบนบอร์ดดิ้งพาสหรือจอในสนามบิน' : ''].filter(Boolean).join(' · ') + (today ? ' (เวลาไทย)' : '');
       R.push({ id: 'ek-daily', kind: 'flight', msg: { title: `📋 EK384 วันนี้ (${+n.date.slice(8)} พ.ย.)`, body, tag: 'ek-daily' } });
     }
     if (c && ek.ev.includes('dxbDep')) R.push({ id: 'ek-dxb-' + c.day, kind: 'flight', msg: { title: '🛫 EK384 ออกจากดูไบแล้ว', body: `ออกเมื่อ${c.dxbApprox ? 'ราว' : ''} ${thTime(c.dxbDep)} น. (เวลาไทย) กำลังบินมากรุงเทพฯ`, tag: 'ek-air' } });
+    if (c && ek.ev.includes('bkkDep')) R.push({ id: 'ek-bkkdep-' + c.day, kind: 'flight', msg: { title: '🛫 EK384 ออกจากสุวรรณภูมิแล้ว', body: `ออกเมื่อ ${thTime(c.bkkDep)} น. (เวลาไทย) กำลังบินไปฮ่องกง`, tag: 'ek-air' } });
     if (c && ek.ev.includes('bkkArr')) R.push({ id: 'ek-bkk-' + c.day, kind: 'flight', msg: { title: '🛬 EK384 ถึงสุวรรณภูมิแล้ว', body: `ลงเมื่อ ${thTime(c.bkkArr)} น. (เวลาไทย)${c.day === '2026-11-14' ? ' · เครื่องลำที่เราจะขึ้นมาถึงแล้ว' : ''}`, tag: 'ek-air' } });
   }
 

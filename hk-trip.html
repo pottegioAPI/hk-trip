@@ -296,6 +296,7 @@ nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding-
 .tab.dzt-tab{position:relative;padding-top:0}
 .hhero{position:relative;overflow:hidden;border-radius:24px;padding:20px 18px 18px;margin-bottom:12px;color:#fff;background:linear-gradient(140deg,var(--pink),var(--grape) 60%,var(--sky));box-shadow:var(--shadow)}
 .hhero .plane{position:absolute;right:-6px;top:6px;width:150px;opacity:.95}
+.hhero .ekchip{position:absolute;right:12px;top:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;border:0;border-radius:999px;padding:5px 9px 5px 8px;background:rgba(255,255,255,.92);color:var(--grape);font-weight:700;font-size:12px;line-height:1;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}.ekchip .ekst{font-weight:600;color:var(--muted);font-size:11px}.ekchip .ekst.s1,.ekchip .ekst.s3{color:var(--sky)}.ekchip .ekst.s2,.ekchip .ekst.s4{color:var(--mint)}.ekpanel .ekrows{list-style:none;margin:0;padding:0;display:grid;gap:4px}.ekpanel .ekrows li{display:flex;justify-content:space-between;font-size:14px}.ektab{width:100%;border-collapse:collapse;font-size:12.5px}.ektab th,.ektab td{text-align:left;padding:3px 4px;border-bottom:1px solid var(--line,rgba(0,0,0,.08))}.ektab th{color:var(--muted);font-weight:600}
 .hi{font-size:14px;font-weight:600;opacity:.95}
 .hbig{font-family:var(--display);font-weight:600;font-size:44px;line-height:1.05;margin:4px 0 2px}
 .hsub{font-size:15px;font-weight:500;max-width:78%}
@@ -2131,6 +2132,39 @@ function flightHTML(no){
     <div class="acts"><a class="btn-s" href="https://www.emirates.com/english/manage-booking/flight-status/" target="_blank" rel="noopener">สถานะบนเว็บ Emirates</a>
       <a class="btn-s" href="https://www.flightstats.com/v2/flight-tracker/EK/${no.slice(2)}" target="_blank" rel="noopener">ติดตามเครื่องบิน</a></div></div>`;
 }
+/* ---------- EK384 tracker (server follows the aircraft every 5 min, 10–14 Nov; this only reads it) ---------- */
+let EK=null; try{ EK=JSON.parse(lsGet('hk-ek384','null')) }catch(e){}
+S.ekOpen=false;
+const ekShow = () => hkNow().date<'2026-11-15';
+async function ekFetch(force){
+  if(window.claude || !ekShow()) return; if(!force && EK && Date.now()-EK.got<3*60e3) return;
+  try{ const j=await liveJSON(SB.url+'/functions/v1/hk-push?ek384=1'); if(j && !j.error){ EK={...j, got:Date.now()}; lsSet('hk-ek384', JSON.stringify(EK)); if(S.tab==='home') renderHome() } }catch(e){}
+}
+const thT = iso => { if(!iso) return null; const d=new Date(Date.parse(iso)+7*3600e3); return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0') };
+const thToday = () => new Date(Date.now()+7*3600e3).toISOString().slice(0,10);
+// where the aircraft is in today's trip: 0 nothing yet, 1 flying from Dubai, 2 in Bangkok, 3 flying to Hong Kong, 4 in Hong Kong
+function ekStage(){ const t=EK&&EK.hist&&EK.hist[thToday()]; if(!t) return 0; return t.hkgArr?4:t.bkkDep?3:t.bkkArr?2:t.dxbDep?1:0 }
+function ekChipHTML(){
+  if(!ekShow() || window.claude) return '';
+  const st=ekStage(), lab=['ยังไม่ออก','บินจากดูไบ','อยู่กรุงเทพฯ','บินไปฮ่องกง','ถึงฮ่องกง'][st];
+  return '<button type="button" class="ekchip" data-ek="1" aria-expanded="'+S.ekOpen+'" aria-label="ติดตามเที่ยวบิน EK384"><svg viewBox="-12 -12 24 24" width="16" height="16" aria-hidden="true"><path d="M-11 1 L-3 -1 L2 -9 L5 -9 L3 -1 L10 -1 Q12 0 10 1 L3 1 L5 9 L2 9 L-3 1 Z" fill="currentColor"/></svg>EK384<span class="ekst s'+st+'">'+lab+'</span></button>';
+}
+function ekPanelHTML(){
+  if(!S.ekOpen || !ekShow()) return '';
+  const d=thToday(), t=EK&&EK.hist&&EK.hist[d]||{}, row=(k,v,approx)=>'<li><span>'+k+'</span><b class="num">'+(v?(approx?'≈ ':'')+v+' น.':'—')+'</b></li>';
+  const seen=EK&&EK.seen&&Date.now()-Date.parse(EK.seen.at)<15*60e3 ? EK.seen : null;
+  const past=Object.entries(EK&&EK.hist||{}).filter(([k])=>k<d).sort().reverse().slice(0,4);
+  const mine=d==='2026-11-14';
+  return '<div class="panel ekpanel"><h3>✈️ ติดตาม EK384 · ดูไบ → กรุงเทพฯ → ฮ่องกง</h3>'
+    +'<p class="mini" style="margin:0 0 6px">วันนี้ ('+(+d.slice(8))+' พ.ย.) · เวลาไทย</p><ul class="ekrows">'
+    +row('ออกจากดูไบ', thT(t.dxbDep), t.dxbApprox)+row('ถึงสุวรรณภูมิ', thT(t.bkkArr), t.bkkArrApprox)+row('ออกจากสุวรรณภูมิ', thT(t.bkkDep))+row('ถึงฮ่องกง', thT(t.hkgArr))+'</ul>'
+    +(seen?'<p class="mini">ตอนนี้: '+(seen.alt==='ground'?'จอดอยู่บนพื้น':'บินอยู่ที่ความสูง '+Math.round(seen.alt/100)*100+' ฟุต')+'</p>':'')
+    +(past.length?'<p class="mini" style="margin:8px 0 4px">วันก่อนๆ (ดูว่าตรงเวลาแค่ไหน)</p><table class="ektab"><tr><th>วัน</th><th>ออกดูไบ</th><th>ถึง BKK</th><th>ออก BKK</th></tr>'
+      +past.map(([k,v])=>'<tr><td>'+(+k.slice(8))+' พ.ย.</td><td class="num">'+(thT(v.dxbDep)||'—')+'</td><td class="num">'+(thT(v.bkkArr)||'—')+'</td><td class="num">'+(thT(v.bkkDep)||'—')+'</td></tr>').join('')+'</table>':'')
+    +(mine?'<p class="mini" style="margin-top:8px"><b>เที่ยวที่เราบิน:</b> ออกจากสุวรรณภูมิ 13:45 น. ประตูขึ้นเครื่องและเวลาบอร์ดดิ้งดูบนบอร์ดดิ้งพาส หรือจอในสนามบิน</p>':'<p class="mini" style="margin-top:8px">วันที่ 14 พ.ย. เราบินช่วงกรุงเทพฯ → ฮ่องกง ออก 13:45 น.</p>')
+    +'<p class="mini">ข้อมูลจากสัญญาณเครื่องบินจริง (ADS-B) และตารางสนามบินฮ่องกง'+(EK&&EK.checked?' · เช็คล่าสุด '+thT(EK.checked)+' น.':'')+'</p>'
+    +'<div class="acts"><a class="btn-s" href="https://www.emirates.com/english/manage-booking/flight-status/" target="_blank" rel="noopener">สถานะบนเว็บ Emirates</a></div></div>';
+}
 const flightFor = id => ({'1s':'EK384','1f':'EK384','1a':'EK384','4e':'EK385','4f':'EK385'})[id];
 
 /* ---------- start and end of the trip ---------- */
@@ -2157,7 +2191,7 @@ function heroHTML(){
   else if(td) mid=`<div class="hbig num">วันที่ ${td}</div><div class="hsub">${esc(DAYS[td-1].title)}</div>`;
   else if(days>0) mid=`<div class="hbig num">อีก ${days} วัน</div><div class="hsub">ได้บินไปฮ่องกงแล้ว!</div>`;
   else mid=`<div class="hbig">จบทริปแล้ว 🎉</div><div class="hsub">ขอบคุณที่เที่ยวด้วยกันนะ</div>`;
-  return `<div class="hhero"><div class="plane" aria-hidden="true">${PLANE_SVG}</div>${hi}${mid}${foot}</div>`;
+  return `<div class="hhero"><div class="plane" aria-hidden="true">${PLANE_SVG}</div>${ekChipHTML()}${hi}${mid}${foot}</div>${ekPanelHTML()}`;
 }
 
 /* ---------- trip summary ---------- */
@@ -4054,6 +4088,7 @@ document.addEventListener('click', e=>{
   if(ds.hday){ const v=Number(ds.hday); S.homeDay = S.homeDay===v ? null : v; renderHome(); return }
   if(ds.live) return liveShow(ds.live);
   if(ds.gps){ if(ds.gps==='on') gpsStart(true); else gpsStop(); renderHome(); return }
+  if(ds.ek){ S.ekOpen=!S.ekOpen; renderHome(); if(S.ekOpen) ekFetch(true); return }
   if(ds.planroute){ S.planRoute.add(ds.planroute); renderPlan(); return }
   if(ds.gpsroute){ S.planRoute.delete(ds.gpsroute); if(!gpsFresh()){ gpsStart(true); toast('กำลังหาตำแหน่ง…') } renderPlan(); return }
   if(ds.sos){ openSheet({kind:'sos'}); return }
@@ -4179,8 +4214,8 @@ let savedTab = lsGet('hk-tab','home'); if(savedTab==='set'){ savedTab='money'; S
 S.tab = ['home','plan','go','dz','money'].includes(savedTab) ? savedTab : 'home';
 setTab(S.tab);
 // live feeds start once the whole script has run (the Supabase address is defined further down)
-setTimeout(()=>{ warnFetch(); nowFetch(); flightFetch(); dzQueueFetch(); dzProfFetch(); verCheck() }, 0); setInterval(verCheck, 30*60e3); setInterval(dzProfFetch, 6*3600e3);
-setInterval(warnFetch, 10*60e3); setInterval(nowFetch, 10*60e3); setInterval(()=>flightFetch(), 5*60e3); gpsStart(false);
+setTimeout(()=>{ warnFetch(); nowFetch(); flightFetch(); ekFetch(); dzQueueFetch(); dzProfFetch(); verCheck() }, 0); setInterval(verCheck, 30*60e3); setInterval(dzProfFetch, 6*3600e3);
+setInterval(warnFetch, 10*60e3); setInterval(nowFetch, 10*60e3); setInterval(()=>flightFetch(), 5*60e3); setInterval(()=>ekFetch(), 5*60e3); gpsStart(false);
 setInterval(()=>{ if(document.visibilityState==='visible') dzQueueFetch() }, 60e3);   // the plan's park stop needs it too, not only the Disney tab
 setInterval(()=>{ if(!S.sheet && S.tab==='home' && !['chk-new','pinin','keyin'].includes(document.activeElement?.id)) renderHome(); if(!S.sheet && S.tab==='plan') renderPlan(); if(!S.sheet && S.tab==='dz' && !S.dzEdit) renderDisney(); renderHeader() }, 60000);
 
