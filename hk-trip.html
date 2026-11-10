@@ -1524,12 +1524,17 @@ function ohCheck(src, dn, t, e){
 // a stop's opening hours: saved when it was picked from the search, else the same place in the search data (same name, within 300 m)
 const OH_MEMO=new Map();
 // places in our plan that OpenStreetMap has no hours for, from the Chinese Temples Committee (checked 8 Nov 2026)
-const KNOWN_OH={'lin fa temple':'Mo-Su 07:30-17:00', 'lin fa kung':'Mo-Su 07:30-17:00', 'che kung temple':'Mo-Su 07:00-18:00'};
+// checked 10 Nov 2026: Citygate's own site (mall 10:00-22:00, lockers GF/B2/B3 at P2 car park 08:00-23:00), OpenRice (Beef Station),
+// Ngong Ping 360's site (weekdays 10:00-18:00, weekends 09:00-18:30), Hong Kong Tourism Board and guides (Ladies' Market, K11 MUSEA).
+// The first name that matches wins, so the lockers come before the mall.
+const KNOWN_OH={'ฝากกระเป๋า citygate':'Mo-Su 08:00-23:00', 'citygate':'Mo-Su 10:00-22:00', "ladies' market":'Mo-Su 12:00-23:00', 'ตลาดเลดี้ส์':'Mo-Su 12:00-23:00',
+  'beef station':'Mo-Fr 12:00-16:00,17:00-23:00; Sa,Su 12:00-23:00', 'ngong ping 360':'Mo-Fr 10:00-18:00; Sa,Su 09:00-18:30', 'k11 musea':'Mo-Su 10:00-22:00',
+  'lin fa temple':'Mo-Su 07:30-17:00', 'lin fa kung':'Mo-Su 07:30-17:00', 'che kung temple':'Mo-Su 07:00-18:00'};
 function itemOH(it){
-  if(!it) return ''; if(it.oh) return it.oh; if(!PL || !it.ll) return '';
+  if(!it) return ''; if(it.oh) return it.oh; if(!PL) return '';
   const key=it.id+'|'+(it.map||it.h); if(OH_MEMO.has(key)) return OH_MEMO.get(key);
   const nm=String(it.map||it.h).toLowerCase(), alt=String(it.h).toLowerCase();
-  const p=PL.p.find(p=>p[9] && (p[0].toLowerCase()===nm || p[0].toLowerCase()===alt || (p[2] && p[2].toLowerCase()===alt)) && metres(it.ll,[p[3]/1e5,p[4]/1e5])<300);
+  const p=it.ll && PL.p.find(p=>p[9] && (p[0].toLowerCase()===nm || p[0].toLowerCase()===alt || (p[2] && p[2].toLowerCase()===alt)) && metres(it.ll,[p[3]/1e5,p[4]/1e5])<300);
   const known=Object.keys(KNOWN_OH).find(k=>nm.includes(k)||alt.includes(k));
   const v=p?p[9]:known?KNOWN_OH[known]:''; OH_MEMO.set(key,v); return v;
 }
