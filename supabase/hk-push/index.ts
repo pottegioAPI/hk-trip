@@ -92,7 +92,8 @@ async function ekTrack(key: string, cs: string, route: string[], now: number, ad
   const st: any = JSON.parse((await conf(key)) || '{}'); st.hist = st.hist || {}; const ev: string[] = [];
   const j = adsb || await getJSON('https://api.adsb.lol/v2/callsign/' + cs);
   const a = (j?.ac || [])[0], iso = new Date(now).toISOString();
-  let cur = st.cur && now - Date.parse(st.cur.start) < 20 * 3600e3 ? st.cur : null;   // one trip of the aircraft takes ~11-12 h
+  // one trip of the aircraft takes ~11-12 h; a trip that has landed at its destination is over (the next day's starts ~13 h later)
+  let cur = st.cur && !st.cur[dArr] && now - Date.parse(st.cur.start) < 20 * 3600e3 ? st.cur : null;
   if (a && a.lat != null) {
     const p: [number, number] = [a.lat, a.lon], ground = a.alt_baro === 'ground', alt = ground ? 0 : Number(a.alt_baro) || 0;
     const dO = km(p, AP[O]), dM = km(p, AP[M]), dD = km(p, AP[D]), past = side * (a.lon - AP[M][1]);
