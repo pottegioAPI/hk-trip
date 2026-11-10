@@ -94,18 +94,24 @@ async function tick(atIso?: string, mock: any = {}) {
   at('2026-11-13', '20:00', 'pack', 'pack', '🧳 พรุ่งนี้บินแล้ว!', 'เปิดเช็คลิสต์ก่อนบินในแอป เตรียมของให้ครบ');
   at('2026-11-14', '09:00', 'go-bkk', 'flight', '✈️ วันนี้บิน EK384', 'เครื่องออก 13:45 น. เวลาไทย · ไปให้ถึงสุวรรณภูมิประมาณ 10:45 น.');
 
-  // --- every trip morning: the first stop, the weather, an umbrella if it rains
-  if ([2, 3, 4].includes(tripDay) && inWin(n.min, 8 * 60)) {
-    const items = ((await doc('plan/d' + tripDay))?.items || []).slice().sort((a: any, b: any) => toMin(a.t) - toMin(b.t));
-    const w = ((await getJSON(SITE + 'weather.json?t=' + Date.now()))?.days || []).find((d: any) => d.date === n.date);
-    const first = items.find((i: any) => !done[i.id]);
-    const rain = w && (w.icon >= 53 && w.icon <= 65 || /high/i.test(w.psr || ''));
-    const parts = [first ? `เริ่ม ${first.t} น. ${first.h}` : '', w ? `อากาศ ${w.min}–${w.max}° ${WXI[w.icon] || ''}${rain ? ' · พกร่มด้วย ☔' : ''}` : '', tripDay === 3 ? 'Disney เปิด 10:30 น.' : ''].filter(Boolean);
-    R.push({ id: 'morning', kind: 'morning', msg: { title: `☀️ อรุณสวัสดิ์ วันที่ ${tripDay} ของทริป`, body: parts.join(' · '), tag: 'morning' } });
+  // Disney's own calendar for the Disney day: opening time and the fireworks
+  let fwAt = 20 * 60, dzOpen = '10:30';
+  if (tripDay >= 3) try { const c = await getJSON(SITE + 'dzcal.json?t=' + Date.now()); const s = (c?.shows || []).find((x: any) => /Momentous|Nighttime/i.test(x.name)); if (s && s.times && s.times.length) fwAt = toMin(s.times[s.times.length - 1]); if (c?.date === '2026-11-16' && c.open) dzOpen = c.open } catch (_) {}
+  const dayItems = async (d: number) => ((await doc('plan/d' + d))?.items || []).filter((i: any) => i.t).slice().sort((a: any, b: any) => toMin(a.t) - toMin(b.t));
+
+  // --- every trip morning, 30 min before the day's first stop (not before 06:00): that stop, the weather, an umbrella if it rains
+  if ([2, 3, 4].includes(tripDay)) {
+    const items = await dayItems(tripDay), first = items[0];
+    if (first && inWin(n.min, Math.max(6 * 60, toMin(first.t) - 30))) {
+      const w = ((await getJSON(SITE + 'weather.json?t=' + Date.now()))?.days || []).find((d: any) => d.date === n.date);
+      const rain = w && (w.icon >= 53 && w.icon <= 65 || /high/i.test(w.psr || ''));
+      const parts = [`จุดแรก ${first.t} น. ${first.h}`, w ? `อากาศ ${w.min}–${w.max}° ${WXI[w.icon] || ''}${rain ? ' · พกร่มด้วย ☔' : ''}` : '',
+        tripDay === 3 ? `Disney เปิด ${dzOpen} น.` : '', tripDay === 4 ? 'วันนี้เช็คเอาท์ เก็บของให้ครบ แล้วไปฝากกระเป๋าที่ Citygate Outlets (Tung Chung)' : ''].filter(Boolean);
+      R.push({ id: 'morning', kind: 'morning', msg: { title: `☀️ อรุณสวัสดิ์ วันที่ ${tripDay} ของทริป`, body: parts.join(' · '), tag: 'morning' } });
+    }
   }
 
   // --- the Disney day: both paid meals, the fireworks, the must-do rides
-  let fwAt = 20 * 60; try { const c = await getJSON(SITE + 'dzcal.json?t=' + Date.now()); const s = (c?.shows || []).find((x: any) => /Momentous|Nighttime/i.test(x.name)); if (s && s.times && s.times.length) fwAt = toMin(s.times[s.times.length - 1]) } catch (_) {}
   at('2026-11-16', '14:30', 'lunch', 'meal', '🍽️ ยังไม่ได้กินมื้อเที่ยง', 'voucher มื้อเที่ยงต้องสั่งก่อน 16:00 น. ไปกินตอนนี้เลย', !(done['dz:lunch'] || done['3l']));
   at('2026-11-16', '18:15', 'dinner', 'meal', '🍽️ ยังไม่ได้กินมื้อเย็น', 'ไปกินตอนนี้จะทันไปจองที่ดูพลุ (voucher แลกได้ถึงประมาณ 19:30 น.)', !(done['dz:dinner'] || done['3n']));
   at('2026-11-16', hhmm(fwAt - 70), 'fw1', 'fireworks', '🎆 อีก 30 นาทีไปจองที่ดูพลุ', `พลุเริ่ม ${hhmm(fwAt)} น. ไปจองที่หน้าปราสาทก่อน ${hhmm(fwAt - 40)} น.`, !done['3c'], 15);
@@ -144,10 +150,13 @@ async function tick(atIso?: string, mock: any = {}) {
   }
 
   // --- getting home at night: the last MTR is around midnight
-  for (const [date, last] of [['2026-11-14', '1c'], ['2026-11-15', '2h'], ['2026-11-16', '3d']]) at(date, '23:10', 'night-' + date, 'night', '🚇 ใกล้รถไฟเที่ยวสุดท้ายแล้ว', 'ยังไม่ถึงที่พัก? เปิดแอปดูเวลารถไฟเที่ยวสุดท้ายจากจุดที่อยู่ หรือกด "พากลับที่พัก"', !done[last]);
+  // (the day's last stop in the plan as it is now, not a fixed one: plans change)
+  if ([1, 2, 3].includes(tripDay) && inWin(n.min, 23 * 60 + 10)) {
+    const items = await dayItems(tripDay), last = items[items.length - 1];
+    at(n.date, '23:10', 'night-' + n.date, 'night', '🚇 ใกล้รถไฟเที่ยวสุดท้ายแล้ว', 'ยังไม่ถึงที่พัก? เปิดแอปดูเวลารถไฟเที่ยวสุดท้ายจากจุดที่อยู่ หรือกด "พากลับที่พัก"', !!last && !done[last.id]);
+  }
 
-  // --- the last day: check-out, bags, airport
-  at('2026-11-17', '07:30', 'checkout', 'depart', '🧳 วันนี้เช็คเอาท์', 'เก็บของให้ครบ แล้วไปฝากกระเป๋าที่ Citygate Outlets (Tung Chung)', !done['4a']);
+  // --- the last day: bags, airport (check-out is in that morning's message)
   at('2026-11-17', '16:00', 'bags', 'depart', '🧳 ไปรับกระเป๋าที่ Citygate', 'รับกระเป๋าคืน แล้วนั่งบัส S1 ไปสนามบิน', !done['4e']);
   at('2026-11-17', '16:30', 'to-hkg', 'flight', '✈️ ได้เวลาไปสนามบิน', 'EK385 ออก 21:00 น. เคาน์เตอร์เช็คอินปิดประมาณ 20:00 น.', !done['4e']);
 
