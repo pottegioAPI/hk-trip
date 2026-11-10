@@ -76,8 +76,50 @@ const WX: Record<string, [string, string]> = {
 const WXI: Record<number, string> = { 50: 'แดดจัด', 51: 'แดดเป็นช่วง', 52: 'แดดสลับเมฆ', 53: 'แดดเป็นช่วง มีฝนบ้าง', 54: 'แดดสลับเมฆ มีฝนบ้าง', 60: 'มีเมฆ', 61: 'เมฆมาก', 62: 'ฝนเล็กน้อย', 63: 'ฝนตก', 64: 'ฝนหนัก', 65: 'พายุฝนฟ้าคะนอง', 76: 'เมฆเป็นส่วนใหญ่', 77: 'ส่วนใหญ่อากาศดี' };
 const share = (e: any, p: number) => e.kind === 'settle' ? 0 : e.type === 'split' ? e.amt / 2 : e.type === 'adv' ? (e.payer === p ? 0 : e.amt) : (e.payer === p ? e.amt : 0);
 
+// --- EK384 (Dubai → Bangkok → Hong Kong), followed every day 10–14 Nov from live aircraft positions (ADS-B, adsb.lol, free)
+// and Hong Kong airport's own schedule. Times are kept as ISO; messages show Thai time (the departure and the Bangkok
+// stop are read at home in Thailand). State in hk_config 'ek384' (nothing secret: the app reads it via GET ?ek384=1).
+const AP: Record<string, [number, number]> = { DXB: [25.2532, 55.3657], BKK: [13.69, 100.7501], HKG: [22.308, 113.9185] };
+const km = (a: [number, number], b: [number, number]) => { const r = Math.PI / 180, x = (b[1] - a[1]) * r * Math.cos((a[0] + b[0]) / 2 * r), y = (b[0] - a[0]) * r; return Math.sqrt(x * x + y * y) * 6371 };
+const thTime = (iso: string) => { const d = new Date(Date.parse(iso) + 7 * 3600e3); return String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0') };
+const thDate = (t: number) => new Date(t + 7 * 3600e3).toISOString().slice(0, 10);
+async function ekTrack(now: number, mock: any = {}) {
+  const st: any = JSON.parse((await conf('ek384')) || '{}'); st.hist = st.hist || {}; const ev: string[] = [];
+  const j = mock.adsb || await getJSON('https://api.adsb.lol/v2/callsign/UAE384');
+  const a = (j?.ac || [])[0], iso = new Date(now).toISOString();
+  let cur = st.cur && now - Date.parse(st.cur.start) < 20 * 3600e3 ? st.cur : null;   // one trip of the aircraft, Dubai to Hong Kong, takes ~11 h
+  if (a && a.lat != null) {
+    const p: [number, number] = [a.lat, a.lon], ground = a.alt_baro === 'ground', alt = ground ? 0 : Number(a.alt_baro) || 0;
+    const dD = km(p, AP.DXB), dB = km(p, AP.BKK), dH = km(p, AP.HKG);
+    if (!ground && !cur && dD < dB) {   // in the air on the Dubai leg: a new trip
+      cur = { day: thDate(now), start: iso, dxbDep: iso, dxbApprox: dD > 400 }; ev.push('dxbDep');
+    }
+    if (cur) {
+      if (cur.dxbDep && !cur.bkkArr && ground && dB < 30) { cur.bkkArr = iso; ev.push('bkkArr') }
+      if (cur.bkkArr && !cur.bkkDep && !ground && dB < 400) { cur.bkkDep = iso; ev.push('bkkDep') }
+      if (cur.bkkDep && !cur.hkgArr && ground && dH < 30) { cur.hkgArr = iso; ev.push('hkgArr') }
+      cur.last = { lat: a.lat, lon: a.lon, alt, gs: a.gs ?? null, at: iso };
+    }
+  } else if (cur && cur.last && now - Date.parse(cur.last.at) < 30 * 60e3 && cur.last.alt > 0 && cur.last.alt < 15000) {
+    // gone from the air while coming down near an airport: landed (receivers often miss aircraft on the ground);
+    // the landing time is the last sighting plus the flying time left at that speed
+    const p: [number, number] = [cur.last.lat, cur.last.lon], land = (d: number) => new Date(Date.parse(cur.last.at) + Math.min(20, d / ((cur.last.gs || 250) * 1.852 / 60)) * 60e3).toISOString();
+    const dB = km(p, AP.BKK), dH = km(p, AP.HKG);
+    if (!cur.bkkArr && dB < 150) { cur.bkkArr = land(dB); ev.push('bkkArr') }
+    else if (cur.bkkDep && !cur.hkgArr && dH < 150) { cur.hkgArr = land(dH); ev.push('hkgArr') }
+  }
+  if (cur) { st.cur = cur; st.hist[cur.day] = { dxbDep: cur.dxbDep, dxbApprox: cur.dxbApprox, bkkArr: cur.bkkArr || null, bkkDep: cur.bkkDep || null, hkgArr: cur.hkgArr || null } }
+  const days = Object.keys(st.hist).sort(); while (days.length > 7) delete st.hist[days.shift()!];
+  st.seen = a ? { at: iso, lat: a.lat, lon: a.lon, alt: a.alt_baro, gs: a.gs ?? null } : st.seen || null; st.checked = iso;
+  await db.from('hk_config').upsert({ k: 'ek384', v: JSON.stringify(st) });
+  return { st, cur, ev };
+}
+
 async function tick(atIso?: string, mock: any = {}) {
   const n = hkAt(atIso ? Date.parse(atIso) : Date.now()), log: string[] = [];
+  const now = atIso ? Date.parse(atIso) : Date.now();
+  const ekDays = ['2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13', '2026-11-14'];
+  const ek = ekDays.includes(n.date) || (n.date === '2026-11-15' && n.min < 60) ? await ekTrack(now, mock) : null;
   const { data: subs } = await db.from('hk_push_subs').select('uid');
   const uids = [...new Set((subs || []).map((s: any) => s.uid as string))];
   if (!uids.length) return { n, log: ['no subscribers'] };
@@ -93,6 +135,26 @@ async function tick(atIso?: string, mock: any = {}) {
   // --- before the flight
   at('2026-11-13', '20:00', 'pack', 'pack', '🧳 พรุ่งนี้บินแล้ว!', 'เปิดเช็คลิสต์ก่อนบินในแอป เตรียมของให้ครบ');
   at('2026-11-14', '09:00', 'go-bkk', 'flight', '✈️ วันนี้บิน EK384', 'เครื่องออก 13:45 น. เวลาไทย · ไปให้ถึงสุวรรณภูมิประมาณ 10:45 น.');
+
+  // --- EK384 every day until we fly it: still scheduled? left Dubai? landed in Bangkok?
+  if (ek) {
+    const c = ek.cur, mine = n.date === '2026-11-14';
+    // (only when the airport's schedule could be read: a failed read is tried again at the next tick, never reported as "not found")
+    const hk = ekDays.includes(n.date) && n.min >= 8 * 60 && n.min < 22 * 60 ? (mock.hkg !== undefined ? { found: mock.hkg } : await getJSON(`${FN}hk-flight?flight=EK384&date=${n.date}&arrival=1`)) : null;
+    if (hk && !hk.error) {
+      const f = hk.found;
+      const today = c && c.day === thDate(now) ? c : null;
+      const body = !f ? 'ไม่พบ EK384 ในตารางสนามบินฮ่องกงวันนี้ ลองเช็คกับ Emirates'
+        : /cancel/i.test(String(f.status || '')) ? '❗ สนามบินฮ่องกงแจ้งว่าเที่ยวบินวันนี้ถูกยกเลิก'
+        : [`วันนี้ยังบินตามกำหนด ดูไบ → กรุงเทพฯ → ฮ่องกง (ตารางถึงฮ่องกง ${f.time} น. เวลาฮ่องกง)`,
+           today ? `ออกจากดูไบ ${today.dxbApprox ? 'ราว ' : ''}${thTime(today.dxbDep)} น.` : '',
+           today && today.bkkArr ? `ถึงสุวรรณภูมิ ${thTime(today.bkkArr)} น.` : '',
+           mine ? 'เที่ยวที่เราบิน: ออกจากสุวรรณภูมิ 13:45 น. · ประตูขึ้นเครื่องและเวลาบอร์ดดิ้งดูบนบอร์ดดิ้งพาสหรือจอในสนามบิน' : ''].filter(Boolean).join(' · ') + (today ? ' (เวลาไทย)' : '');
+      R.push({ id: 'ek-daily', kind: 'flight', msg: { title: `📋 EK384 วันนี้ (${+n.date.slice(8)} พ.ย.)`, body, tag: 'ek-daily' } });
+    }
+    if (c && ek.ev.includes('dxbDep')) R.push({ id: 'ek-dxb-' + c.day, kind: 'flight', msg: { title: '🛫 EK384 ออกจากดูไบแล้ว', body: `ออกเมื่อ${c.dxbApprox ? 'ราว' : ''} ${thTime(c.dxbDep)} น. (เวลาไทย) กำลังบินมากรุงเทพฯ`, tag: 'ek-air' } });
+    if (c && ek.ev.includes('bkkArr')) R.push({ id: 'ek-bkk-' + c.day, kind: 'flight', msg: { title: '🛬 EK384 ถึงสุวรรณภูมิแล้ว', body: `ลงเมื่อ ${thTime(c.bkkArr)} น. (เวลาไทย)${c.day === '2026-11-14' ? ' · เครื่องลำที่เราจะขึ้นมาถึงแล้ว' : ''}`, tag: 'ek-air' } });
+  }
 
   // Disney's own calendar for the Disney day: opening time and the fireworks
   let fwAt = 20 * 60, dzOpen = '10:30';
@@ -203,7 +265,10 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   try {
     const pub = await vapid();
-    if (req.method === 'GET') return out({ pub });
+    if (req.method === 'GET') {
+      if (new URL(req.url).searchParams.has('ek384')) { const s = JSON.parse((await conf('ek384')) || '{}'); return out({ hist: s.hist || {}, cur: s.cur || null, seen: s.seen || null, checked: s.checked || null }) }
+      return out({ pub });
+    }
     const body = await req.json().catch(() => ({}));
     if (body.tick) {
       if (req.headers.get('x-cron') !== await conf('cron_secret')) return out({ error: 'forbidden' }, 403);
