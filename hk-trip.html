@@ -55,6 +55,17 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .cur{font-size:.55em;font-weight:500;opacity:.85;letter-spacing:.02em}
 .hero .big small{display:block;font-size:15px;margin-top:2px;opacity:.9}
 .hdbud .cur{font-size:.85em}
+.bellb{position:relative;background:var(--surface2);color:var(--ink)}
+/* five round buttons on a narrow phone: a little smaller, and the line under the title may wrap rather than be cut */
+@media (max-width:420px){ header.top .wrap{gap:6px} header.top .wbtn{width:34px;height:34px} header.top .wbtn svg{width:20px;height:20px} .ttl p{white-space:normal;line-height:1.3} } .nw{white-space:nowrap}
+.belln{position:absolute;top:-4px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--danger);color:#fff;font:700 11.5px/19px system-ui,sans-serif;text-align:center;border:2px solid var(--bg);box-sizing:content-box}
+.ibxd{margin:12px 0 4px;font-weight:700;color:var(--muted)}
+.ibx{list-style:none;margin:0;padding:0}
+.ibx li{background:var(--surface2);border-radius:14px;padding:9px 12px;margin-bottom:6px}
+.ibx li.new{background:var(--sky-soft);box-shadow:inset 3px 0 0 var(--sky)}
+.ibx li div{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.ibx li b{font-size:14.5px}.ibx li span{flex:none;font-size:12.5px;color:var(--muted)}
+.ibx li p{margin:3px 0 0;font-size:13.5px;white-space:pre-line;color:var(--ink)}
 .gearb{position:relative;background:var(--surface2);color:var(--ink)}
 .gearb i{position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:var(--muted);border:2px solid var(--bg)}
 .gearb.on i{background:var(--mint)}
@@ -642,6 +653,7 @@ input[type=time].txt{appearance:none;min-height:46px}
     <button class="wbtn hbtn2" id="hotelbtn" type="button" aria-label="ที่พักของเรา และพากลับที่พัก"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" fill="currentColor"/></svg></button>
     <button class="wbtn" id="waterbtn" type="button" aria-label="จุดกดน้ำฟรีใกล้ฉัน"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z" fill="currentColor"/><path d="M9.5 15.5q2.5 2 5 0" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></button>
     <button class="wbtn sosb" type="button" data-sos="1" aria-label="บัตรฉุกเฉิน โทร 999 และสถานกงสุลไทย">SOS</button>
+    <button class="wbtn bellb" id="bellbtn" type="button" aria-label="การแจ้งเตือน"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg><b class="belln" hidden></b></button>
     <button class="wbtn gearb" id="gearbtn" type="button" aria-label="ตั้งค่า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><i></i></button>
   </div>
 </header>
@@ -1070,9 +1082,37 @@ const b64u = s => { const p='='.repeat((4-s.length%4)%4), r=atob((s+p).replace(/
 const PUSH_KINDS = [['ride','🚌 ป้ายหน้าลง (โหมดนับป้ายรถบัส · เปิดแอปค้างไว้)'],['arrive','📍 ถึงจุดหมายถัดไปแล้ว (GPS · เปิดแอปค้างไว้)'],['wrongway','🧭 เดินห่างออกจากจุดหมาย (GPS · เปิดแอปค้างไว้)'],['weather','🌀 พายุ / ฝนหนัก (หอดูดาวฮ่องกง)'],['flight','✈️ เที่ยวบิน: ดีเลย์ ประตู ไปสนามบิน'],['mtr','🚇 MTR ขัดข้อง'],['morning','☀️ สรุปเช้าทุกวัน'],
   ['meal','🍽️ มื้อ voucher ที่ Disney'],['fireworks','🎆 ไปจองที่ดูพลุ'],['dzwait','🎢 เครื่องห้ามพลาดคิวสั้น'],['dzstatus','🔧 เครื่องห้ามพลาดหยุด / กลับมาเปิด'],
   ['night','🌙 ใกล้รถไฟเที่ยวสุดท้าย'],['depart','🧳 วันกลับ: เช็คเอาท์ รับกระเป๋า'],['budget','💰 วันนี้ใช้เกินงบ (ส่วนตัว)'],['pack','📋 คืนก่อนบิน: เช็คลิสต์']];
+/* ---------- 🔔 inbox: every notification kept on this phone; unread number on the bell and the app icon ---------- */
+var ibxDB=()=>new Promise((ok,no)=>{ const r=indexedDB.open('hk-inbox',1); r.onupgradeneeded=()=>r.result.createObjectStore('n',{keyPath:'id',autoIncrement:true}); r.onsuccess=()=>ok(r.result); r.onerror=()=>no(r.error) });
+var ibxTx=(mode,fn)=>ibxDB().then(db=>new Promise((ok,no)=>{ const tx=db.transaction('n',mode), st=tx.objectStore('n'); let out; const q=st.getAll(); q.onsuccess=()=>{ out=fn(st,q.result) }; tx.oncomplete=()=>{ db.close(); ok(out) }; tx.onerror=()=>{ db.close(); no(tx.error) } }));
+// add one, keep the newest 100, return how many are unread
+var ibxAdd=d=>ibxTx('readwrite',(st,all)=>{ st.add({at:Date.now(), title:d.title||'ทริปฮ่องกง', body:d.body||'', tag:d.tag||'', read:false});
+  all.sort((a,b)=>a.at-b.at).slice(0,Math.max(0,all.length+1-100)).forEach(x=>st.delete(x.id)); return all.filter(x=>!x.read).length+1 });
+var ibxBadge=n=>{ try{ const nv=self.navigator||navigator; if(n>0){ if(nv.setAppBadge) return nv.setAppBadge(n).catch(()=>{}) } else if(nv.clearAppBadge) return nv.clearAppBadge().catch(()=>{}) }catch(e){} };
+
+function ibxLoad(){ if(!('indexedDB' in window)) return Promise.resolve();
+  return ibxTx('readonly',(st,all)=>all).then(all=>{ S.ibx=all.sort((a,b)=>b.at-a.at); renderBell(); ibxBadge(S.ibx.filter(x=>!x.read).length); if(S.sheet && S.sheet.kind==='inbox') drawSheet() }).catch(()=>{}) }
+function renderBell(){ const b=document.getElementById('bellbtn'); if(!b) return; const n=(S.ibx||[]).filter(x=>!x.read).length, el=b.querySelector('.belln');
+  el.hidden=!n; el.textContent=n>99?'99+':String(n); b.setAttribute('aria-label','การแจ้งเตือน'+(n?' ยังไม่อ่าน '+n:'')) }
+function ibxOpen(){ const fresh=(S.ibx||[]).filter(x=>!x.read).map(x=>x.id); openSheet({kind:'inbox', fresh});
+  if(fresh.length && 'indexedDB' in window) ibxTx('readwrite',(st,all)=>all.forEach(x=>{ if(!x.read){ x.read=true; st.put(x) } })).then(()=>{ (S.ibx||[]).forEach(x=>x.read=true); renderBell(); ibxBadge(0) }).catch(()=>{}); else ibxBadge(0) }
+function ibxClear(){ if(!confirm('ลบการแจ้งเตือนทั้งหมดในเครื่องนี้?')) return; ibxTx('readwrite',st=>st.clear()).then(()=>{ S.ibx=[]; renderBell(); ibxBadge(0); drawSheet() }).catch(()=>toast('ลบไม่สำเร็จ')) }
+function inboxSheetHTML(){
+  const L=S.ibx||[], fresh=new Set(S.sheet.fresh||[]), day=t=>new Date(t).toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'short'}), tm=t=>new Date(t).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  let h='', last='';
+  for(const x of L){ const d=day(x.at); if(d!==last){ h+=(last?'</ul>':'')+'<p class="mini ibxd">'+esc(d)+'</p><ul class="ibx">'; last=d }
+    h+='<li'+(fresh.has(x.id)?' class="new"':'')+'><div><b>'+esc(x.title)+'</b><span class="num">'+tm(x.at)+' น.</span></div>'+(x.body?'<p>'+esc(x.body)+'</p>':'')+'</li>' }
+  if(last) h+='</ul>';
+  return '<div class="wrap"><div class="grab"></div><h2 id="sheet-title">การแจ้งเตือน <button class="x" type="button" data-close aria-label="ปิด">'+ic('x')+'</button></h2>'
+    +(L.length ? h : '<p class="mini">ยังไม่มีการแจ้งเตือน ที่ได้รับจากนี้ไปจะเก็บไว้ที่นี่</p>')
+    +'<p class="mini" style="margin-top:10px">เก็บไว้ในเครื่องนี้ 100 อันล่าสุด · เวลาตามนาฬิกามือถือ</p>'
+    +(L.length?'<div class="acts"><button type="button" class="btn-s" data-ibxclear="1">ลบทั้งหมด</button></div>':'')+'</div>' }
+if(navigator.serviceWorker) navigator.serviceWorker.addEventListener('message', e=>{ const m=e.data||{}; if(m.inbox) ibxLoad(); if(m.openInbox) ibxLoad().then(ibxOpen) });
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) ibxLoad() });
+setTimeout(()=>{ ibxLoad().then(()=>{ if(/[?&]inbox=1/.test(location.search)){ history.replaceState(null,'',location.pathname); ibxOpen() } }) }, 0);
 function localNotify(kind, title, body){
   try{ if('Notification' in window && Notification.permission==='granted' && !(S.pushOff||[]).includes(kind) && navigator.serviceWorker)
-    navigator.serviceWorker.ready.then(r=>r.showNotification(title, {body, tag:kind, renotify:true, icon:'icon-192.png'})) }catch(e){}
+    { navigator.serviceWorker.ready.then(r=>r.showNotification(title, {body, tag:kind, renotify:true, icon:'icon-192.png'})); ibxAdd({title, body, tag:kind}).then(()=>ibxLoad()).catch(()=>{}) } }catch(e){}
 }
 async function pushKind(k){
   const off=new Set(S.pushOff||[]); off.has(k)?off.delete(k):off.add(k); S.pushOff=[...off]; refreshSet();
@@ -1723,7 +1763,8 @@ function renderHeader(){
   // under the title: where we are in the trip, and how much of my own budget is left (tap → money)
   const when = td ? `วันที่ ${td}/4 · ${DAYS[td-1].dow} ${DAYS[td-1].d} พ.ย.` : n.date<DAYS[0].date ? `อีก ${Math.ceil((Date.parse(DAYS[0].date)-Date.parse(n.date))/864e5)} วันบิน` : 'จบทริปแล้ว';
   const B=Number(S.budget)||0, left = S.me!=null && B>0 ? B-allExp().reduce((t,e)=>t+share(e,S.me),0) : null;
-  cd.innerHTML = left==null ? esc(when)+' · 14–17 พ.ย. 2569' : `<button type="button" class="hdbud${left<0?' neg':left<B*.15?' low':''}" data-tab="money">${left<0?'เกินงบ '+hkH(-left):'เหลือ '+hkH(left)}</button> · ${esc(when)}`;
+  cd.innerHTML = left==null ? '<span class="nw">'+esc(when)+'</span> · <span class="nw">14–17 พ.ย. 2569</span>' : `<button type="button" class="hdbud${left<0?' neg':left<B*.15?' low':''}" data-tab="money">${left<0?'เกินงบ '+hkH(-left):'เหลือ '+hkH(left)}</button> · <span class="nw">${esc(when)}</span>`;
+  renderBell();
   const sy=document.getElementById('gearbtn');
   sy.className='wbtn gearb'+(S.mode==='shared' && S.net!=='off' && S.net!=='wait'?' on':'')+(S.net==='wait'?' wait':'')+(S.net==='off'?' off':'');
   sy.setAttribute('aria-label', 'ตั้งค่า'+(S.me==null?'':' · '+nm(S.me)));
@@ -3693,6 +3734,7 @@ function drawSheet(){
       <button type="button" data-addx="place"><span class="ai" style="background:var(--mint-soft);color:var(--mint)">${ic('pin')}</span><b>เพิ่มที่เที่ยว</b><small>ค้นหาสถานที่ ร้านอาหาร ลงแผนวัน${tripDay()?'นี้':'ที่ '+DAYS[S.day-1].d+' พ.ย.'}</small></button></div></div>`; return }
   if(d.kind==='hotel'){ el.innerHTML = '<div class="wrap"><div class="grab"></div><h2 id="sheet-title">ที่พักของเรา <button class="x" type="button" data-close aria-label="ปิด">'+ic('x')+'</button></h2>'+hotelCardHTML()+'</div>'; return }
   if(d.kind==='water'){ el.innerHTML = waterSheetHTML(); return }
+  if(d.kind==='inbox'){ el.innerHTML = inboxSheetHTML(); return }
   if(d.kind==='sos'){ el.innerHTML = sosSheetHTML(); return }
   if(d.kind==='dzinfo'){ el.innerHTML = dzInfoSheetHTML(); return }
   if(d.kind==='walk'){ el.innerHTML = walkSheetHTML(); arrowDraw(); return }
@@ -4082,6 +4124,8 @@ document.addEventListener('click', e=>{
   if(ds.wnear){ S.wOpen.has(ds.wnear)?S.wOpen.delete(ds.wnear):S.wOpen.add(ds.wnear); renderPlan(); return }
   if(ds.wcenter!=null){ S.wCenter=ds.wcenter||null; if(S.sheet&&S.sheet.kind==='water') drawSheet(); else renderHome(); return }
   if(t.id==='waterbtn') return openSheet({kind:'water'});
+  if(t.id==='bellbtn') return ibxOpen();
+  if(ds.ibxclear) return ibxClear();
   if(t.id==='hotelbtn') return openSheet({kind:'hotel'});
   if(ds.skipgo && S.sheet && S.sheet.kind==='skipask'){ const {id,ids}=S.sheet; S.sheetIds=ids; closeSheet(); const r=toggleArrive(id, ds.skipgo); S.sheetIds=null;
     if(ds.skipgo==='skip') toast(`ข้าม ${ids.length} จุด ปรับเวลาที่เหลือให้แล้ว`); return r }
