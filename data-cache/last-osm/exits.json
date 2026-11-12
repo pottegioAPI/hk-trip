@@ -2,8 +2,8 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-10T23:21:21Z",
-    "timestamp_areas_base": "2026-11-10T19:28:21Z",
+    "timestamp_osm_base": "2026-11-12T00:43:32Z",
+    "timestamp_areas_base": "2026-11-11T21:36:56Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -6507,7 +6507,9 @@
   "lon": 114.1840900,
   "tags": {
     "door": "no",
+    "elevator": "no",
     "entrance": "yes",
+    "escalator": "yes",
     "exit": "yes",
     "level": "-1",
     "location": "underground",
@@ -6519,6 +6521,7 @@
     "old_name:zh": "渣甸坊",
     "railway": "subway_entrance",
     "ref": "F2",
+    "steps": "yes",
     "was:name": "渣甸坊 Jardine's Crescent",
     "was:name:en": "Jardine's Crescent",
     "was:name:zh": "渣甸坊",
