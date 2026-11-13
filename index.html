@@ -65,7 +65,7 @@ header.top .wrap{padding-block:12px 10px;display:flex;align-items:center;gap:12p
 .hdbud .cur{font-size:.85em}
 .bellb{position:relative;background:var(--surface2);color:var(--ink)}
 /* five round buttons on a narrow phone: a little smaller, and the line under the title may wrap rather than be cut */
-@media (max-width:420px){ header.top .wrap{gap:6px} header.top .wbtn{width:34px;height:34px} header.top .wbtn svg{width:20px;height:20px} .ttl p{white-space:normal;line-height:1.3} } .nw{white-space:nowrap}
+@media (max-width:420px){ header.top .wrap{gap:6px} header.top .wbtn{width:34px;height:34px} header.top .wbtn svg{width:20px;height:20px} } .ttl p{white-space:normal;line-height:1.3;text-overflow:clip} .nw{white-space:nowrap}
 .belln{position:absolute;top:-4px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--danger);color:#fff;font:700 11.5px/19px system-ui,sans-serif;text-align:center;border:2px solid var(--bg);box-sizing:content-box}
 .ibxd{margin:12px 0 4px;font-weight:700;color:var(--muted)}
 .ibx{list-style:none;margin:0;padding:0}
@@ -1049,7 +1049,7 @@ const toMin = t => { const [h,m]=String(t||'0:0').split(':').map(Number); return
 // (defined early: the first screen is drawn before the end of this script)
 // which copy of the app this is (stamped by the website build) and whether a newer one is online
 // v: build fingerprint (any change, data included: phones fetch the new copy) · n: release number people read (1.00, 1.01, ...)
-const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('6b0020fd03|13 พ.ย. 07:41|1.38');
+const APP_VER = (s => s.startsWith('__') ? {v:'dev', at:'', n:'dev'} : {v:s.split('|')[0], at:s.split('|')[1], n:s.split('|')[2]||s.split('|')[0]})('086d4540d5|13 พ.ย. 11:31|1.39');
 let APP_NEWER=null, APP_NEWER_N=null;
 async function verCheck(){
   if(APP_VER.v==='dev') return;
@@ -2215,7 +2215,7 @@ function ekPanelHTML(){
     ? (mine?'<b>เที่ยวที่เราบิน:</b> ออกจากสุวรรณภูมิ 13:45 น. ประตูขึ้นเครื่องและเวลาบอร์ดดิ้งดูบนบอร์ดดิ้งพาส หรือจอในสนามบิน':'วันที่ 14 พ.ย. เราบินช่วงกรุงเทพฯ → ฮ่องกง ออก 13:45 น.')
     : (mine?'<b>เที่ยวที่เรานั่งกลับ:</b> ออกจากฮ่องกง 21:00 น. (20:00 น. เวลาไทย) ลงที่สุวรรณภูมิ':'วันที่ 17 พ.ย. เรานั่งช่วงฮ่องกง → กรุงเทพฯ ออก 21:00 น. เวลาฮ่องกง');
   return '<div class="panel ekpanel"><h3>✈️ ติดตาม EK'+no+' · '+r.from+' → '+r.mid+' → '+r.to+'</h3>'
-    +'<p class="mini" style="margin:0 0 6px">เที่ยววันที่ '+(+d.slice(8))+' พ.ย. · เวลาไทย</p><ul class="ekrows">'
+    +'<p class="mini" style="margin:0 0 6px">'+(d===thToday()?'<b>เที่ยววันนี้</b> ('+(+d.slice(8))+' พ.ย.)':'เที่ยววันที่ '+(+d.slice(8))+' พ.ย.')+' · เวลาไทย'+'</p><ul class="ekrows">'
     +row('ออกจาก'+r.from, thT(t[f[0]]), t[r.ap[0]])+row('ถึงสุวรรณภูมิ', thT(t[f[1]]), t[r.ap[1]])+row('ออกจากสุวรรณภูมิ', thT(t[f[2]]))+row('ถึง'+r.to, thT(t[f[3]]))+'</ul>'
     +(seen?'<p class="mini">ตอนนี้: '+(seen.alt==='ground'?'จอดอยู่บนพื้น':'บินอยู่ที่ความสูง '+Math.round(seen.alt/100)*100+' ฟุต')+'</p>':'')
     +(past.length?'<p class="mini" style="margin:8px 0 4px">วันก่อนๆ (ดูว่าตรงเวลาแค่ไหน)</p><table class="ektab"><tr><th>วัน</th>'+r.cols.map(c=>'<th>'+c+'</th>').join('')+'</tr>'
