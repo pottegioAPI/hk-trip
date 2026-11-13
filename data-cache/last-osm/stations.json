@@ -2,7 +2,7 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-12T23:38:45Z",
+    "timestamp_osm_base": "2026-11-13T23:33:36Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -4484,11 +4484,15 @@
     "name": "樂富 Lok Fu",
     "name:en": "Lok Fu",
     "name:zh": "樂富",
+    "name:zh-Hans": "乐富",
+    "name:zh-Hant": "樂富",
     "network": "港鐵 MTR",
     "network:en": "MTR",
     "network:ref": "MTR",
     "network:wikidata": "Q14751",
     "network:zh": "港鐵",
+    "network:zh-Hans": "港铁",
+    "network:zh-Hant": "港鐵",
     "operator": "香港鐵路有限公司 MTR Corporation Limited",
     "operator:en": "MTR Corporation Limited",
     "operator:loc_name": "港鐵公司 MTR Corporation",
@@ -5939,53 +5943,6 @@
     "wheelchair": "limited",
     "wikidata": "Q2076934",
     "wikipedia": "zh:觀塘站"
-  }
-},
-{
-  "type": "way",
-  "id": 205358842,
-  "center": {
-    "lat": 22.2766396,
-    "lon": 114.2397523
-  },
-  "tags": {
-    "addr:housenumber": "100",
-    "addr:street": "盛泰道 Shing Tai Road",
-    "building": "train_station",
-    "fixme": "please help improve the 3D mapping of the station, the depot, the residential area, and the mall at individual levels, each level have different shapes and different numbers",
-    "layer": "-1",
-    "level": "0;1",
-    "location": "surface",
-    "name": "杏花邨 Heng Fa Chuen",
-    "name:en": "Heng Fa Chuen",
-    "name:zh": "杏花邨",
-    "network": "MTR",
-    "operator": "香港鐵路有限公司 MTR Corporation Limited",
-    "operator:en": "MTR Corporation Limited",
-    "operator:loc_name": "港鐵公司 MTR Corporation",
-    "operator:loc_name:en": "MTR Corporation",
-    "operator:loc_name:zh": "港鐵公司",
-    "operator:ref": "MTR",
-    "operator:short": "港鐵 MTRCL",
-    "operator:short:en": "MTRCL",
-    "operator:short:zh": "港鐵",
-    "operator:short_name": "港鐵 MTRCL",
-    "operator:short_name:en": "MTRCL",
-    "operator:short_name:zh": "港鐵",
-    "operator:wikidata": "Q1479375",
-    "operator:zh": "香港鐵路有限公司",
-    "operator:zh-Hans": "香港铁路有限公司",
-    "operator:zh-Hant": "香港鐵路有限公司",
-    "platforms": "2",
-    "public_transport": "station",
-    "railway": "station",
-    "ref": "HFC",
-    "start_date": "1985-05-31",
-    "station": "subway",
-    "subway": "yes",
-    "wheelchair": "limited",
-    "wikidata": "Q839665",
-    "wikipedia": "zh:杏花邨站"
   }
 },
 {
