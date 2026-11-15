@@ -2,8 +2,8 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-14T22:22:58Z",
-    "timestamp_areas_base": "2026-11-14T20:17:49Z",
+    "timestamp_osm_base": "2026-11-15T22:47:48Z",
+    "timestamp_areas_base": "2026-11-15T16:11:21Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -4344,6 +4344,9 @@
   "lat": 22.3370879,
   "lon": 114.1762546,
   "tags": {
+    "name": "F",
+    "name:en": "F",
+    "name:zh": "F",
     "railway": "subway_entrance",
     "ref": "F",
     "toilets:wheelchair": "yes",
@@ -4769,6 +4772,9 @@
   "lat": 22.3370233,
   "lon": 114.1756454,
   "tags": {
+    "name": "H",
+    "name:en": "H",
+    "name:zh": "H",
     "railway": "subway_entrance",
     "ref": "H"
   }
@@ -4779,6 +4785,9 @@
   "lat": 22.3369609,
   "lon": 114.1755307,
   "tags": {
+    "name": "C1",
+    "name:en": "C1",
+    "name:zh": "C1",
     "railway": "subway_entrance",
     "ref": "C1"
   }
@@ -4789,6 +4798,9 @@
   "lat": 22.3366796,
   "lon": 114.1754928,
   "tags": {
+    "name": "C2",
+    "name:en": "C2",
+    "name:zh": "C2",
     "railway": "subway_entrance",
     "ref": "C2"
   }
@@ -4799,6 +4811,9 @@
   "lat": 22.3371286,
   "lon": 114.1759267,
   "tags": {
+    "name": "G2",
+    "name:en": "G2",
+    "name:zh": "G2",
     "railway": "subway_entrance",
     "ref": "G2"
   }
@@ -4809,6 +4824,9 @@
   "lat": 22.3370297,
   "lon": 114.1759802,
   "tags": {
+    "name": "G1",
+    "name:en": "G1",
+    "name:zh": "G1",
     "railway": "subway_entrance",
     "ref": "G1"
   }
@@ -4819,6 +4837,9 @@
   "lat": 22.3369681,
   "lon": 114.1765532,
   "tags": {
+    "name": "B",
+    "name:en": "B",
+    "name:zh": "B",
     "railway": "subway_entrance",
     "ref": "B"
   }
@@ -4829,6 +4850,9 @@
   "lat": 22.3364815,
   "lon": 114.1765237,
   "tags": {
+    "name": "D",
+    "name:en": "D",
+    "name:zh": "D",
     "railway": "subway_entrance",
     "ref": "D"
   }
@@ -4839,6 +4863,9 @@
   "lat": 22.3366639,
   "lon": 114.1775564,
   "tags": {
+    "name": "E",
+    "name:en": "E",
+    "name:zh": "E",
     "railway": "subway_entrance",
     "ref": "E"
   }
@@ -4849,6 +4876,9 @@
   "lat": 22.3368954,
   "lon": 114.1777640,
   "tags": {
+    "name": "A1",
+    "name:en": "A1",
+    "name:zh": "A1",
     "railway": "subway_entrance",
     "ref": "A1"
   }
@@ -4859,6 +4889,9 @@
   "lat": 22.3368890,
   "lon": 114.1779842,
   "tags": {
+    "name": "A2",
+    "name:en": "A2",
+    "name:zh": "A2",
     "railway": "subway_entrance",
     "ref": "A2"
   }

@@ -2,7 +2,7 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-14T22:24:01Z",
+    "timestamp_osm_base": "2026-11-15T22:48:51Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -7298,6 +7298,8 @@
     "name": "九龍塘 Kowloon Tong",
     "name:en": "Kowloon Tong",
     "name:zh": "九龍塘",
+    "name:zh-Hans": "九龙塘",
+    "name:zh-Hant": "九龍塘",
     "network": "港鐵 MTR",
     "network:en": "MTR",
     "network:wikidata": "Q14751",
