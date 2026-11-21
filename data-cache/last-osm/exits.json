@@ -2,8 +2,8 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-20T00:36:36Z",
-    "timestamp_areas_base": "2026-11-19T22:06:04Z",
+    "timestamp_osm_base": "2026-11-20T23:58:19Z",
+    "timestamp_areas_base": "2026-11-20T18:43:21Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -1519,6 +1519,8 @@
     "name": "香港中文大學 Chinese University of Hong Kong",
     "name:en": "Chinese University of Hong Kong",
     "name:zh": "香港中文大學",
+    "name:zh-Hans": "香港中文大学",
+    "name:zh-Hant": "香港中文大學",
     "railway": "subway_entrance",
     "ref": "A",
     "wheelchair": "no"
@@ -1533,6 +1535,8 @@
     "name": "綜合教學樓 Integrated Teaching Blocks",
     "name:en": "Integrated Teaching Blocks",
     "name:zh": "綜合教學樓",
+    "name:zh-Hans": "综合教学楼",
+    "name:zh-Hant": "綜合教學樓",
     "railway": "subway_entrance",
     "ref": "D",
     "wheelchair": "yes"
@@ -5585,6 +5589,8 @@
     "name": "香港中文大學 Chinese University of Hong Kong",
     "name:en": "Chinese University of Hong Kong",
     "name:zh": "香港中文大學",
+    "name:zh-Hans": "香港中文大学",
+    "name:zh-Hant": "香港中文大學",
     "railway": "subway_entrance",
     "ref": "C",
     "wheelchair": "no"
@@ -6302,6 +6308,8 @@
     "name": "澤祥街 Chak Cheung Street",
     "name:en": "Chak Cheung Street",
     "name:zh": "澤祥街",
+    "name:zh-Hans": "泽祥街",
+    "name:zh-Hant": "澤祥街",
     "railway": "subway_entrance",
     "ref": "B",
     "wheelchair": "yes"
