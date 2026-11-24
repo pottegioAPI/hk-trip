@@ -2,8 +2,8 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-11-21T23:14:58Z",
-    "timestamp_areas_base": "2026-11-21T17:28:06Z",
+    "timestamp_osm_base": "2026-11-24T03:56:50Z",
+    "timestamp_areas_base": "2026-11-23T20:42:06Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -787,6 +787,17 @@
 },
 {
   "type": "node",
+  "id": 1561111108,
+  "lat": 22.3563493,
+  "lon": 114.1273000,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "C",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
   "id": 1597620669,
   "lat": 22.4442524,
   "lon": 114.1708013,
@@ -859,12 +870,13 @@
 {
   "type": "node",
   "id": 1704465153,
-  "lat": 22.3571330,
-  "lon": 114.1278752,
+  "lat": 22.3571148,
+  "lon": 114.1278706,
   "tags": {
     "entrance": "yes",
     "railway": "subway_entrance",
-    "ref": "E"
+    "ref": "E",
+    "wheelchair": "no"
   }
 },
 {
@@ -1472,22 +1484,13 @@
 },
 {
   "type": "node",
-  "id": 2093151954,
-  "lat": 22.3573828,
-  "lon": 114.1280643,
-  "tags": {
-    "railway": "subway_entrance",
-    "ref": "D"
-  }
-},
-{
-  "type": "node",
   "id": 2093151958,
-  "lat": 22.3572648,
-  "lon": 114.1282665,
+  "lat": 22.3572174,
+  "lon": 114.1282329,
   "tags": {
     "railway": "subway_entrance",
-    "ref": "A"
+    "ref": "A",
+    "wheelchair": "no"
   }
 },
 {
@@ -6490,26 +6493,6 @@
 },
 {
   "type": "node",
-  "id": 7016481520,
-  "lat": 22.3562572,
-  "lon": 114.1275101,
-  "tags": {
-    "railway": "subway_entrance",
-    "ref": "B"
-  }
-},
-{
-  "type": "node",
-  "id": 7016481521,
-  "lat": 22.3563831,
-  "lon": 114.1273138,
-  "tags": {
-    "railway": "subway_entrance",
-    "ref": "C"
-  }
-},
-{
-  "type": "node",
   "id": 7018858862,
   "lat": 22.3731474,
   "lon": 114.1182573,
@@ -7840,6 +7823,17 @@
 },
 {
   "type": "node",
+  "id": 12041459986,
+  "lat": 22.3573372,
+  "lon": 114.1280479,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "D",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
   "id": 12046189249,
   "lat": 22.3204081,
   "lon": 114.1695071,
@@ -8521,6 +8515,17 @@
     "railway": "subway_entrance",
     "ref": "D",
     "steps": "yes",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 14409966385,
+  "lat": 22.3562333,
+  "lon": 114.1274790,
+  "tags": {
+    "railway": "subway_entrance",
+    "ref": "B",
     "wheelchair": "no"
   }
 }
